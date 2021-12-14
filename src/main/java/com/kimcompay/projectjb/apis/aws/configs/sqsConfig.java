@@ -6,6 +6,7 @@ import com.amazonaws.regions.Regions;
 import com.amazonaws.services.sqs.AmazonSQSAsync;
 import com.amazonaws.services.sqs.AmazonSQSAsyncClientBuilder;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.aws.messaging.core.QueueMessagingTemplate;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,8 +15,10 @@ import org.springframework.context.annotation.Primary;
 @Configuration
 public class sqsConfig {
     
-    private final String acce="AKIAXVQHL24PHXPXKYU4";
-    private final String sec="Xzg2LcJrNnJmEdYV4H1eOqX7QBIPs1/ELrn9d51z";
+    @Value("${cloud.aws.credentials.access-key}")
+    private String acce;
+    @Value("${cloud.aws.credentials.secret-key}")
+    private String sec;
 
     @Bean
     public QueueMessagingTemplate queueMessagingTemplate() {

@@ -31,8 +31,4 @@ public class restController {
         queueMessagingTemplate.send(url,MessageBuilder.withPayload(message).build());
         
     }
-    @SqsListener("testsqs")
-    public void loadMessage(String message,String kind) {
-        logger.info("message: "+message);
-    }
 }
