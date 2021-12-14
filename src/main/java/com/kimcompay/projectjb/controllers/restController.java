@@ -2,6 +2,10 @@ package com.kimcompay.projectjb.controllers;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import com.kimcompay.projectjb.apis.sns.snsService;
+import com.nimbusds.jose.shaded.json.JSONObject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.aws.messaging.core.QueueMessagingTemplate;
 import org.springframework.cloud.aws.messaging.listener.annotation.SqsListener;
 import org.springframework.messaging.support.MessageBuilder;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -18,6 +23,8 @@ public class restController {
     private Logger logger=LoggerFactory.getLogger(restController.class);
     @Autowired
     private QueueMessagingTemplate queueMessagingTemplate;
+    @Autowired
+    private snsService snsService;
 
     @RequestMapping(value = "/test/**",method = RequestMethod.GET)
     public void name() {
@@ -30,5 +37,10 @@ public class restController {
         String message=request.getParameter("message");
         queueMessagingTemplate.send(url,MessageBuilder.withPayload(message).build());
         
+    }
+    @RequestMapping(value = "/sns/**",method = RequestMethod.POST)
+    public void sendSns(@RequestBody JSONObject jsonObject,HttpSession httpSession,HttpServletResponse response) {
+        logger.info("sendSns Controller");
+        snsService.send(jsonObject, httpSession);
     }
 }
