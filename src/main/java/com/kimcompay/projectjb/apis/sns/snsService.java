@@ -9,6 +9,7 @@ import javax.servlet.http.HttpSession;
 
 import com.kimcompay.projectjb.apis.requestTo;
 import com.kimcompay.projectjb.apis.utillService;
+import com.kimcompay.projectjb.apis.aws.services.sqsService;
 import com.kimcompay.projectjb.enums.senums;
 import com.kimcompay.projectjb.users.user.userdao;
 import com.nimbusds.jose.shaded.json.JSONObject;
@@ -29,8 +30,10 @@ public class snsService {
     private requestTo requestTo;
     @Autowired
     private userdao userdao;
+    @Autowired
+    private sqsService sqsService;
     
-    public void send(JSONObject jsonObject,HttpSession httpSession) {
+    public JSONObject send(JSONObject jsonObject,HttpSession httpSession) {
         logger.info("send"+jsonObject.toString());
         //입력값 검사
         String val= Optional.ofNullable(jsonObject.get("val").toString()).orElseThrow(()-> utillService.makeRuntimeEX("이메일/전화번호를 확인해주세요", "send"));
@@ -86,6 +89,8 @@ public class snsService {
         }else{
             utillService.throwRuntimeEX("지원하지 않는 인증방식입니다");
         }
-        
+        //sqs전송요청
+        sqsService.sendSqs("인증번호는 "+num+"입니다", type);
+        return utillService.getJson(true, "인증번호가 "+type+"로 전송되었습니다");
     }
 }
