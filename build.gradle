@@ -19,6 +19,8 @@ repositories {
 }
 
 dependencies {
+	// https://mvnrepository.com/artifact/net.nurigo/javaSDK
+	implementation group: 'net.nurigo', name: 'javaSDK', version: '2.2'
 	// https://mvnrepository.com/artifact/org.springframework.cloud/spring-cloud-aws-messaging
 	implementation group: 'org.springframework.cloud', name: 'spring-cloud-aws-messaging', version: '2.2.6.RELEASE'
 	// https://mvnrepository.com/artifact/org.springframework.cloud/spring-cloud-starter-aws

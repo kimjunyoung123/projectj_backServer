@@ -86,7 +86,7 @@ public class snsService {
             utillService.throwRuntimeEX("지원하지 않는 인증방식입니다");
         }
         //sqs전송요청
-        sqsService.sendSqs("인증번호는 "+num+"입니다", type);
+        sqsService.sendSqs("인증번호는 "+num+"입니다", type,val);
         return utillService.getJson(true, "인증번호가 "+type+"로 전송되었습니다");
     }
 }
