@@ -5,8 +5,10 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import javax.validation.Valid;
 
 import com.kimcompay.projectjb.apis.sns.snsService;
+import com.kimcompay.projectjb.users.user.tryInsertDto;
 import com.nimbusds.jose.shaded.json.JSONObject;
 
 import org.slf4j.Logger;
@@ -49,5 +51,10 @@ public class restController {
     public JSONObject checkConfrim(@RequestBody JSONObject jsonObject,HttpSession httpSession) {
         logger.info("checkConfrim");
         return snsService.confrim(jsonObject,httpSession);
+    }
+    @RequestMapping(value = "/user/**",method = RequestMethod.POST)
+    public void tryJoin(@Valid @RequestBody tryInsertDto tryInsertDto ,HttpSession session) {
+        logger.info("tryJoin");
+        logger.info(tryInsertDto.toString());
     }
 }
