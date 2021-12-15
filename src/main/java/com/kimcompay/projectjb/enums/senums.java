@@ -6,7 +6,11 @@ public enum senums {
     find("1"),
     persnal("persnal"),
     buyer("buyer"),
-    seller("seller");
+    seller("seller"),
+    phone("up,cp"),
+    email("ue,ce"),
+    phonet("phone"),
+    emailt("email");
     
     private String s;
     senums(String s){

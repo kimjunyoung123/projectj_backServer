@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 
 public interface userdao extends JpaRepository<userVo,Integer>{
     
-    @Query(value = "select count(*)up,(select count(*) from companys where cphone=?)cp from users where uphone=?",nativeQuery = true)
-    Map<String,Object> findByPhoneJoinCompany(String phone,String sam_phone);
+    @Query(value = "select (select count(*) from users where uphone=?)up,(select count(*) from companys where cphone=?)cp,(select count(*) from users where uemail=?)ue,(select count(*) from companys where cemail=?)pe ",nativeQuery = true)
+    Map<String,Object> findByPhoneAndEmailJoinCompany(String eorp,String sam_eorp,String sam_eorp2,String sam_eorp3);
+
 }

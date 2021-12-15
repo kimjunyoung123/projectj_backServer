@@ -1,5 +1,7 @@
 package com.kimcompay.projectjb.apis;
 
+import java.util.Random;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,5 +24,13 @@ public class utillService {
         }
         return false;
     }
+    public static String getRandomNum(int len) {
+        String num="";
+        Random random=new Random();
+        for(int i=0;i<len;i++){
+            num+=Integer.toString(random.nextInt(10));
+        }
+        return num;
+    } 
 
 }
