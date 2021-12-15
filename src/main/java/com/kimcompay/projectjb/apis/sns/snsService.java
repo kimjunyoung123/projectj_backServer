@@ -90,4 +90,34 @@ public class snsService {
         sqsService.sendSqs("인증번호는 "+num+"입니다", type,val);
         return utillService.getJson(true, "인증번호가 "+type+"로 전송되었습니다");
     }
+    public JSONObject confrim(JSONObject jsonObject,HttpSession session) {
+        logger.info("confrim");
+        //요청정보 표시
+        logger.info(jsonObject.toString());
+        //세션에서 요청 기록꺼내기
+        Map<String,Object>map=new HashMap<>();
+        String key=jsonObject.get("detail").toString()+jsonObject.get("type").toString();
+        logger.info("조회키: "+key);
+        try {
+            logger.info(session.getAttribute(key).toString());
+            map=(Map<String,Object>)session.getAttribute(key);
+        } catch (NullPointerException e) {
+            logger.info("인증 요청 내역없음");
+            utillService.throwRuntimeEX("요청 기록이 존재하지 않습니다 다시 요청 해주세요");
+        }
+        logger.info(map.toString());
+        //비교하기
+        String rnum=Optional.ofNullable(jsonObject.get("val").toString()).orElseThrow(()->utillService.throwRuntimeEX("인증번호를 입력해주세요"));
+        utillService.checkBlank(rnum);
+        String num=map.get("num").toString();
+        if(rnum.equals(num)){
+            map.put("res",true);
+            session.setAttribute(key, map);
+            session.removeAttribute(key);
+            session.setAttribute(key, true);
+            return utillService.getJson(true, "인증성공");
+        }
+        return utillService.getJson(false, "인증번호 불일치");
+        
+    }
 }

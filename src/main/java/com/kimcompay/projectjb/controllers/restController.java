@@ -1,5 +1,7 @@
 package com.kimcompay.projectjb.controllers;
 
+import java.util.Map;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -42,5 +44,10 @@ public class restController {
     public JSONObject sendSns(@RequestBody JSONObject jsonObject,HttpSession httpSession,HttpServletResponse response) {
         logger.info("sendSns Controller");
         return snsService.send(jsonObject, httpSession);
+    }
+    @RequestMapping(value = "/confrim/**",method = RequestMethod.POST)
+    public JSONObject checkConfrim(@RequestBody JSONObject jsonObject,HttpSession httpSession) {
+        logger.info("checkConfrim");
+        return snsService.confrim(jsonObject,httpSession);
     }
 }
