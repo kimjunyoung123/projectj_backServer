@@ -75,8 +75,9 @@ public class snsService {
         map.put("type", type);
         map.put("val", val);
         map.put("num",num);
+        map.put("detail",detail);
         httpSession.setMaxInactiveInterval(limiteMin*60);
-        httpSession.setAttribute(jsonObject.get("detail").toString(), map);
+        httpSession.setAttribute(detail+type, map);
         //이메일/휴대폰 구분전송
         if(type.equals(senums.phonet.get())){
             logger.info("휴대폰 전송시도");

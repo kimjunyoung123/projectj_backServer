@@ -26,8 +26,9 @@ public class restController {
     private snsService snsService;
 
     @RequestMapping(value = "/test/**",method = RequestMethod.GET)
-    public void name() {
+    public void name(HttpSession session) {
         logger.info("test");
+        logger.info(session.getAttribute("auth").toString());
     }
     @RequestMapping(value = "/message",method =RequestMethod.POST )
     public void sendSqs(HttpServletRequest request,HttpServletResponse response) {

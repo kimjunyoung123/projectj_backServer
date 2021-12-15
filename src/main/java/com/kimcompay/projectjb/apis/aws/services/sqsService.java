@@ -5,6 +5,7 @@ import java.util.Map;
 
 
 import com.kimcompay.projectjb.apis.utillService;
+import com.kimcompay.projectjb.apis.sns.emailService;
 import com.kimcompay.projectjb.apis.sns.smsService;
 import com.kimcompay.projectjb.enums.senums;
 
@@ -23,20 +24,22 @@ public class sqsService {
     private QueueMessagingTemplate queueMessagingTemplate;
     @Autowired
     private smsService smsService;
-    
+    @Autowired
+    private emailService emailService;
+
     @SqsListener("projectj_sms_sqs")
     public void loadSMSMessage(String message) {
         logger.info("sms_sqs");
         logger.info("message: "+message);
         Map<String,String>map=getMessageAndAddress(message);
-        smsService.sendMessege(map.get("val"),map.get("message"));
+        smsService.sendMessege(map.get("val"),map.get("title")+"\n"+map.get("message"));
     }
     @SqsListener("projectj_email_sqs")
     public void loadEmailMessage(String message) {
         logger.info("email_sqs");
         logger.info("message: "+message);
-        Map<String,String> strings=getMessageAndAddress(message);
-        //smsService.sendMessege(strings[0], strings[1]);
+        Map<String,String> map=getMessageAndAddress(message);
+        emailService.sendEmail(map.get("val"),map.get("title"),map.get("message"));
     }
     public void sendSqs(String text,String type,String val) {
         logger.info("sendSqs");
@@ -61,6 +64,7 @@ public class sqsService {
         Map<String,String>map=new HashMap<>();
         map.put("message", sqsMessage);
         map.put("val", strings[strings.length-1]);
+        map.put("title", "안녕하세요 장보고 입니다");
         return map;
     }
 }
