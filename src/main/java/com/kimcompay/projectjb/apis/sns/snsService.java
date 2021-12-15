@@ -47,14 +47,16 @@ public class snsService {
         } catch (IllegalArgumentException e) {
             utillService.throwRuntimeEX("존재하지 않는 인증방법 혹은 수단입니다 입니다");
         }
+        logger.info("조회할 정보: "+val);
         //db에 전화번호/이메일 찾기 (count 로 가져옴)
         Map<String,Object>dpe=userdao.findByPhoneAndEmailJoinCompany(val,val,val,val);
         String upoe=dpe.get(keys[0]).toString();
         String cpoe=dpe.get(keys[1]).toString();
         logger.info("일반회원: "+upoe+", 기업회원: "+cpoe);
+        logger.info(detail);
         //찾기라면 카운트가 1 이여야하고 가입이라면 0이여야함
         if(detail.equals(senums.auth.get())||detail.equals(senums.find.get())){
-            logger.info("가입 요청");
+            logger.info("가입 되있는지 여부 검사해야하는 요청");
             if(!upoe.equals("0")||!cpoe.equals("0")&&detail.equals(senums.auth.get())){
                 logger.info("이미 가입 되어있는 정보");
                 utillService.throwRuntimeEX("이미 가입되어있는 "+type+"입니다");

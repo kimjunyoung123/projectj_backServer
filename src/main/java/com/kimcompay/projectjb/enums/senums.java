@@ -2,8 +2,8 @@ package com.kimcompay.projectjb.enums;
 
 public enum senums {
     
-    auth("0"),
-    find("1"),
+    auth("auth"),
+    find("find"),
     persnal("persnal"),
     buyer("buyer"),
     seller("seller"),
