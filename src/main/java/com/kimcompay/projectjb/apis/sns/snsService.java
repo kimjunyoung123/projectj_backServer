@@ -55,12 +55,15 @@ public class snsService {
         logger.info("일반회원: "+upoe+", 기업회원: "+cpoe);
         logger.info(detail);
         //찾기라면 카운트가 1 이여야하고 가입이라면 0이여야함
-        if(detail.equals(senums.auth.get())||detail.equals(senums.find.get())){
-            logger.info("가입 되있는지 여부 검사해야하는 요청");
-            if(!upoe.equals("0")||!cpoe.equals("0")&&detail.equals(senums.auth.get())){
+        if(detail.equals(senums.auth.get())){
+            logger.info("가입이 안되어있어야하는요청");
+            if(!upoe.equals("0")||!cpoe.equals("0")){
                 logger.info("이미 가입 되어있는 정보");
                 utillService.throwRuntimeEX("이미 가입되어있는 "+type+"입니다");
-            }else if(upoe.equals("0")||cpoe.equals("0")&&detail.equals(senums.find.get())){
+            }
+        }else if(detail.equals(senums.find.get())){
+            logger.info("가입이 되어있어야하는요청");
+            if(upoe.equals("0")||cpoe.equals("0")){
                 logger.info("회원 정보가 존재하지 않습니다");
                 utillService.throwRuntimeEX("가입된 회원정보가 존재하지 않습니다");
             }
@@ -68,12 +71,12 @@ public class snsService {
             logger.info("비회원 요청");
         }
         //세션에 요청정보 담기
-        String num=utillService.getRandomNum(len);
+        String num=utillService.getRandomNum(len*60);
         Map<String,Object>map=new HashMap<>();
-        map.put("type", jsonObject.get("type"));
+        map.put("type", type);
         map.put("val", val);
-        map.put("expireDate",LocalDateTime.now().plusMinutes(limiteMin));
         map.put("num",num);
+        httpSession.setMaxInactiveInterval(limiteMin);
         httpSession.setAttribute(jsonObject.get("detail").toString(), map);
         //이메일/휴대폰 구분전송
         if(type.equals(senums.phonet.get())){
