@@ -11,7 +11,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.aws.messaging.core.QueueMessagingTemplate;
-import org.springframework.cloud.aws.messaging.listener.annotation.SqsListener;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -39,8 +38,8 @@ public class restController {
         
     }
     @RequestMapping(value = "/sns/**",method = RequestMethod.POST)
-    public void sendSns(@RequestBody JSONObject jsonObject,HttpSession httpSession,HttpServletResponse response) {
+    public JSONObject sendSns(@RequestBody JSONObject jsonObject,HttpSession httpSession,HttpServletResponse response) {
         logger.info("sendSns Controller");
-        snsService.send(jsonObject, httpSession);
+        return snsService.send(jsonObject, httpSession);
     }
 }

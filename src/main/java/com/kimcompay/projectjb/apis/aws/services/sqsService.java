@@ -18,18 +18,24 @@ public class sqsService {
     @Autowired
     private QueueMessagingTemplate queueMessagingTemplate;
     
-    @SqsListener("testsqs")
-    public void loadMessage(String message,String kind) {
+    @SqsListener("sms_sqs")
+    public void loadSMSMessage(String message) {
+        logger.info("sms_sqs");
+        logger.info("message: "+message);
+    }
+    @SqsListener("email_sqs")
+    public void loadEmailMessage(String message) {
+        logger.info("email_sqs");
         logger.info("message: "+message);
     }
     public void sendSqs(String text,String type) {
         logger.info("sendSqs");
         if(type.equals(senums.phonet.get())){
             logger.info("휴대폰 sqs전송시도");
-            end_point+="testsqs";
+            end_point+="sms_sqs";
         }else if(type.equals(senums.emailt.get())){
             logger.info("이메일 sqs전송시도");
-            end_point+="testsqs";
+            end_point+="email_sqs";
         }else{
             utillService.throwRuntimeEX("sqs 전송 실패 지원하지 않는 인증수단");
         }

@@ -1,13 +1,11 @@
 package com.kimcompay.projectjb.apis.sns;
 
-import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
 import javax.servlet.http.HttpSession;
 
-import com.kimcompay.projectjb.apis.requestTo;
 import com.kimcompay.projectjb.apis.utillService;
 import com.kimcompay.projectjb.apis.aws.services.sqsService;
 import com.kimcompay.projectjb.enums.senums;
@@ -26,8 +24,6 @@ public class snsService {
     private final int limiteMin=3;
     private final int len=10;
 
-    @Autowired
-    private requestTo requestTo;
     @Autowired
     private userdao userdao;
     @Autowired
@@ -74,12 +70,12 @@ public class snsService {
             logger.info("비회원 요청");
         }
         //세션에 요청정보 담기
-        String num=utillService.getRandomNum(len*60);
+        String num=utillService.getRandomNum(len);
         Map<String,Object>map=new HashMap<>();
         map.put("type", type);
         map.put("val", val);
         map.put("num",num);
-        httpSession.setMaxInactiveInterval(limiteMin);
+        httpSession.setMaxInactiveInterval(limiteMin*60);
         httpSession.setAttribute(jsonObject.get("detail").toString(), map);
         //이메일/휴대폰 구분전송
         if(type.equals(senums.phonet.get())){
