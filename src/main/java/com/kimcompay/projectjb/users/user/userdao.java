@@ -1,6 +1,5 @@
 package com.kimcompay.projectjb.users.user;
 
-import java.util.List;
 import java.util.Map;
 
 import org.springframework.data.jpa.repository.JpaRepository;

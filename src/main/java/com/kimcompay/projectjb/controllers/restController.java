@@ -1,6 +1,5 @@
 package com.kimcompay.projectjb.controllers;
 
-import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -9,6 +8,7 @@ import javax.validation.Valid;
 
 import com.kimcompay.projectjb.apis.sns.snsService;
 import com.kimcompay.projectjb.users.user.tryInsertDto;
+import com.kimcompay.projectjb.users.user.userService;
 import com.nimbusds.jose.shaded.json.JSONObject;
 
 import org.slf4j.Logger;
@@ -28,6 +28,8 @@ public class restController {
     private QueueMessagingTemplate queueMessagingTemplate;
     @Autowired
     private snsService snsService;
+    @Autowired
+    private userService userService;
 
     @RequestMapping(value = "/test/**",method = RequestMethod.GET)
     public void name(HttpSession session) {
@@ -56,5 +58,6 @@ public class restController {
     public void tryJoin(@Valid @RequestBody tryInsertDto tryInsertDto ,HttpSession session) {
         logger.info("tryJoin");
         logger.info(tryInsertDto.toString());
+        userService.insert(tryInsertDto, session);
     }
 }
