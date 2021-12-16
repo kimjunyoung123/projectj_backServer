@@ -8,7 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class utillService {
-    private final static Logger logger=LoggerFactory.getLogger(requestTo.class);
+    private final static Logger logger=LoggerFactory.getLogger(utillService.class);
 
     public static JSONObject getJson(boolean flag,String message) {
         logger.info("getjosn");
