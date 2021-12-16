@@ -30,9 +30,7 @@ public class requestTo {
             headers.clear();
         }
     }
-<<<<<<< HEAD
-    
-=======
+
     public <T> JSONObject requestGet(T body,String url,HttpHeaders headers) {
         logger.info("requestGet");
         try {
@@ -45,5 +43,5 @@ public class requestTo {
         }
   
     }
->>>>>>> 5b4aea646582ebfbf91c8daa166f99d4f1acb45b
+
 }
