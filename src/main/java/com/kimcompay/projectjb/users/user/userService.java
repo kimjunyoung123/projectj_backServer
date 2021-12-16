@@ -1,7 +1,6 @@
 package com.kimcompay.projectjb.users.user;
 
-import java.util.HashMap;
-import java.util.List;
+
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -10,7 +9,6 @@ import javax.servlet.http.HttpSession;
 import com.kimcompay.projectjb.apis.utillService;
 import com.kimcompay.projectjb.apis.jungbu.jungbuService;
 import com.kimcompay.projectjb.enums.senums;
-import com.nimbusds.jose.shaded.json.JSONObject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

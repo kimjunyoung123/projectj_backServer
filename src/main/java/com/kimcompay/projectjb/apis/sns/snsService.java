@@ -10,7 +10,6 @@ import com.kimcompay.projectjb.apis.utillService;
 import com.kimcompay.projectjb.apis.aws.services.sqsService;
 import com.kimcompay.projectjb.enums.senums;
 import com.kimcompay.projectjb.users.user.userService;
-import com.kimcompay.projectjb.users.user.userdao;
 import com.nimbusds.jose.shaded.json.JSONObject;
 
 import org.slf4j.Logger;
