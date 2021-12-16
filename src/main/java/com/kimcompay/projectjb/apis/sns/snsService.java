@@ -9,6 +9,7 @@ import javax.servlet.http.HttpSession;
 import com.kimcompay.projectjb.apis.utillService;
 import com.kimcompay.projectjb.apis.aws.services.sqsService;
 import com.kimcompay.projectjb.enums.senums;
+import com.kimcompay.projectjb.users.user.userService;
 import com.kimcompay.projectjb.users.user.userdao;
 import com.nimbusds.jose.shaded.json.JSONObject;
 
@@ -25,9 +26,9 @@ public class snsService {
     private final int len=10;
 
     @Autowired
-    private userdao userdao;
-    @Autowired
     private sqsService sqsService;
+    @Autowired
+    private userService userService;
     
     public JSONObject send(JSONObject jsonObject,HttpSession httpSession) {
         logger.info("send"+jsonObject.toString());
@@ -44,11 +45,11 @@ public class snsService {
         try {
             keys=senums.valueOf(type).get().split(",");
         } catch (IllegalArgumentException e) {
-            utillService.throwRuntimeEX("존재하지 않는 인증방법 혹은 수단입니다 입니다");
+            throw utillService.makeRuntimeEX("존재하지 않는 인증방법 혹은 수단입니다 입니다","send");
         }
         logger.info("조회할 정보: "+val);
         //db에 전화번호/이메일 찾기 (count 로 가져옴)
-        Map<String,Object>dpe=userdao.findByPhoneAndEmailJoinCompany(val,val,val,val);
+        Map<String,Object>dpe=userService.getCount(val);
         String upoe=dpe.get(keys[0]).toString();
         String cpoe=dpe.get(keys[1]).toString();
         logger.info("일반회원: "+upoe+", 기업회원: "+cpoe);
