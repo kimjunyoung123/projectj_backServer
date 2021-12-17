@@ -43,7 +43,7 @@ public class userService {
     public JSONObject insert(tryInsertDto tryInsertDto,HttpSession session) {
         logger.info("insert");
         //휴대폰/이메일 인증했는지 검사
-        //checkAuth(tryInsertDto, session);
+        checkAuth(tryInsertDto, session);
         //유효성검사
         checkValues(tryInsertDto);
         //인서트 시도
