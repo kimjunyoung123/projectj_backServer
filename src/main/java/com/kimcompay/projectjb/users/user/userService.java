@@ -145,8 +145,7 @@ public class userService {
         //이메일,전화번호 중복검사 validation 어노테이션으로 null검사는 다하고 온다
         String email=tryInsertDto.getEmail();
         String phone=tryInsertDto.getPhone();
-        Map<String,Object>email_phone_count=userdao.findByEmailUsersAndCompanys(email, email);
-        email_phone_count=userdao.findByPhoneUsersAndCompanys(phone, phone);
+        Map<String,Object>email_phone_count=userdao.findByPhoneAndEmailJoinCompany(phone, phone,email,email);
         for(Entry<String, Object> entry:email_phone_count.entrySet()){
             logger.info(entry.getValue().toString());
             if(Integer.parseInt(entry.getValue().toString())!=0){
