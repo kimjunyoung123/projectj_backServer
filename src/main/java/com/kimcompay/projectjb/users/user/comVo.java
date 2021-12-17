@@ -1,4 +1,4 @@
-package com.kimcompay.projectjb.users.admin;
+package com.kimcompay.projectjb.users.user;
 
 import java.sql.Timestamp;
 
@@ -65,5 +65,11 @@ public class comVo {
 
     @Column(name = "ckind",nullable = false,columnDefinition = "TINYINT")
     private int ckind;
+
+    @Column(name = "start_time",nullable = false,columnDefinition = "TINYINT")
+    private int start_time;
+
+    @Column(name = "end_time",nullable = false,columnDefinition = "TINYINT")
+    private int end_time;
 
 }

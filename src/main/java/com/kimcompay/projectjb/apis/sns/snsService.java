@@ -112,9 +112,8 @@ public class snsService {
         String num=map.get("num").toString();
         if(rnum.equals(num)){
             map.put("res",true);
+            map.put(map.get("type").toString(), map.get("val"));
             session.setAttribute(key, map);
-            session.removeAttribute(key);
-            session.setAttribute(key, true);
             return utillService.getJson(true, "인증성공");
         }
         return utillService.getJson(false, "인증번호 불일치");

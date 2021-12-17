@@ -47,4 +47,9 @@ uservo.java
 -구매회사인지/판매회사인지  
 12.ccreated  
 -가입일자  
+13.start_time
+-영업시작 시간  
+14.close_time
+-영업종료 시간
+
 
