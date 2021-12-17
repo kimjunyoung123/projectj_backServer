@@ -1,8 +1,12 @@
 package com.kimcompay.projectjb.users.user;
 
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Map.Entry;
 
 import javax.servlet.http.HttpSession;
@@ -12,6 +16,8 @@ import com.kimcompay.projectjb.apis.jungbu.jungbuService;
 import com.kimcompay.projectjb.apis.kakaos.kakaoMapService;
 import com.kimcompay.projectjb.configs.securityConfig;
 import com.kimcompay.projectjb.enums.senums;
+import com.kimcompay.projectjb.users.company.comVo;
+import com.kimcompay.projectjb.users.company.compayDao;
 import com.nimbusds.jose.shaded.json.JSONObject;
 
 import org.slf4j.Logger;
@@ -31,28 +37,95 @@ public class userService {
     private userdao userdao;
     @Autowired
     private securityConfig securityConfig;
+    @Autowired
+    private compayDao compayDao;
     
-    public void insert(tryInsertDto tryInsertDto,HttpSession session) {
+    public JSONObject insert(tryInsertDto tryInsertDto,HttpSession session) {
         logger.info("insert");
-        //JSONObject res=jungbuService.getCompanyNum(Integer.parseInt(tryInsertDto.getCompany_num()));
-        //휴대폰 문자 인증했는지 검사
-        checkAuth(tryInsertDto, session);
+        //휴대폰/이메일 인증했는지 검사
+        //checkAuth(tryInsertDto, session);
+        //유효성검사
         checkValues(tryInsertDto);
+        //인서트 시도
         try_insert(tryInsertDto);
+        return utillService.getJson(true, "회원가입에 성공하였습니다");
     }
     private void try_insert(tryInsertDto tryInsertDto) {
-        logger.info("dto_to_vo");
+        logger.info("try_insert");
         String hash_pwd=securityConfig.pwdEncoder().encode(tryInsertDto.getPwd());
-        int post_code=Integer.parseInt(tryInsertDto.getPost_code());
+        String post_code=tryInsertDto.getPost_code();
         if(tryInsertDto.getScope_num()==0){
             logger.info("일반 회원 가입 ");
             userVo vo=userVo.builder().email(tryInsertDto.getEmail()).uaddress(tryInsertDto.getAddress()).udetail_address(tryInsertDto.getDetail_address())
                                         .uphone(tryInsertDto.getPhone()).upostcode(post_code).upwd(hash_pwd)
                                         .usleep(0).build();
+                                        userdao.save(vo);
         }else{
             logger.info("기업 회원가입");
-           /* comVo vo=comVo.builder().cdetail_address(tryInsertDto.getDetail_address()).caddress(tryInsertDto.getAddress()).cemail(tryInsertDto.getEmail()).ckind(tryInsertDto.getScope_num()).cnum(tryInsertDto.getCompany_num())
-                                    .cphone(tryInsertDto.getPhone()).cpostcode(post_code).cpwd(hash_pwd).*/
+            //추가 검사 
+            checkCompanyNum(tryInsertDto);
+            checkTimeAndOther(tryInsertDto);
+            comVo vo=comVo.builder().cdetail_address(tryInsertDto.getDetail_address()).caddress(tryInsertDto.getAddress()).cemail(tryInsertDto.getEmail()).ckind(tryInsertDto.getScope_num()).cnum(tryInsertDto.getCompany_num())
+                                    .cphone(tryInsertDto.getPhone()).cpostcode(post_code).cpwd(hash_pwd).close_time(tryInsertDto.getClose_time()).csleep(0).ctel(tryInsertDto.getTel()).start_time(tryInsertDto.getOpen_time()).build();
+                                    compayDao.save(vo);
+        }
+    }
+    private void checkTimeAndOther(tryInsertDto tryInsertDto) {
+        logger.info("checkTimeAndOther");
+        //요청시간 꺼내기
+        String open_time=utillService.getValue(tryInsertDto.getOpen_time(),"시간값이 규격에 맞지 않습니다", "checkTime");
+        String close_time=utillService.getValue(tryInsertDto.getClose_time(),"시간값이 규격에 맞지 않습니다", "checkTime");
+        logger.info("시작시간: "+open_time);
+        logger.info("종료시간: "+close_time);
+        //시간분리
+        List<Integer>times=new ArrayList<>();
+        try {
+            for(String s:open_time.split(":")){
+                times.add(Integer.parseInt(s));
+            }
+            for(String s:close_time.split(":")){
+                times.add(Integer.parseInt(s));
+            } 
+        } catch (IllegalArgumentException e) {
+            throw utillService.makeRuntimeEX("시간값은 숫자만가능합니다", "checkTime");
+        }
+        //음수가 있는지 검사
+        for(int i:times){
+            logger.info("시/분: "+i);
+            if(i<0){
+                throw utillService.makeRuntimeEX("시간은 0보다 작을수 없습니다", "checkTime");
+            }
+        }
+        //시작시간보다 종료시간이 빠른지 검사
+        if(times.get(0)>times.get(2)){
+            throw utillService.makeRuntimeEX("종료시간이 시작시간보다 빠를 수없습니다", "checkTime");
+        }
+        logger.info("시간 유효성검사 통과");
+        //전화번호 유효성검사
+        for(char s:tryInsertDto.getTel().toCharArray()){
+            logger.info("전화번호 분리: "+s);
+            int ss=(int)s;
+            logger.info("전화번호 아스키코드값: "+ss);
+            if(ss<48||ss>57){
+                throw utillService.makeRuntimeEX("전화번호는 숫자만 입력가능합니다", "checkTimeAndOther");
+            }
+        }
+        logger.info("전화번호 유효성 통과");
+    }
+    private void checkCompanyNum(tryInsertDto tryInsertDto){
+        logger.info("checkCompanyNum");
+        int company_num=0;
+        try {
+            //null검사를 받을 때 안하므로 여기서 한다
+            company_num=Integer.parseInt(Optional.ofNullable(tryInsertDto.getCompany_num()).orElseThrow(()-> utillService.makeRuntimeEX("기업회원은 사업자 등록번호가 필수입니다", "try_insert")));
+            //JSONObject res=jungbuService.getCompanyNum(company_num);
+        } catch (IllegalArgumentException e) {
+            throw utillService.makeRuntimeEX("사업자 번호는 숫자만 적어주세요", "try_insert");
+        }
+        int count=userdao.countByCnumNative(company_num);
+        logger.info("사업자번호 조회결과: "+count);
+        if(count!=0){
+            throw utillService.makeRuntimeEX("이미등록된 사업자번호입니다 ", "try_insert");
         }
     }
     public Map<String,Object> getCount(String val) {
@@ -100,28 +173,35 @@ public class userService {
         logger.info("checkAuth");
         boolean check_email=false;
         boolean check_phone=false;
-        String auth_phone=null;
-        String auth_email=null;
+        Map<String,Object>auth_phone=new HashMap<>();
+        Map<String,Object>auth_email=new HashMap<>();
+        String phone=null;
+        String email=null;
+        //세션에서 인증정보가져오기
         try {
-            check_phone=Boolean.parseBoolean(httpSession.getAttribute(senums.auth.get()+senums.phonet.get()).toString());
-            auth_phone=httpSession.getAttribute(senums.phonet.get()).toString();
+            auth_phone=(Map<String,Object>)httpSession.getAttribute(senums.auth.get()+senums.phonet.get());
+            logger.info("휴대폰인증내역: "+auth_phone);
+            phone=auth_phone.get("val").toString();
+            check_phone=Boolean.parseBoolean(auth_phone.get("res").toString());
         } catch (Exception e) {
             throw utillService.makeRuntimeEX("휴대폰 인증을 먼저 해주세요", "checkAuth");
         }
         try {
-            check_email=Boolean.parseBoolean(httpSession.getAttribute(senums.auth.get()+senums.emailt.get()).toString());
-            auth_email=httpSession.getAttribute(senums.emailt.get()).toString();
+            auth_email=(Map<String,Object>)httpSession.getAttribute(senums.auth.get()+senums.emailt.get());
+            logger.info("이메일인증내역: "+auth_email);
+            email=auth_email.get("val").toString();
+            check_email=Boolean.parseBoolean(auth_email.get("res").toString());
         } catch (Exception e) {
             throw utillService.makeRuntimeEX("이메일 인증을 먼저 해주세요", "checkAuth");
         }
+        //인증완료 했는지 검사
         if(!check_email){
             throw utillService.makeRuntimeEX("이메일 인증이 되지 않았습니다", "checkAuth");
         }else if(!check_phone){
             throw utillService.makeRuntimeEX("휴대폰 인증이 되지 않았습니다", "checkAuth");
-
-        }else if(!tryInsertDto.getPhone().equals(auth_phone)){
+        }else if(!tryInsertDto.getPhone().equals(phone)){
             throw utillService.makeRuntimeEX("인증한 휴대폰과 번호가 다릅니다", "checkAuth");
-        }else if(!tryInsertDto.getEmail().equals(auth_email)){
+        }else if(!tryInsertDto.getEmail().equals(email)){
             throw utillService.makeRuntimeEX("인증한 이메일과 번호가 다릅니다", "checkAuth");
         }
         logger.info("인증 유효성검사 통과");

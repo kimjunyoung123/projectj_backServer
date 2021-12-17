@@ -113,6 +113,7 @@ public class snsService {
         if(rnum.equals(num)){
             map.put("res",true);
             map.put(map.get("type").toString(), map.get("val"));
+            logger.info("인증후세션 내역: "+map.toString());
             session.setAttribute(key, map);
             return utillService.getJson(true, "인증성공");
         }

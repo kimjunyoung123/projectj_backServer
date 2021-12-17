@@ -32,7 +32,7 @@ public class sqsService {
         logger.info("sms_sqs");
         logger.info("message: "+message);
         Map<String,String>map=getMessageAndAddress(message);
-        smsService.sendMessege(map.get("val"),map.get("title")+"\n"+map.get("message"));
+        //smsService.sendMessege(map.get("val"),map.get("title")+"\n"+map.get("message"));
     }
     @SqsListener("projectj_email_sqs")
     public void loadEmailMessage(String message) {

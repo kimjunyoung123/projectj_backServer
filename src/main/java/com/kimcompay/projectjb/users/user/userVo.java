@@ -41,8 +41,8 @@ public class userVo {
     @Column(name = "udetail_address",nullable = false ,length = 50)
     private String udetail_address;
 
-    @Column(name = "upostcode",nullable = false ,columnDefinition = "TINYINT")
-    private int upostcode;
+    @Column(name = "upostcode",nullable = false ,length =20)
+    private String upostcode;
 
     @Column(name = "uphone",nullable = false ,unique = true,length = 11)
     private String uphone;

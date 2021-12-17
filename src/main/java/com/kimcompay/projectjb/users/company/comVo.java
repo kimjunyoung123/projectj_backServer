@@ -1,4 +1,4 @@
-package com.kimcompay.projectjb.users.user;
+package com.kimcompay.projectjb.users.company;
 
 import java.sql.Timestamp;
 
@@ -41,8 +41,8 @@ public class comVo {
     @Column(name = "cdetail_address",nullable = false ,length = 50)
     private String cdetail_address;
 
-    @Column(name = "cpostcode",nullable = false ,columnDefinition = "TINYINT")
-    private int cpostcode;
+    @Column(name = "cpostcode",nullable = false,length = 20 )
+    private String cpostcode;
 
     @Column(name = "cphone",nullable = false ,unique = true,length = 11)
     private String cphone;
@@ -66,10 +66,10 @@ public class comVo {
     @Column(name = "ckind",nullable = false,columnDefinition = "TINYINT")
     private int ckind;
 
-    @Column(name = "start_time",nullable = false,columnDefinition = "TINYINT")
-    private int start_time;
+    @Column(name = "start_time",nullable = false)
+    private String start_time;
 
-    @Column(name = "end_time",nullable = false,columnDefinition = "TINYINT")
-    private int end_time;
+    @Column(name = "close_time",nullable = false)
+    private String close_time;
 
 }

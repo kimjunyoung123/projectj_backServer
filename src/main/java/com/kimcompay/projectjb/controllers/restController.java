@@ -55,9 +55,9 @@ public class restController {
         return snsService.confrim(jsonObject,httpSession);
     }
     @RequestMapping(value = "/user/**",method = RequestMethod.POST)
-    public void tryJoin(@Valid @RequestBody tryInsertDto tryInsertDto ,HttpSession session) {
+    public JSONObject tryJoin(@Valid @RequestBody tryInsertDto tryInsertDto ,HttpSession session) {
         logger.info("tryJoin");
         logger.info(tryInsertDto.toString());
-        userService.insert(tryInsertDto, session);
+        return userService.insert(tryInsertDto, session);
     }
 }

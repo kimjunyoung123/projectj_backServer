@@ -1,5 +1,6 @@
 package com.kimcompay.projectjb.apis;
 
+import java.util.Optional;
 import java.util.Random;
 
 import com.nimbusds.jose.shaded.json.JSONObject;
@@ -41,5 +42,9 @@ public class utillService {
         }
         return num;
     } 
+    public static <T> T getValue(T ob,String error_message,String method_name) {
+        logger.info("getValue");
+        return Optional.ofNullable(ob).orElseThrow(()->makeRuntimeEX(error_message,method_name));
+    }
 
 }
