@@ -39,6 +39,7 @@ public class requestTo {
             ResponseEntity<JSONObject>responseEntity=restTemplate.exchange(url,HttpMethod.GET,entity,JSONObject.class);
             return responseEntity.getBody();
         } catch (Exception e) {
+            e.printStackTrace();
             throw utillService.makeRuntimeEX("통신에 실패했습니다","requestget");
         }
   

@@ -42,6 +42,8 @@ public class tryInsertDto {
     private String tel;
     //기업시에만 따로 검사
     private String company_num;
+    //db에는 숫자로 회원유형이 들어감
+    private int scope_num;
 
 
 }

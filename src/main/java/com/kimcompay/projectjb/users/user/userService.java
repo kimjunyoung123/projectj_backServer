@@ -1,6 +1,7 @@
 package com.kimcompay.projectjb.users.user;
 
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -8,7 +9,9 @@ import javax.servlet.http.HttpSession;
 
 import com.kimcompay.projectjb.apis.utillService;
 import com.kimcompay.projectjb.apis.jungbu.jungbuService;
+import com.kimcompay.projectjb.apis.kakaos.kakaoMapService;
 import com.kimcompay.projectjb.enums.senums;
+import com.nimbusds.jose.shaded.json.JSONObject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,14 +25,15 @@ public class userService {
     @Autowired
     private jungbuService jungbuService;
     @Autowired
+    private kakaoMapService kakaoMapService;
+    @Autowired
     private userdao userdao;
     
     public void insert(tryInsertDto tryInsertDto,HttpSession session) {
         logger.info("insert");
-        //JSONObject res=jungbuService.getCompanyNum(Integer.parseInt(tryInsertDto.getCompany_num()));
+        JSONObject res=jungbuService.getCompanyNum(Integer.parseInt(tryInsertDto.getCompany_num()));
         //휴대폰 문자 인증했는지 검사
-        //logger.info(res.toString());
-        checkAuth(tryInsertDto, session);
+       // checkAuth(tryInsertDto, session);
         checkValues(tryInsertDto);
     }
     public Map<String,Object> getCount(String val) {
@@ -42,6 +46,7 @@ public class userService {
         String scope_num=null;
         try {
             scope_num=senums.valueOf(scope).get();
+            
         } catch (IllegalArgumentException e) {
             throw utillService.makeRuntimeEX("존재하는 회원 유형이 아닙니다", "checkValues");
         }
@@ -51,8 +56,9 @@ public class userService {
         Map<String,Object>email_phone_count=userdao.findByEmailUsersAndCompanys(email, email);
         email_phone_count=userdao.findByPhoneUsersAndCompanys(phone, phone);
         for(Entry<String, Object> entry:email_phone_count.entrySet()){
-            if(!entry.getValue().equals("0")){
-                throw utillService.makeRuntimeEX("이미 존재하는 "+ senums.valueOf(entry.getKey())+"입니다", "checkValues");
+            logger.info(entry.getValue().toString());
+            if(Integer.parseInt(entry.getValue().toString())!=0){
+                throw utillService.makeRuntimeEX("이미 존재하는 "+ senums.valueOf(entry.getKey()).get()+"입니다", "checkValues");
             }
         }
         //비밀번호 일치검사 자리수,공백검사는 validation으로 한다
@@ -60,8 +66,15 @@ public class userService {
         if(!pwd.equals(tryInsertDto.getPwd2())){
             throw utillService.makeRuntimeEX("비밀번호가 일치 하지 않습니다", "checkValues");
         }
-        
-    
+        //주소검사 자리수,공백검사는 validation으로 한다
+        JSONObject krespon=kakaoMapService.getAddress(tryInsertDto.getAddress());
+        logger.info("주소 조회결과: "+krespon.toString());
+        LinkedHashMap<String,Object>meta=(LinkedHashMap<String, Object>)krespon.get("meta");
+        if(Integer.parseInt(meta.get("total_count").toString())==0){
+            logger.info("주소 검색결과 미존재");
+            throw utillService.makeRuntimeEX("주소검색결과가 없습니다", "checkValues");
+        }
+        logger.info("회원가입 유효성검사 통과");
     }
     private void checkAuth(tryInsertDto tryInsertDto,HttpSession httpSession) {
         logger.info("checkAuth");

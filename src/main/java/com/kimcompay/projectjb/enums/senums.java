@@ -14,7 +14,8 @@ public enum senums {
     up("전화번호"),
     cp("전화번호"),
     ue("유저 이메일"),
-    ce("이메일");
+    ce("이메일"),
+    Authorization("Authorization");
 
     private String s;
     senums(String s){
