@@ -1,6 +1,8 @@
 package com.kimcompay.projectjb.filters;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -18,6 +20,9 @@ import com.nimbusds.jose.shaded.json.JSONObject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -30,10 +35,17 @@ public class loginFilter extends UsernamePasswordAuthenticationFilter {
     private final Logger logger=LoggerFactory.getLogger(loginFilter.class);
     private jwtService jwtService;
     private AuthenticationManager authenticationManager;
+    private RedisTemplate<String,String>redisTemplate;
 
-    public loginFilter(jwtService jwtService,AuthenticationManager authenticationManager){
+    //@Value("${access_token_cookie}")
+    private String access_cookie_name="actk";
+    //@Value("${refresh_token_cookie}")
+    private String refresh_cookie_name="rftk";
+
+    public loginFilter(jwtService jwtService,AuthenticationManager authenticationManager,RedisTemplate<String,String>redisTemplate){
         this.jwtService=jwtService;
         this.authenticationManager=authenticationManager;
+        this.redisTemplate=redisTemplate;
     }
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)throws AuthenticationException {
@@ -53,20 +65,33 @@ public class loginFilter extends UsernamePasswordAuthenticationFilter {
         logger.info("successfulAuthentication");
         String email=null;
         SecurityContextHolder.getContext().setAuthentication(authResult);
+        ValueOperations<String,String>valueOperations=redisTemplate.opsForValue();
         try {
             userDetail userDetail=(userDetail)authResult.getPrincipal();
-            email=userDetail.getUservo().getEmail();
+            userVo userVo=userDetail.getUservo();
+            userVo.setUpwd(null);
+            email=userVo.getEmail();
+            valueOperations.set(email, userVo.toString());
         } catch (Exception e) {
             logger.info("유저 디테일 미존재 기업꺼내기");
             comDetail comDetail=(comDetail)authResult.getPrincipal();
-            email=comDetail.getComVo().getCemail();
+            comVo comVo=comDetail.getComVo();
+            comVo.setCpwd(null);
+            email=comVo.getCemail();
+            valueOperations.set(email, comVo.toString().replace("comVo", ""));
         }
+        //토큰생성
         String access_token=jwtService.get_access_token(email);
         String refresh_token=jwtService.get_refresh_token();
         logger.info("엑세스토큰: "+access_token);
         logger.info("리프레시토큰: "+refresh_token);
+        //레디스에 유저정보 담기
+        //쿠키저장
+        Map<String,Object>infor=new HashMap<>();
+        infor.put(access_cookie_name, access_token);
+        infor.put(refresh_cookie_name, refresh_token);
+        utillService.makeCookie(infor, response);
         
-
   
     }
     @Override

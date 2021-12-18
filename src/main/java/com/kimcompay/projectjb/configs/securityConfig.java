@@ -7,6 +7,7 @@ import com.kimcompay.projectjb.jwt.jwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -22,6 +23,8 @@ public class securityConfig extends WebSecurityConfigurerAdapter {
     private corsFilter corsFilter;
     @Autowired
     private jwtService jwtService;
+    @Autowired
+    private RedisTemplate<String,String>redisTemplate;
     /*@Autowired
     private userDao userDao;*/
 
@@ -39,7 +42,7 @@ public class securityConfig extends WebSecurityConfigurerAdapter {
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             .and()
             .addFilter(corsFilter.crosfilter())
-            .addFilter(new loginFilter(jwtService,authenticationManager()))
+            .addFilter(new loginFilter(jwtService,authenticationManager(),redisTemplate))
             //.addFilter(new authorizationFilter(authenticationManager(),jwtService,userDao))
             .csrf().disable().formLogin().disable().httpBasic().disable()
             .authorizeRequests().antMatchers("/api/**").authenticated().anyRequest().permitAll();
