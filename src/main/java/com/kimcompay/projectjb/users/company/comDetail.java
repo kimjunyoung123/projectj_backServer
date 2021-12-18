@@ -10,9 +10,11 @@ import lombok.Data;
 @Data
 public class comDetail implements UserDetails {
     private comVo comVo;
+    private boolean is_can=false;
 
-    comDetail(comVo comVo){
+    public comDetail(comVo comVo){
         this.comVo=comVo;
+        this.is_can=check_lock(comVo.getCsleep());
     }
 
     @Override
@@ -24,36 +26,42 @@ public class comDetail implements UserDetails {
     @Override
     public String getPassword() {
         // TODO Auto-generated method stub
-        return null;
+        return comVo.getCpwd();
     }
 
     @Override
     public String getUsername() {
         // TODO Auto-generated method stub
-        return null;
+        return comVo.getCemail();
     }
 
     @Override
-    public boolean isAccountNonExpired() {
+    public boolean isAccountNonExpired() {//계정만료여부
         // TODO Auto-generated method stub
-        return false;
+        return is_can;
     }
 
     @Override
-    public boolean isAccountNonLocked() {
+    public boolean isAccountNonLocked() {//계정잠금여부
         // TODO Auto-generated method stub
-        return false;
+        return is_can;
     }
 
     @Override
-    public boolean isCredentialsNonExpired() {
+    public boolean isCredentialsNonExpired() {//계정패스워드 만료여부
         // TODO Auto-generated method stub
-        return false;
+        return true;
     }
 
     @Override
-    public boolean isEnabled() {
+    public boolean isEnabled() {//계정이 사용가능한지 여부
         // TODO Auto-generated method stub
+        return is_can;
+    }
+    private Boolean check_lock(int num){
+        if(num==0){
+            return true;
+        }
         return false;
     }
     

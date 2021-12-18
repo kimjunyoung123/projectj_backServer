@@ -11,7 +11,7 @@ import java.util.Map.Entry;
 
 import javax.servlet.http.HttpSession;
 
-import com.kimcompay.projectjb.apis.utillService;
+import com.kimcompay.projectjb.utillService;
 import com.kimcompay.projectjb.apis.jungbu.jungbuService;
 import com.kimcompay.projectjb.apis.kakaos.kakaoMapService;
 import com.kimcompay.projectjb.configs.securityConfig;
@@ -48,6 +48,9 @@ public class userService {
         checkValues(tryInsertDto);
         //인서트 시도
         try_insert(tryInsertDto);
+        //세션비우기
+        session.removeAttribute(senums.auth.get()+senums.emailt.get());
+        session.removeAttribute(senums.auth.get()+senums.phonet.get() );
         return utillService.getJson(true, "회원가입에 성공하였습니다");
     }
     private void try_insert(tryInsertDto tryInsertDto) {
@@ -57,7 +60,7 @@ public class userService {
         if(tryInsertDto.getScope_num()==0){
             logger.info("일반 회원 가입 ");
             userVo vo=userVo.builder().email(tryInsertDto.getEmail()).uaddress(tryInsertDto.getAddress()).udetail_address(tryInsertDto.getDetail_address())
-                                        .uphone(tryInsertDto.getPhone()).upostcode(post_code).upwd(hash_pwd)
+                                        .uphone(tryInsertDto.getPhone()).upostcode(post_code).upwd(hash_pwd).urole(senums.user_role.get())
                                         .usleep(0).build();
                                         userdao.save(vo);
         }else{
@@ -66,7 +69,7 @@ public class userService {
             checkCompanyNum(tryInsertDto);
             checkTimeAndOther(tryInsertDto);
             comVo vo=comVo.builder().cdetail_address(tryInsertDto.getDetail_address()).caddress(tryInsertDto.getAddress()).cemail(tryInsertDto.getEmail()).ckind(tryInsertDto.getScope_num()).cnum(tryInsertDto.getCompany_num())
-                                    .cphone(tryInsertDto.getPhone()).cpostcode(post_code).cpwd(hash_pwd).close_time(tryInsertDto.getClose_time()).csleep(0).ctel(tryInsertDto.getTel()).start_time(tryInsertDto.getOpen_time()).build();
+                                    .crole(senums.company_role.get()).cphone(tryInsertDto.getPhone()).cpostcode(post_code).cpwd(hash_pwd).close_time(tryInsertDto.getClose_time()).csleep(0).ctel(tryInsertDto.getTel()).start_time(tryInsertDto.getOpen_time()).build();
                                     compayDao.save(vo);
         }
     }

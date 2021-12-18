@@ -8,7 +8,9 @@ import com.auth0.jwt.algorithms.Algorithm;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 
+@Service
 public class jwtService {
     private Logger logger=LoggerFactory.getLogger(jwtService.class);
     
@@ -22,7 +24,6 @@ public class jwtService {
     private int access_expire_min;
     @Value("${refresh_expire_day}")
     private int refresh_expire_day;
-
 
     public String get_access_token(String email) {
         logger.info("get_access_token");

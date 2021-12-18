@@ -3,8 +3,7 @@ package com.kimcompay.projectjb.apis.aws.services;
 import java.util.HashMap;
 import java.util.Map;
 
-
-import com.kimcompay.projectjb.apis.utillService;
+import com.kimcompay.projectjb.utillService;
 import com.kimcompay.projectjb.apis.sns.emailService;
 import com.kimcompay.projectjb.apis.sns.smsService;
 import com.kimcompay.projectjb.enums.senums;

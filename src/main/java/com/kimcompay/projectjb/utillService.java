@@ -1,4 +1,4 @@
-package com.kimcompay.projectjb.apis;
+package com.kimcompay.projectjb;
 
 import java.util.Optional;
 import java.util.Random;

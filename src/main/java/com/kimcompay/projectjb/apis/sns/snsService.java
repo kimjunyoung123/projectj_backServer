@@ -6,7 +6,7 @@ import java.util.Optional;
 
 import javax.servlet.http.HttpSession;
 
-import com.kimcompay.projectjb.apis.utillService;
+import com.kimcompay.projectjb.utillService;
 import com.kimcompay.projectjb.apis.aws.services.sqsService;
 import com.kimcompay.projectjb.enums.senums;
 import com.kimcompay.projectjb.users.user.userService;

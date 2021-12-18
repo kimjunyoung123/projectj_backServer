@@ -1,6 +1,8 @@
 package com.kimcompay.projectjb.configs;
 
 import com.kimcompay.projectjb.filters.corsFilter;
+import com.kimcompay.projectjb.filters.loginFilter;
+import com.kimcompay.projectjb.jwt.jwtService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -18,9 +20,9 @@ public class securityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
     private corsFilter corsFilter;
-    /*@Autowired
-    private jwtService jwtService;
     @Autowired
+    private jwtService jwtService;
+    /*@Autowired
     private userDao userDao;*/
 
     @Bean
@@ -37,7 +39,7 @@ public class securityConfig extends WebSecurityConfigurerAdapter {
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             .and()
             .addFilter(corsFilter.crosfilter())
-            //.addFilter(new loginFilter(jwtService))
+            .addFilter(new loginFilter(jwtService,authenticationManager()))
             //.addFilter(new authorizationFilter(authenticationManager(),jwtService,userDao))
             .csrf().disable().formLogin().disable().httpBasic().disable()
             .authorizeRequests().antMatchers("/api/**").authenticated().anyRequest().permitAll();

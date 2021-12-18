@@ -3,7 +3,7 @@ package com.kimcompay.projectjb.apis.sns;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
-import com.kimcompay.projectjb.apis.utillService;
+import com.kimcompay.projectjb.utillService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
