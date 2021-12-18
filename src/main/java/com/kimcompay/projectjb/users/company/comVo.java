@@ -50,6 +50,10 @@ public class comVo {
     @Column(name = "ctel",nullable = false ,unique = true,length = 11)
     private String ctel;
 
+    @Column(name = "crole",nullable = false ,length = 20)
+    private String crole;
+
+
     @Column(name = "clogin_date")
     private Timestamp clogin_date;
 

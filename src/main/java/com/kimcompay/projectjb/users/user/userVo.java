@@ -57,6 +57,9 @@ public class userVo {
     @Column(name = "usleep",nullable = false ,columnDefinition = "TINYINT")
     private int usleep;
 
+    @Column(name = "urole",nullable = false ,length = 20)
+    private String urole;
+
 
 
 
