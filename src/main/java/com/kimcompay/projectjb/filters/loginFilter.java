@@ -12,9 +12,8 @@ import javax.servlet.http.HttpServletResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kimcompay.projectjb.utillService;
 import com.kimcompay.projectjb.jwt.jwtService;
-import com.kimcompay.projectjb.users.company.comDetail;
+import com.kimcompay.projectjb.users.principalDetails;
 import com.kimcompay.projectjb.users.company.comVo;
-import com.kimcompay.projectjb.users.user.userDetail;
 import com.kimcompay.projectjb.users.user.userVo;
 import com.nimbusds.jose.shaded.json.JSONObject;
 
@@ -65,25 +64,16 @@ public class loginFilter extends UsernamePasswordAuthenticationFilter {
         logger.info("successfulAuthentication");
         String email=null;
         SecurityContextHolder.getContext().setAuthentication(authResult);
+        //프린시펄디에일 꺼내기
+        principalDetails principalDetails=(principalDetails)authResult.getPrincipal();
+        Map<String,Object>map=principalDetails.getPrinci();
+        //vo->map으로 변환
+        ObjectMapper objectMapper=new ObjectMapper();
+        Map<String,Object> result = objectMapper.convertValue(map.get("dto"), Map.class);
+        logger.info("로그인정보: "+result.toString());
+        //redis밀어넣기
         HashOperations<String, Object, Object> hashOperations = redisTemplate.opsForHash();
-        try {
-            userDetail userDetail=(userDetail)authResult.getPrincipal();
-            userVo userVo=userDetail.getUservo();
-            userVo.setUpwd(null);
-            email=userVo.getEmail();
-            Map<String,Object>map=new HashMap<>();
-            hashOperations.putAll(email, map);
-        } catch (Exception e) {
-            logger.info("유저 디테일 미존재 기업꺼내기");
-            comDetail comDetail=(comDetail)authResult.getPrincipal();
-            comVo comVo=comDetail.getComVo();
-            comVo.setCpwd(null);
-            email=comVo.getCemail();
-            Map<String,Object>map=new HashMap<>();
-            map.put("email", "t");
-            map.put("address","a");
-            hashOperations.putAll(email, map);
-        }
+        hashOperations.putAll(map.get("email").toString(),result);
         //토큰생성
         String access_token=jwtService.get_access_token(email);
         String refresh_token=jwtService.get_refresh_token();

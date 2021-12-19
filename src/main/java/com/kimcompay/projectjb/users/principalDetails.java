@@ -1,6 +1,9 @@
-package com.kimcompay.projectjb.users.company;
+package com.kimcompay.projectjb.users;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -8,31 +11,41 @@ import org.springframework.security.core.userdetails.UserDetails;
 import lombok.Data;
 
 @Data
-public class comDetail implements UserDetails {
-    private comVo comVo;
+public class principalDetails implements UserDetails {
+    
+    private Map<String,Object>princi=new HashMap<>();
     private boolean is_can=false;
 
-    public comDetail(comVo comVo){
-        this.comVo=comVo;
-        this.is_can=check_lock(comVo.getCsleep());
+
+    public principalDetails(Map<String,Object>map){
+        this.princi=map;
+        is_can=check_lock(Integer.parseInt(map.get("sleep").toString()));
     }
+
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        // TODO Auto-generated method stub
-        return null;
+        Collection<GrantedAuthority>roles=new ArrayList<>();
+        roles.add(new GrantedAuthority(){
+            @Override
+            public String getAuthority() {
+                System.out.println(princi.get("role")+"권한 가져오기");
+                return princi.get("role").toString();
+            }
+        });
+        return roles;
     }
 
     @Override
     public String getPassword() {
         // TODO Auto-generated method stub
-        return comVo.getCpwd();
+        return princi.get("pwd").toString();
     }
 
     @Override
     public String getUsername() {
         // TODO Auto-generated method stub
-        return comVo.getCemail();
+        return princi.get("email").toString();
     }
 
     @Override
