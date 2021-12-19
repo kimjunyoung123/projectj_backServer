@@ -3,6 +3,8 @@ package com.kimcompay.projectjb.filters;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
+import java.util.Map.Entry;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -13,15 +15,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kimcompay.projectjb.utillService;
 import com.kimcompay.projectjb.jwt.jwtService;
 import com.kimcompay.projectjb.users.principalDetails;
-import com.kimcompay.projectjb.users.company.comVo;
-import com.kimcompay.projectjb.users.user.userVo;
 import com.nimbusds.jose.shaded.json.JSONObject;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -67,26 +65,37 @@ public class loginFilter extends UsernamePasswordAuthenticationFilter {
         //프린시펄디에일 꺼내기
         principalDetails principalDetails=(principalDetails)authResult.getPrincipal();
         Map<String,Object>map=principalDetails.getPrinci();
+        email=principalDetails.getUsername();
         //vo->map으로 변환
         ObjectMapper objectMapper=new ObjectMapper();
-        Map<String,Object> result = objectMapper.convertValue(map.get("dto"), Map.class);
+        Map<String,Object> result= objectMapper.convertValue(map.get("dto"), Map.class);
         logger.info("로그인정보: "+result.toString());
-        //redis밀어넣기
-        HashOperations<String, Object, Object> hashOperations = redisTemplate.opsForHash();
-        hashOperations.putAll(map.get("email").toString(),result);
-        //토큰생성
+        //토큰발급
         String access_token=jwtService.get_access_token(email);
         String refresh_token=jwtService.get_refresh_token();
         logger.info("엑세스토큰: "+access_token);
         logger.info("리프레시토큰: "+refresh_token);
-        //레디스에 유저정보 담기
         //쿠키저장
         Map<String,Object>infor=new HashMap<>();
         infor.put(access_cookie_name, access_token);
         infor.put(refresh_cookie_name, refresh_token);
         utillService.makeCookie(infor, response);
-        
-  
+        //redis구격에 맞게 int값 ->string
+        for(Entry<String,Object>s:result.entrySet()){
+            logger.info(s.getKey());
+            if(Optional.ofNullable(s.getValue()).orElseGet(()->null)==null){
+                logger.info("null발견 무시");
+                continue;
+            }else if(!s.getValue().getClass().getSimpleName().equals("String")){
+                result.put(s.getKey(), s.getValue().toString());
+            }
+        }
+        //redis밀어넣기
+        HashOperations<String, Object, Object> hashOperations = redisTemplate.opsForHash();
+        result.put(refresh_cookie_name, refresh_token);
+        hashOperations.putAll(email,result);
+        logger.info(hashOperations.get(email, "ccreated").toString());
+        logger.info("로그인 과정완료");
     }
     @Override
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response,AuthenticationException failed) throws IOException, ServletException {

@@ -1,6 +1,5 @@
 package com.kimcompay.projectjb.users;
 
-import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -43,27 +42,14 @@ public class userDetailService implements UserDetailsService {
                 princi.put("role", comVo.getCrole());
             }else{
                 princi.put("dto", userVo);
-                voToMap(princi, userVo.getEmail(), userVo.getUpwd(), userVo.getUaddress() ,userVo.getUpostcode(), userVo.getUdetail_address(), 
-                userVo.getUphone() , userVo.getUcreated(), userVo.getUsleep(), userVo.getUlogin_date(),userVo.getUid() ,userVo.getUrole());
+                princi.put("sleep", userVo .getUsleep());
+                princi.put("email", userVo .getEmail());
+                princi.put("pwd", userVo .getUpwd());
+                princi.put("role", userVo .getUrole());
             }
             return new principalDetails(princi);
         } catch (Exception e) {
             return null;
         } 
-    }
-   private void voToMap(Map<String,Object>princi,String email,String pwd,String address,String post_code,String detail_address,String phone,Timestamp created,int sleep,Timestamp login_date,int id,String role) {
-        logger.info("voToMap");
-        princi.put("email", email);
-        princi.put("pwd", pwd);
-        princi.put("address", address);
-        princi.put("post_code", post_code);
-        princi.put("detail_address", detail_address);
-        princi.put("phone", phone);
-        princi.put("created", created);
-        princi.put("sleep", sleep);
-        princi.put("login_date", login_date);
-        princi.put("id", id);
-        princi.put("role", role);
-
-    }   
+    } 
 }
