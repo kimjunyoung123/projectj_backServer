@@ -20,7 +20,7 @@ import com.nimbusds.jose.shaded.json.JSONObject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -65,20 +65,24 @@ public class loginFilter extends UsernamePasswordAuthenticationFilter {
         logger.info("successfulAuthentication");
         String email=null;
         SecurityContextHolder.getContext().setAuthentication(authResult);
-        ValueOperations<String,String>valueOperations=redisTemplate.opsForValue();
+        HashOperations<String, Object, Object> hashOperations = redisTemplate.opsForHash();
         try {
             userDetail userDetail=(userDetail)authResult.getPrincipal();
             userVo userVo=userDetail.getUservo();
             userVo.setUpwd(null);
             email=userVo.getEmail();
-            valueOperations.set(email, userVo.toString());
+            Map<String,Object>map=new HashMap<>();
+            hashOperations.putAll(email, map);
         } catch (Exception e) {
             logger.info("유저 디테일 미존재 기업꺼내기");
             comDetail comDetail=(comDetail)authResult.getPrincipal();
             comVo comVo=comDetail.getComVo();
             comVo.setCpwd(null);
             email=comVo.getCemail();
-            valueOperations.set(email, comVo.toString().replace("comVo", ""));
+            Map<String,Object>map=new HashMap<>();
+            map.put("email", "t");
+            map.put("address","a");
+            hashOperations.putAll(email, map);
         }
         //토큰생성
         String access_token=jwtService.get_access_token(email);
