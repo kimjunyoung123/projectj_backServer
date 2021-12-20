@@ -40,15 +40,15 @@ public class loginFilter extends UsernamePasswordAuthenticationFilter {
     private AuthenticationManager authenticationManager;
     private RedisTemplate<String,String>redisTemplate;
 
-    //@Value("${access_token_cookie}")
-    private String access_cookie_name="actk";
-    //@Value("${refresh_token_cookie}")
-    private String refresh_cookie_name="rftk";
+    private String access_cookie_name;
+    private String refresh_cookie_name;
 
-    public loginFilter(jwtService jwtService,AuthenticationManager authenticationManager,RedisTemplate<String,String>redisTemplate){
+    public loginFilter(jwtService jwtService,AuthenticationManager authenticationManager,RedisTemplate<String,String>redisTemplate,String access_cookie_name,String refresh_cookie_name){
         this.jwtService=jwtService;
         this.authenticationManager=authenticationManager;
         this.redisTemplate=redisTemplate;
+        this.access_cookie_name=access_cookie_name;
+        this.refresh_cookie_name=refresh_cookie_name;
     }
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)throws AuthenticationException {
@@ -78,7 +78,7 @@ public class loginFilter extends UsernamePasswordAuthenticationFilter {
         SecurityContextHolder.getContext().setAuthentication(authResult);
         //프린시펄디에일 꺼내기
         principalDetails principalDetails=(principalDetails)authResult.getPrincipal();
-        Map<String,Object>map=principalDetails.getPrinci();
+        Map<Object,Object>map=principalDetails.getPrinci();
         email=principalDetails.getUsername();
         //vo->map으로 변환
         ObjectMapper objectMapper=new ObjectMapper();

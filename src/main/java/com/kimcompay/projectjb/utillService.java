@@ -26,6 +26,7 @@ public class utillService {
         JSONObject jsonObject=new JSONObject();
         jsonObject.put("flag", flag);
         jsonObject.put("message", message);
+        logger.info("리스폰 담기완료");
         return jsonObject;
     }
     public static RuntimeException makeRuntimeEX(String message,String methodName) {

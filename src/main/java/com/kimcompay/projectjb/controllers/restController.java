@@ -66,12 +66,16 @@ public class restController {
     @RequestMapping(value = "/login/{scope}/{detail}",method = RequestMethod.POST)
     public JSONObject tryLogin(@PathVariable String detail,@PathVariable String scope,HttpServletRequest request,HttpServletResponse response) {
         logger.info("tryLogin");
-        if(scope.equals(senums.logint.get())){
-            return userService.checkLogin(request, response);
-        }else if(scope.equals(senums.checkt.get())){
-            return userService.checkLogin(request,detail);
+        try {
+            if(scope.equals(senums.logint.get())){
+                return userService.checkLogin(request, response);
+            }else if(scope.equals(senums.checkt.get())){
+                return userService.checkLogin(request,detail);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+
         return utillService.getJson(false, "존재 하지 않는 처리");
     }
-
 }

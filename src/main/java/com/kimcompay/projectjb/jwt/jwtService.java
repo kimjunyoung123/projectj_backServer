@@ -34,4 +34,8 @@ public class jwtService {
         logger.info("get_refresh_token");
         return JWT.create().withSubject(refresh_name).withExpiresAt(new Date(System.currentTimeMillis()+1000*60*24*refresh_expire_day)).sign(Algorithm.HMAC512(jwt_sing));
     }
+    public String openJwt(String accessToken) {
+        logger.info("openJwt");
+        return JWT.require(Algorithm.HMAC512(jwt_sing)).build().verify(accessToken).getClaim("email").asString();
+    }
 }

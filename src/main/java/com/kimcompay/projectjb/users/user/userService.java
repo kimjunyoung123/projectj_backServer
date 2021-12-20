@@ -46,24 +46,28 @@ public class userService {
 
     public JSONObject checkLogin(HttpServletRequest request,String detail) {
         logger.info("checkLogin");
-        //시큐리티 세션 꺼내기
-        principalDetails principalDetails=(com.kimcompay.projectjb.users.principalDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        //요청분류
-        if(detail.equals(senums.emailt.get())){
-            logger.info("이메일만 전달");
-            return utillService.getJson(true, principalDetails.getUsername());
-        }else if(detail.equals(senums.allt.get())){
-            logger.info("비밀번호 제외 후 전달");
-            JSONObject jsonObject=new JSONObject();
-            jsonObject.put("flag", true);
-            return jsonObject;
-        }else{
-            return utillService.getJson(false, "잘못된 요청");
+        logger.info("detail: "+detail);
+        try {
+             //시큐리티 세션 꺼내기
+            principalDetails principalDetails=(principalDetails)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            //요청분류
+            if(detail.equals("email")){
+                logger.info("이메일만 전달");
+                return utillService.getJson(true, principalDetails.getUsername());
+            }else if(detail.equals(senums.allt.get())){
+                logger.info("비밀번호 제외 후 전달");
+                JSONObject jsonObject=new JSONObject();
+                jsonObject.put("flag", true);
+                return jsonObject;
+            }else{
+                return utillService.getJson(false, "잘못된 요청");
+            }
+        } catch (NullPointerException e) {
+            throw utillService.makeRuntimeEX("로그인 실패", "checkLogin");
         }
-    
     }
     public JSONObject checkLogin(HttpServletRequest request,HttpServletResponse response) {
-        logger.info("checkLogin");
+        logger.info("checkLoginAuth");
         boolean flag=Boolean.parseBoolean(request.getParameter("flag"));
         System.out.println(flag);
         if(flag){

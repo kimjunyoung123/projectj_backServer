@@ -13,11 +13,11 @@ import lombok.Data;
 @Data
 public class principalDetails implements UserDetails {
     
-    private Map<String,Object>princi=new HashMap<>();
+    private Map<Object,Object>princi=new HashMap<>();
     private boolean is_can=false;
 
 
-    public principalDetails(Map<String,Object>map){
+    public principalDetails(Map<Object,Object>map){
         this.princi=map;
         is_can=check_lock(Integer.parseInt(map.get("sleep").toString()));
     }

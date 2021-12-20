@@ -28,7 +28,7 @@ public class userDetailService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         logger.info("loadUserByUsername");
-        Map<String,Object>princi=new HashMap<>();
+        Map<Object,Object>princi=new HashMap<>();
         userVo userVo=userdao.findByEmail(username).orElseGet(()->null);
         if(userVo==null){
             logger.info("기업회원인지 찾기");
