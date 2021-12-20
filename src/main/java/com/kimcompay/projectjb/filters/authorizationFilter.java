@@ -49,10 +49,13 @@ public class authorizationFilter extends BasicAuthenticationFilter  {
             //redis에서 꺼내기
             Map<Object, Object>map=redisTemplate.opsForHash().entries(email);
             map.put("email",email);
-            map.put("dto", redisTemplate.opsForHash().entries(email));
+            map.put("role", redisTemplate.opsForHash().get(email, "crole"));
+            map.put("sleep", redisTemplate.opsForHash().get(email, "csleep"));
+            map.put("dto", map);
             //시큐리티 인증세션 주입
             principalDetails principalDetails=new principalDetails(map);
             SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(principalDetails,null,principalDetails.getAuthorities()));
+
         } catch (TokenExpiredException e) {
            logger.info("만료된 토큰: "+access_token);
         }catch(NullPointerException e2){
