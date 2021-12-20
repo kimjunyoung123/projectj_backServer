@@ -11,6 +11,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.fasterxml.jackson.core.exc.StreamReadException;
+import com.fasterxml.jackson.databind.DatabindException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kimcompay.projectjb.utillService;
 import com.kimcompay.projectjb.jwt.jwtService;
@@ -21,6 +23,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
+import org.springframework.security.authentication.InternalAuthenticationServiceException;
+import org.springframework.security.authentication.LockedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -47,15 +53,23 @@ public class loginFilter extends UsernamePasswordAuthenticationFilter {
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)throws AuthenticationException {
         logger.info("loginFilter");
-        try {
             ObjectMapper objectMapper=new ObjectMapper();
-            JSONObject jsonObject=objectMapper.readValue(request.getInputStream(), JSONObject.class);
+            JSONObject jsonObject=new JSONObject();
+            try {
+                jsonObject = objectMapper.readValue(request.getInputStream(), JSONObject.class);
+            } catch (StreamReadException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } catch (DatabindException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
             logger.info("로그인시도 정보: "+jsonObject);
             return authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(jsonObject.get("email"),jsonObject.get("pwd")));
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw utillService.makeRuntimeEX("로그인에 실패했습니다", "");
-        }
+    
     }
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain,Authentication authResult) throws IOException, ServletException {
@@ -96,11 +110,24 @@ public class loginFilter extends UsernamePasswordAuthenticationFilter {
         hashOperations.putAll(email,result);
         logger.info(hashOperations.get(email, "ccreated").toString());
         logger.info("로그인 과정완료");
+        utillService.goFoward("/login?flag=true", request, response);
     }
     @Override
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response,AuthenticationException failed) throws IOException, ServletException {
         logger.info("unsuccessfulAuthentication");
         logger.info("로그인 실패");
-        utillService.throwRuntimeEX("회원정보가 존재하지 않습니다");
+        //로그인 실패원인 분류
+        //failed.getClass().getSimpleName()도 되지만 instanceofeh도 가능
+        String cause=null;
+        if(failed instanceof BadCredentialsException){
+            cause="비밀번호가 일치하지 않습니다";
+        }else if(failed instanceof InternalAuthenticationServiceException){
+            cause="가입한 이메일이 없습니다";
+        }else if(failed instanceof LockedException || failed instanceof DisabledException){
+            cause="계정이 잠겨있습니다";
+        }else{
+            cause="알수 없는 오류 발생";
+        }
+        utillService.goFoward("/login?flag=false&cause="+cause, request, response);
     }
 }

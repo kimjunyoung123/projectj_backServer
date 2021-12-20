@@ -6,6 +6,8 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.Map.Entry;
 
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -85,6 +87,16 @@ public class utillService {
             e.printStackTrace();
             logger.info("doRedirect error"+e.getMessage());
         }
+    }
+    public static void goFoward(String errorUrl,HttpServletRequest request,HttpServletResponse response) {
+       logger.info("goFoward");
+        RequestDispatcher dp=request.getRequestDispatcher(errorUrl);
+        try {
+            dp.forward(request, response);
+        } catch (ServletException | IOException e) {
+           logger.info("에러링크 존재 하지 않음");
+            e.printStackTrace();
+        } 
     }
 
 }

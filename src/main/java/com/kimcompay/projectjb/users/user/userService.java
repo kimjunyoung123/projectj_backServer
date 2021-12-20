@@ -9,6 +9,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Map.Entry;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import com.kimcompay.projectjb.utillService;
@@ -40,6 +42,15 @@ public class userService {
     @Autowired
     private compayDao compayDao;
     
+    public JSONObject checkLogin(HttpServletRequest request,HttpServletResponse response) {
+        logger.info("checkLogin");
+        boolean flag=Boolean.parseBoolean(request.getParameter("flag"));
+        System.out.println(flag);
+        if(flag){
+            return utillService.getJson(flag, "로그인완료");
+        }
+        return utillService.getJson(flag, request.getParameter("cause"));
+    }
     public JSONObject insert(tryInsertDto tryInsertDto,HttpSession session) {
         logger.info("insert");
         //휴대폰/이메일 인증했는지 검사

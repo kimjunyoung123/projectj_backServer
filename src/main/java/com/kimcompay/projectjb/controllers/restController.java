@@ -60,4 +60,9 @@ public class restController {
         logger.info(tryInsertDto.toString());
         return userService.insert(tryInsertDto, session);
     }
+    @RequestMapping(value = "/login/**",method = RequestMethod.POST)
+    public JSONObject tryLogin(HttpServletRequest request,HttpServletResponse response) {
+        logger.info("tryLogin");
+        return userService.checkLogin(request, response);
+    }
 }
