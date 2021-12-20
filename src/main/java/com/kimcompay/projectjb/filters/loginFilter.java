@@ -101,5 +101,6 @@ public class loginFilter extends UsernamePasswordAuthenticationFilter {
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response,AuthenticationException failed) throws IOException, ServletException {
         logger.info("unsuccessfulAuthentication");
         logger.info("로그인 실패");
+        utillService.throwRuntimeEX("회원정보가 존재하지 않습니다");
     }
 }
