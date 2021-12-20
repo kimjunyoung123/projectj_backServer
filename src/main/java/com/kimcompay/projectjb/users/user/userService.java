@@ -56,8 +56,11 @@ public class userService {
                 return utillService.getJson(true, principalDetails.getUsername());
             }else if(detail.equals(senums.allt.get())){
                 logger.info("비밀번호 제외 후 전달");
+                Map<Object,Object>map=principalDetails.getPrinci();
+                map.put("pwd", null);
                 JSONObject jsonObject=new JSONObject();
                 jsonObject.put("flag", true);
+                jsonObject.put("message", map);
                 return jsonObject;
             }else{
                 return utillService.getJson(false, "잘못된 요청");
