@@ -107,6 +107,7 @@ public class userService {
         }else{
             logger.info("기업 회원가입");
             //추가 검사 
+            //jungbuService.getCompanyNum(Integer.parseInt(tryInsertDto.getCompany_num())); 
             checkCompanyNum(tryInsertDto);
             checkTimeAndOther(tryInsertDto);
             comVo vo=comVo.builder().cdetail_address(tryInsertDto.getDetail_address()).caddress(tryInsertDto.getAddress()).cemail(tryInsertDto.getEmail()).ckind(tryInsertDto.getScope_num()).cnum(tryInsertDto.getCompany_num())
