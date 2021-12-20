@@ -18,6 +18,7 @@ import com.kimcompay.projectjb.apis.jungbu.jungbuService;
 import com.kimcompay.projectjb.apis.kakaos.kakaoMapService;
 import com.kimcompay.projectjb.configs.securityConfig;
 import com.kimcompay.projectjb.enums.senums;
+import com.kimcompay.projectjb.users.principalDetails;
 import com.kimcompay.projectjb.users.company.comVo;
 import com.kimcompay.projectjb.users.company.compayDao;
 import com.nimbusds.jose.shaded.json.JSONObject;
@@ -25,6 +26,7 @@ import com.nimbusds.jose.shaded.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -41,7 +43,25 @@ public class userService {
     private securityConfig securityConfig;
     @Autowired
     private compayDao compayDao;
+
+    public JSONObject checkLogin(HttpServletRequest request,String detail) {
+        logger.info("checkLogin");
+        //시큐리티 세션 꺼내기
+        principalDetails principalDetails=(com.kimcompay.projectjb.users.principalDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        //요청분류
+        if(detail.equals(senums.emailt.get())){
+            logger.info("이메일만 전달");
+            return utillService.getJson(true, principalDetails.getUsername());
+        }else if(detail.equals(senums.allt.get())){
+            logger.info("비밀번호 제외 후 전달");
+            JSONObject jsonObject=new JSONObject();
+            jsonObject.put("flag", true);
+            return jsonObject;
+        }else{
+            return utillService.getJson(false, "잘못된 요청");
+        }
     
+    }
     public JSONObject checkLogin(HttpServletRequest request,HttpServletResponse response) {
         logger.info("checkLogin");
         boolean flag=Boolean.parseBoolean(request.getParameter("flag"));

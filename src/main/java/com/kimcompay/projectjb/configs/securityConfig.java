@@ -5,6 +5,7 @@ import com.kimcompay.projectjb.filters.loginFilter;
 import com.kimcompay.projectjb.jwt.jwtService;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -19,6 +20,11 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 @EnableWebSecurity/////필터를 추가해준다
 public class securityConfig extends WebSecurityConfigurerAdapter {
 
+    @Value("${access_token_cookie}")
+    private String access_token_cookie_name;
+    @Value("${refresh_token_cookie}")
+    private String refresh_token_cookie_name;
+    
     @Autowired
     private corsFilter corsFilter;
     @Autowired

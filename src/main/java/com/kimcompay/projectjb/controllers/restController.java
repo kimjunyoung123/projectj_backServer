@@ -6,7 +6,9 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
+import com.kimcompay.projectjb.utillService;
 import com.kimcompay.projectjb.apis.sns.snsService;
+import com.kimcompay.projectjb.enums.senums;
 import com.kimcompay.projectjb.users.user.tryInsertDto;
 import com.kimcompay.projectjb.users.user.userService;
 import com.nimbusds.jose.shaded.json.JSONObject;
@@ -16,6 +18,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.aws.messaging.core.QueueMessagingTemplate;
 import org.springframework.messaging.support.MessageBuilder;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -60,9 +63,15 @@ public class restController {
         logger.info(tryInsertDto.toString());
         return userService.insert(tryInsertDto, session);
     }
-    @RequestMapping(value = "/login/**",method = RequestMethod.POST)
-    public JSONObject tryLogin(HttpServletRequest request,HttpServletResponse response) {
+    @RequestMapping(value = "/login/{scope}/{detail}",method = RequestMethod.POST)
+    public JSONObject tryLogin(@PathVariable String detail,@PathVariable String scope,HttpServletRequest request,HttpServletResponse response) {
         logger.info("tryLogin");
-        return userService.checkLogin(request, response);
+        if(scope.equals(senums.logint.get())){
+            return userService.checkLogin(request, response);
+        }else if(scope.equals(senums.checkt.get())){
+            return userService.checkLogin(request,detail);
+        }
+        return utillService.getJson(false, "존재 하지 않는 처리");
     }
+
 }

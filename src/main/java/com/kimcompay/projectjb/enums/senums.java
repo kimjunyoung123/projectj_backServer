@@ -17,7 +17,10 @@ public enum senums {
     ce("이메일"),
     Authorization("Authorization"),
     user_role("role_user"),
-    company_role("role_company");
+    company_role("role_company"),
+    logint("login"),
+    checkt("check"),
+    allt("all");
 
     private String s;
     senums(String s){

@@ -110,7 +110,7 @@ public class loginFilter extends UsernamePasswordAuthenticationFilter {
         hashOperations.putAll(email,result);
         logger.info(hashOperations.get(email, "ccreated").toString());
         logger.info("로그인 과정완료");
-        utillService.goFoward("/login?flag=true", request, response);
+        utillService.goFoward("/login/login/null/?flag=true", request, response);
     }
     @Override
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response,AuthenticationException failed) throws IOException, ServletException {
@@ -120,7 +120,7 @@ public class loginFilter extends UsernamePasswordAuthenticationFilter {
         //failed.getClass().getSimpleName()도 되지만 instanceofeh도 가능
         String cause=null;
         if(failed instanceof BadCredentialsException){
-            cause="비밀번호가 일치하지 않습니다";
+            cause="이메일 혹은 비밀번호가 일치하지 않습니다";
         }else if(failed instanceof InternalAuthenticationServiceException){
             cause="가입한 이메일이 없습니다";
         }else if(failed instanceof LockedException || failed instanceof DisabledException){
@@ -128,6 +128,6 @@ public class loginFilter extends UsernamePasswordAuthenticationFilter {
         }else{
             cause="알수 없는 오류 발생";
         }
-        utillService.goFoward("/login?flag=false&cause="+cause, request, response);
+        utillService.goFoward("/login/login/null/?flag=false&cause="+cause, request, response);
     }
 }
