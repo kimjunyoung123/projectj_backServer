@@ -34,10 +34,10 @@ public class restController {
     @Autowired
     private userService userService;
 
-    @RequestMapping(value = "/test/**",method = RequestMethod.GET)
+    //
+    @RequestMapping(value = "/api/test",method = RequestMethod.GET)
     public void name(HttpSession session) {
         logger.info("test");
-        logger.info(session.getAttribute("auth").toString());
     }
     @RequestMapping(value = "/message",method =RequestMethod.POST )
     public void sendSqs(HttpServletRequest request,HttpServletResponse response) {

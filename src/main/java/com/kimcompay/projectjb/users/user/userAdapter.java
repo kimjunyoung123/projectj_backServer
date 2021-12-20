@@ -62,7 +62,6 @@ public class userAdapter {
             map.put("start_time", comVo.getStart_time());
             map.put("close_time", comVo.getClose_time());
         }
-        map.put("dto", map);
         return map;
     }
 }

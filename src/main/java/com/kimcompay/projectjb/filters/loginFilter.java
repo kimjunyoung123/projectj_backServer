@@ -78,12 +78,11 @@ public class loginFilter extends UsernamePasswordAuthenticationFilter {
         SecurityContextHolder.getContext().setAuthentication(authResult);
         //프린시펄디에일 꺼내기
         principalDetails principalDetails=(principalDetails)authResult.getPrincipal();
-        Map<Object,Object>map=principalDetails.getPrinci();
+        Map<Object,Object>result=principalDetails.getPrinci();
         email=principalDetails.getUsername();
        /* //vo->map으로 변환
         ObjectMapper objectMapper=new ObjectMapper();
         Map<String,Object> result= objectMapper.convertValue(map.get("dto"), Map.class);*/
-        Map<String,Object>result=(Map<String,Object>)map.get("dto");
         result.put("pwd", null);//비밀번호 지우기
         logger.info("로그인정보: "+result.toString());
         //토큰발급
@@ -97,8 +96,8 @@ public class loginFilter extends UsernamePasswordAuthenticationFilter {
         infor.put(refresh_cookie_name, refresh_token);
         utillService.makeCookie(infor, response);
         //redis구격에 맞게 int값 ->string
-        for(Entry<String,Object>s:result.entrySet()){
-            logger.info(s.getKey());
+        for(Entry<Object, Object> s:result.entrySet()){
+            logger.info(s.getKey().toString());
             if(Optional.ofNullable(s.getValue()).orElseGet(()->null)==null){
                 logger.info("null발견 무시");
                 continue;
