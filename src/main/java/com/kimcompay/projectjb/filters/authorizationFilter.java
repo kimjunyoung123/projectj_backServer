@@ -1,8 +1,7 @@
 package com.kimcompay.projectjb.filters;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;

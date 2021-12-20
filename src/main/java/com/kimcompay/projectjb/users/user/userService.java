@@ -62,7 +62,7 @@ public class userService {
                 logger.info(map.toString());
                 map.put(refresh_token_cookie_name, null);//refresh token제거 비밀번호는 로그인시 애초에 redis에 저장하지 않음
                 JSONObject jsonObject=new JSONObject();
-                jsonObject.put(map.get("email").toString(), map);
+                jsonObject.put("message", map);
                 jsonObject.put("flag", true);
                 return jsonObject;
             }else{

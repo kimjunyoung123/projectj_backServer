@@ -1,6 +1,5 @@
 package com.kimcompay.projectjb.users;
 
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
