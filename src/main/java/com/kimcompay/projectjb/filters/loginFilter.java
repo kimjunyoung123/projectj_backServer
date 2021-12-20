@@ -80,9 +80,11 @@ public class loginFilter extends UsernamePasswordAuthenticationFilter {
         principalDetails principalDetails=(principalDetails)authResult.getPrincipal();
         Map<Object,Object>map=principalDetails.getPrinci();
         email=principalDetails.getUsername();
-        //vo->map으로 변환
+       /* //vo->map으로 변환
         ObjectMapper objectMapper=new ObjectMapper();
-        Map<String,Object> result= objectMapper.convertValue(map.get("dto"), Map.class);
+        Map<String,Object> result= objectMapper.convertValue(map.get("dto"), Map.class);*/
+        Map<String,Object>result=(Map<String,Object>)map.get("dto");
+        result.put("pwd", null);//비밀번호 지우기
         logger.info("로그인정보: "+result.toString());
         //토큰발급
         String access_token=jwtService.get_access_token(email);
@@ -108,7 +110,6 @@ public class loginFilter extends UsernamePasswordAuthenticationFilter {
         HashOperations<String, Object, Object> hashOperations = redisTemplate.opsForHash();
         result.put(refresh_cookie_name, refresh_token);
         hashOperations.putAll(email,result);
-        logger.info(hashOperations.get(email, "ccreated").toString());
         logger.info("로그인 과정완료");
         utillService.goFoward("/login/login/null/?flag=true", request, response);
     }

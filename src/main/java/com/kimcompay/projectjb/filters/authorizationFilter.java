@@ -16,7 +16,6 @@ import com.kimcompay.projectjb.users.principalDetails;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.redis.core.RedisOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -47,13 +46,8 @@ public class authorizationFilter extends BasicAuthenticationFilter  {
             String email=jwtService.openJwt(access_token);
             logger.info("이메일: "+email);
             //redis에서 꺼내기
-            Map<Object, Object>map=redisTemplate.opsForHash().entries(email);
-            map.put("email",email);
-            map.put("role", redisTemplate.opsForHash().get(email, "crole"));
-            map.put("sleep", redisTemplate.opsForHash().get(email, "csleep"));
-            map.put("dto", map);
             //시큐리티 인증세션 주입
-            principalDetails principalDetails=new principalDetails(map);
+            principalDetails principalDetails=new principalDetails(redisTemplate.opsForHash().entries(email));
             SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(principalDetails,null,principalDetails.getAuthorities()));
 
         } catch (TokenExpiredException e) {

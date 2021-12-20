@@ -26,13 +26,15 @@ import com.nimbusds.jose.shaded.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 @Service
 public class userService {
     private Logger logger=LoggerFactory.getLogger(userService.class);
-
+    @Value("${refresh_token_cookie}")
+    private String refresh_token_cookie_name;
     @Autowired
     private jungbuService jungbuService;
     @Autowired
@@ -57,10 +59,10 @@ public class userService {
             }else if(detail.equals(senums.allt.get())){
                 logger.info("비밀번호 제외 후 전달");
                 Map<Object,Object>map=principalDetails.getPrinci();
-                map.put("pwd", null);
+                map.put(refresh_token_cookie_name, null);//refresh token제거 비밀번호는 로그인시 애초에 redis에 저장하지 않음
                 JSONObject jsonObject=new JSONObject();
+                jsonObject.put(map.get("email").toString(), map);
                 jsonObject.put("flag", true);
-                jsonObject.put("message", map);
                 return jsonObject;
             }else{
                 return utillService.getJson(false, "잘못된 요청");

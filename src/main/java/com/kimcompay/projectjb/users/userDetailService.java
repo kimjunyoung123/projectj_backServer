@@ -5,6 +5,7 @@ import java.util.Map;
 
 import com.kimcompay.projectjb.users.company.comVo;
 import com.kimcompay.projectjb.users.company.compayDao;
+import com.kimcompay.projectjb.users.user.userAdapter;
 import com.kimcompay.projectjb.users.user.userVo;
 import com.kimcompay.projectjb.users.user.userdao;
 
@@ -24,28 +25,23 @@ public class userDetailService implements UserDetailsService {
     private userdao userdao;
     @Autowired
     private compayDao compayDao;
+    @Autowired
+    private userAdapter userAdapter;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         logger.info("loadUserByUsername");
-        Map<Object,Object>princi=new HashMap<>();
+        //유저 정보조회
         userVo userVo=userdao.findByEmail(username).orElseGet(()->null);
+        Map<Object,Object>princi=new HashMap<>();
         if(userVo==null){
             logger.info("기업회원인지 찾기");
             comVo comVo=compayDao.findByCemail(username).orElseThrow(()-> new UsernameNotFoundException("회원정보를 찾을 수없습니다"));
-            princi.put("dto", comVo);
-            princi.put("sleep", comVo.getCsleep());
-            princi.put("email", comVo.getCemail());
-            princi.put("pwd", comVo.getCpwd());
-            princi.put("role", comVo.getCrole());
-            comVo.setCpwd(null);
+            userAdapter.adapterCom(comVo);
+            princi=userAdapter.getMap();
         }else{
-            princi.put("dto", userVo);
-            princi.put("sleep", userVo .getUsleep());
-            princi.put("email", userVo .getEmail());
-            princi.put("pwd", userVo .getUpwd());
-            princi.put("role", userVo .getUrole());
-            userVo.setUpwd(null);
+            userAdapter.adapterUser(userVo);
+            princi=userAdapter.getMap();
         }
         return new principalDetails(princi);
     }
