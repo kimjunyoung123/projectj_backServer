@@ -88,7 +88,7 @@ public class userService {
     public JSONObject insert(tryInsertDto tryInsertDto,HttpSession session) {
         logger.info("insert");
         //휴대폰/이메일 인증했는지 검사
-        //checkAuth(tryInsertDto, session);
+        checkAuth(tryInsertDto, session);
         //유효성검사
         checkValues(tryInsertDto);
         //인서트 시도
@@ -96,7 +96,7 @@ public class userService {
         //세션비우기
         session.removeAttribute(senums.auth.get()+senums.emailt.get());
         session.removeAttribute(senums.auth.get()+senums.phonet.get() );
-        return utillService.getJson(false, "회원가입에 성공하였습니다");
+        return utillService.getJson(true, "회원가입에 성공하였습니다");
     }
     private void try_insert(tryInsertDto tryInsertDto) {
         logger.info("try_insert");
