@@ -45,6 +45,8 @@ public class tryInsertDto {
     private String company_num;
     private String open_time;
     private String close_time;
+    private String name;
+    private String start_date;
     //db에는 숫자로 회원유형이 들어감
     private int scope_num;
 

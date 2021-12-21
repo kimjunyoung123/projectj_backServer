@@ -107,9 +107,9 @@ public class userService {
         }else{
             logger.info("기업 회원가입");
             //추가 검사 
-            jungbuService.getCompanyNum(Integer.parseInt(tryInsertDto.getCompany_num())); 
             checkCompanyNum(tryInsertDto);
             checkTimeAndOther(tryInsertDto);
+            jungbuService.getCompanyNum(tryInsertDto.getCompany_num(),tryInsertDto.getStart_date() ,tryInsertDto.getName()); 
             comVo vo=comVo.builder().cdetail_address(tryInsertDto.getDetail_address()).caddress(tryInsertDto.getAddress()).cemail(tryInsertDto.getEmail()).ckind(tryInsertDto.getScope_num()).cnum(tryInsertDto.getCompany_num())
                                     .crole(senums.company_role.get()).cphone(tryInsertDto.getPhone()).cpostcode(post_code).cpwd(hash_pwd).close_time(tryInsertDto.getClose_time()).csleep(0).ctel(tryInsertDto.getTel()).start_time(tryInsertDto.getOpen_time()).build();
                                     compayDao.save(vo);
@@ -147,31 +147,37 @@ public class userService {
         }
         logger.info("시간 유효성검사 통과");
         //전화번호 유효성검사
-        for(char s:tryInsertDto.getTel().toCharArray()){
-            logger.info("전화번호 분리: "+s);
-            int ss=(int)s;
-            logger.info("전화번호 아스키코드값: "+ss);
-            if(ss<48||ss>57){
-                throw utillService.makeRuntimeEX("전화번호는 숫자만 입력가능합니다", "checkTimeAndOther");
-            }
+        if(utillService.checkOnlyNum(tryInsertDto.getTel())||utillService.checkOnlyNum(tryInsertDto.getPhone())){
+            throw utillService.makeRuntimeEX("전화번호는 숫자만 입력가능합니다", "checkTimeAndOther");
         }
         logger.info("전화번호 유효성 통과");
     }
     private void checkCompanyNum(tryInsertDto tryInsertDto){
         logger.info("checkCompanyNum");
+        //값꺼내기
         int company_num=0;
         try {
             //null검사를 받을 때 안하므로 여기서 한다
-            company_num=Integer.parseInt(Optional.ofNullable(tryInsertDto.getCompany_num()).orElseThrow(()-> utillService.makeRuntimeEX("기업회원은 사업자 등록번호가 필수입니다", "try_insert")));
+            company_num=Integer.parseInt(Optional.ofNullable(tryInsertDto.getCompany_num()).orElseThrow(()-> utillService.makeRuntimeEX("기업회원은 사업자 등록번호가 필수입니다", "checkCompanyNum")));
             //JSONObject res=jungbuService.getCompanyNum(company_num);
         } catch (IllegalArgumentException e) {
             throw utillService.makeRuntimeEX("사업자 번호는 숫자만 적어주세요", "try_insert");
         }
-        int count=userdao.countByCnumNative(company_num);
-        logger.info("사업자번호 조회결과: "+count);
-        if(count!=0){
-            throw utillService.makeRuntimeEX("이미등록된 사업자번호입니다 ", "try_insert");
+        String tel=null;
+        try {
+            tel=Optional.ofNullable(tryInsertDto.getTel()).orElseThrow(()->utillService.makeRuntimeEX("회사번호를 입력해주세요", "checkCompanyNum"));
+        } catch (Exception e) {
+            //TODO: handle exception
         }
+        //회사전화 사업자 등록번호 중복확인
+        Map<String,Object>count=userdao.countByCnumNative(company_num,tel);
+        logger.info("사업자번호 조회결과: "+count);
+        if(Integer.parseInt(count.get("cn").toString())!=0){
+            throw utillService.makeRuntimeEX("이미등록된 사업자번호입니다 ", "try_insert");
+        }else if(Integer.parseInt(count.get("ct").toString())!=0){
+            throw utillService.makeRuntimeEX("이미등록된 전화번호입니다 ", "checkCompanyNum");
+        }
+        logger.info("사업자번호/회사번호 유효성 통과");
     }
     public Map<String,Object> getCount(String val) {
         return userdao.findByPhoneAndEmailJoinCompany(val,val,val,val);
@@ -210,7 +216,11 @@ public class userService {
             logger.info("주소 검색결과 미존재");
             throw utillService.makeRuntimeEX("주소검색결과가 없습니다", "checkValues");
         }
+        if(Optional.ofNullable(tryInsertDto.getName()).orElseGet(()->null)==null){
+            throw utillService.makeRuntimeEX("이름을 입력해주세요 ", "checkCompanyNum");
+        }
         tryInsertDto.setScope_num(Integer.parseInt(scope_num));
+        
         logger.info("회원가입 유효성검사 통과");
     }
     private void checkAuth(tryInsertDto tryInsertDto,HttpSession httpSession) {

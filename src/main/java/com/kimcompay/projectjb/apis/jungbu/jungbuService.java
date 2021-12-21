@@ -1,7 +1,7 @@
 package com.kimcompay.projectjb.apis.jungbu;
 
 import java.util.ArrayList;
-
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -27,16 +27,16 @@ public class jungbuService {
     @Value("${tax.decoding.apikey}")
     private String apikey;
 
-    public JSONObject getCompanyNum(int compay_num) {
+    public JSONObject getCompanyNum(String compay_num,String start_dt,String name) {
         logger.info("getCompanyNum");
         //resttemplate통신이 안되서 okhttp3으로 통신
         OkHttpClient client = new OkHttpClient().newBuilder().build();
         MediaType mediaType = MediaType.parse("application/json");
         //필수값 넣기
-        Map<String,Object> map=new JSONObject();
-        map.put("b_no", "0000000000");
-        map.put("start_dt", "20000101");
-        map.put("p_nm", "홍길동");
+        Map<String,Object> map=new LinkedHashMap<>();
+        map.put("b_no", compay_num);
+        map.put("start_dt", start_dt);
+        map.put("p_nm", name);
        /* 필수값이 아닌것들
         map.put("p_nm2", "홍길동"); 
         map.put("b_nm", "테스트");
@@ -63,7 +63,7 @@ public class jungbuService {
                         "       }\n  " +
                         "   ]\n" +
                         "}"); 옜날 방식*/
-                        logger.info("전송 정보: "+jsonObject);
+        logger.info("전송 정보: "+jsonObject);
         //요청
         Request request = new Request.Builder()
                 .url("http://api.odcloud.kr/api/nts-businessman/v1/validate?serviceKey="+apikey)

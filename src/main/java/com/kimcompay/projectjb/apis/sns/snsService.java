@@ -81,6 +81,9 @@ public class snsService {
         //이메일/휴대폰 구분전송
         if(type.equals(senums.phonet.get())){
             logger.info("휴대폰 전송시도");
+            if(utillService.checkOnlyNum(val)){
+                throw utillService.makeRuntimeEX("전화번호는 숫자만 있어야합니다", "send");
+            }
         }else if(type.equals(senums.emailt.get())){
             logger.info("이메일 전송시도");
         }else{
