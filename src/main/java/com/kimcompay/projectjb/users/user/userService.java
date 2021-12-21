@@ -21,6 +21,8 @@ import com.kimcompay.projectjb.enums.senums;
 import com.kimcompay.projectjb.users.principalDetails;
 import com.kimcompay.projectjb.users.company.comVo;
 import com.kimcompay.projectjb.users.company.compayDao;
+
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import org.slf4j.Logger;
@@ -111,11 +113,20 @@ public class userService {
             //추가 검사 
             checkCompanyValues(tryInsertDto);
             checkTimeAndOther(tryInsertDto);
-            jungbuService.getCompanyNum(tryInsertDto.getCompany_num(),tryInsertDto.getStart_dt() ,tryInsertDto.getStore_name()); 
+            checkComNum(jungbuService.getCompanyNum(tryInsertDto.getCompany_num(),tryInsertDto.getStart_dt() ,tryInsertDto.getStore_name()));
             comVo vo=comVo.builder().cdetail_address(tryInsertDto.getDetail_address()).caddress(tryInsertDto.getAddress()).cemail(tryInsertDto.getEmail()).ckind(tryInsertDto.getScope_num()).cnum(tryInsertDto.getCompany_num())
                                     .crole(senums.company_role.get()).cphone(tryInsertDto.getPhone()).cpostcode(post_code).cpwd(hash_pwd).close_time(tryInsertDto.getClose_time()).csleep(0).ctel(tryInsertDto.getTel()).start_time(tryInsertDto.getOpen_time()).build();
                                     compayDao.save(vo);
         }
+    }
+    private void checkComNum(JSONObject response) {
+        logger.info("checkComNum");
+        JSONArray jsons=(JSONArray)response.get("data");
+        JSONObject jsonObject=(JSONObject)jsons.get(0);
+        if(jsonObject.get("valid_msg").equals("확인할 수 없습니다.")){
+            throw utillService.makeRuntimeEX("사업자 조회에 실패했습니다", "checkComNum");
+        }
+        logger.info("사업자등록 유효성검사 통과");
     }
     private void checkTimeAndOther(tryInsertDto tryInsertDto) {
         logger.info("checkTimeAndOther");
