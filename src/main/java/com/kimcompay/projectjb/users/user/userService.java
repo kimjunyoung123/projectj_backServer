@@ -29,6 +29,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class userService {
@@ -81,6 +82,7 @@ public class userService {
         }
         return utillService.getJson(flag, request.getParameter("cause"));
     }
+    @Transactional(rollbackFor = Exception.class)
     public JSONObject insert(tryInsertDto tryInsertDto,HttpSession session) {
         logger.info("insert");
         //휴대폰/이메일 인증했는지 검사
@@ -167,7 +169,7 @@ public class userService {
         try {
             tel=Optional.ofNullable(tryInsertDto.getTel()).orElseThrow(()->utillService.makeRuntimeEX("회사번호를 입력해주세요", "checkCompanyNum"));
         } catch (Exception e) {
-            //TODO: handle exception
+            throw utillService.makeRuntimeEX(e.getMessage(), "checkCompanyNum");
         }
         //회사전화 사업자 등록번호 중복확인
         Map<String,Object>count=userdao.countByCnumNative(company_num,tel);
