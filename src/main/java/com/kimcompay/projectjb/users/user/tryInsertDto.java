@@ -39,14 +39,16 @@ public class tryInsertDto {
     //회원유형
     @NotBlank(message = "회원유형이 없습니다")
     private String scope;
+    @NotBlank(message = "이름을 입력해주세요")
+    private String name;
     //회사전화번호 기업시에만 따로검사
     private String tel;
     //기업시에만 따로 검사
     private String company_num;
     private String open_time;
     private String close_time;
-    private String name;
-    private String start_date;
+    private String store_name;
+    private String start_dt;
     //db에는 숫자로 회원유형이 들어감
     private int scope_num;
 

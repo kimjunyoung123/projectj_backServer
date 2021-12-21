@@ -109,9 +109,9 @@ public class userService {
         }else{
             logger.info("기업 회원가입");
             //추가 검사 
-            checkCompanyNum(tryInsertDto);
+            checkCompanyValues(tryInsertDto);
             checkTimeAndOther(tryInsertDto);
-            jungbuService.getCompanyNum(tryInsertDto.getCompany_num(),tryInsertDto.getStart_date() ,tryInsertDto.getName()); 
+            jungbuService.getCompanyNum(tryInsertDto.getCompany_num(),tryInsertDto.getStart_dt() ,tryInsertDto.getStore_name()); 
             comVo vo=comVo.builder().cdetail_address(tryInsertDto.getDetail_address()).caddress(tryInsertDto.getAddress()).cemail(tryInsertDto.getEmail()).ckind(tryInsertDto.getScope_num()).cnum(tryInsertDto.getCompany_num())
                                     .crole(senums.company_role.get()).cphone(tryInsertDto.getPhone()).cpostcode(post_code).cpwd(hash_pwd).close_time(tryInsertDto.getClose_time()).csleep(0).ctel(tryInsertDto.getTel()).start_time(tryInsertDto.getOpen_time()).build();
                                     compayDao.save(vo);
@@ -154,32 +154,43 @@ public class userService {
         }
         logger.info("전화번호 유효성 통과");
     }
-    private void checkCompanyNum(tryInsertDto tryInsertDto){
-        logger.info("checkCompanyNum");
+    private void checkCompanyValues(tryInsertDto tryInsertDto){
+        logger.info("checkCompanyValues");
         //값꺼내기
         int company_num=0;
         try {
             //null검사를 받을 때 안하므로 여기서 한다
-            company_num=Integer.parseInt(Optional.ofNullable(tryInsertDto.getCompany_num()).orElseThrow(()-> utillService.makeRuntimeEX("기업회원은 사업자 등록번호가 필수입니다", "checkCompanyNum")));
+            company_num=Integer.parseInt(Optional.ofNullable(tryInsertDto.getCompany_num()).orElseThrow(()-> utillService.makeRuntimeEX("기업회원은 사업자 등록번호가 필수입니다", "checkCompanyValues")));
             //JSONObject res=jungbuService.getCompanyNum(company_num);
         } catch (IllegalArgumentException e) {
             throw utillService.makeRuntimeEX("사업자 번호는 숫자만 적어주세요", "try_insert");
         }
         String tel=null;
         try {
-            tel=Optional.ofNullable(tryInsertDto.getTel()).orElseThrow(()->utillService.makeRuntimeEX("회사번호를 입력해주세요", "checkCompanyNum"));
+            tel=Optional.ofNullable(tryInsertDto.getTel()).orElseThrow(()->utillService.makeRuntimeEX("회사번호를 입력해주세요", "checkCompanyValues"));
         } catch (Exception e) {
-            throw utillService.makeRuntimeEX(e.getMessage(), "checkCompanyNum");
+            throw utillService.makeRuntimeEX(e.getMessage(), "checkCompanyValues");
         }
         //회사전화 사업자 등록번호 중복확인
         Map<String,Object>count=userdao.countByCnumNative(company_num,tel);
-        logger.info("사업자번호 조회결과: "+count);
+        logger.info("사업자번호 조회결과: "+count.toString());
         if(Integer.parseInt(count.get("cn").toString())!=0){
             throw utillService.makeRuntimeEX("이미등록된 사업자번호입니다 ", "try_insert");
         }else if(Integer.parseInt(count.get("ct").toString())!=0){
-            throw utillService.makeRuntimeEX("이미등록된 전화번호입니다 ", "checkCompanyNum");
+            throw utillService.makeRuntimeEX("이미등록된 회사번호입니다 ", "checkCompanyValues");
         }
-        logger.info("사업자번호/회사번호 유효성 통과");
+        String store_name=Optional.ofNullable(tryInsertDto.getStore_name()).orElseThrow(()->utillService.makeRuntimeEX("회사명을 입력해 주세요","checkCompanyValues"));
+        if(utillService.checkBlank(store_name)){
+            throw utillService.makeRuntimeEX("회사명을 입력해 주세요","checkCompanyValues");
+        }
+        String start_dt=Optional.ofNullable(tryInsertDto.getStart_dt()).orElseThrow(()->utillService.makeRuntimeEX("개업일자를 입력해 주세요","checkCompanyValues"));
+        if(utillService.checkBlank(start_dt)){
+            throw utillService.makeRuntimeEX("개업일자가 비어있거나 숫자만 입력해주세요","checkCompanyValues");
+        }
+        if(utillService.checkOnlyNum(start_dt)){
+            throw utillService.makeRuntimeEX("개업일자는 숫자만 주세요","checkCompanyValues");
+        }
+        logger.info("사업자유효성통과");
     }
     public Map<String,Object> getCount(String val) {
         return userdao.findByPhoneAndEmailJoinCompany(val,val,val,val);
@@ -219,7 +230,7 @@ public class userService {
             throw utillService.makeRuntimeEX("주소검색결과가 없습니다", "checkValues");
         }
         if(Optional.ofNullable(tryInsertDto.getName()).orElseGet(()->null)==null){
-            throw utillService.makeRuntimeEX("이름을 입력해주세요 ", "checkCompanyNum");
+            throw utillService.makeRuntimeEX("이름을 입력해주세요 ", "checkCompanyValues");
         }
         tryInsertDto.setScope_num(Integer.parseInt(scope_num));
         
