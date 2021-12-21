@@ -21,7 +21,7 @@ import com.kimcompay.projectjb.enums.senums;
 import com.kimcompay.projectjb.users.principalDetails;
 import com.kimcompay.projectjb.users.company.comVo;
 import com.kimcompay.projectjb.users.company.compayDao;
-import com.nimbusds.jose.shaded.json.JSONObject;
+import org.json.simple.JSONObject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -92,7 +92,7 @@ public class userService {
         //세션비우기
         session.removeAttribute(senums.auth.get()+senums.emailt.get());
         session.removeAttribute(senums.auth.get()+senums.phonet.get() );
-        return utillService.getJson(true, "회원가입에 성공하였습니다");
+        return utillService.getJson(false, "회원가입에 성공하였습니다");
     }
     private void try_insert(tryInsertDto tryInsertDto) {
         logger.info("try_insert");

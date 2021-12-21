@@ -1,17 +1,17 @@
 package com.kimcompay.projectjb.apis.jungbu;
 
-import java.io.IOException;
 import java.util.ArrayList;
+
 import java.util.List;
+import java.util.Map;
 
-import com.kimcompay.projectjb.apis.requestTo;
-import com.nimbusds.jose.shaded.json.JSONObject;
+import com.kimcompay.projectjb.utillService;
 
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 
 import okhttp3.MediaType;
@@ -26,27 +26,29 @@ public class jungbuService {
 
     @Value("${tax.decoding.apikey}")
     private String apikey;
-    @Autowired
-    private requestTo requestTo;
 
-    public void getCompanyNum(int compay_num) {
+    public JSONObject getCompanyNum(int compay_num) {
         logger.info("getCompanyNum");
-       /* //body생성
-        JSONObject body=new JSONObject();
-        //사업자등록증 담기
-        List<String>integers=new ArrayList<>();
-        integers.add(Integer.toString(compay_num));
-        body.put("b_no", integers);
-        //요청 url
-        String url="https://api.odcloud.kr/api/nts-businessman/v1/status?serviceKey="+apikey;
-        //헤더담기
-        HttpHeaders headers=new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        return requestTo.requestPost(body, url, headers);*/
-        OkHttpClient client = new OkHttpClient().newBuilder()
-                .build();
+        //resttemplate통신이 안되서 okhttp3으로 통신
+        OkHttpClient client = new OkHttpClient().newBuilder().build();
         MediaType mediaType = MediaType.parse("application/json");
-        RequestBody body = RequestBody.create(mediaType,
+        //필수값 넣기
+        Map<String,Object> map=new JSONObject();
+        map.put("b_no", "0000000000");
+        map.put("start_dt", "20000101");
+        map.put("p_nm", "홍길동");
+       /* 필수값이 아닌것들
+        map.put("p_nm2", "홍길동"); 
+        map.put("b_nm", "테스트");
+        map.put("corp_no", "0000000000000");
+        map.put("b_sector", "");
+        map.put("b_type", "");*/
+        //요청형식이 json 배열임 
+        List< Map<String,Object>>jsonObjects=new ArrayList<>();
+        jsonObjects.add(map);
+        JSONObject jsonObject=new JSONObject();
+        jsonObject.put("businesses", jsonObjects);
+        RequestBody body = RequestBody.create(jsonObject.toString(),mediaType); /*RequestBody.create(mediaType,
                 "{\n  \"businesses\": " +
                         "   [\n    " +
                         "       {\n      " +
@@ -60,19 +62,27 @@ public class jungbuService {
                         "           \"b_type\": \"\"\n    " +
                         "       }\n  " +
                         "   ]\n" +
-                        "}");
+                        "}"); 옜날 방식*/
+                        logger.info("전송 정보: "+jsonObject);
+        //요청
         Request request = new Request.Builder()
                 .url("http://api.odcloud.kr/api/nts-businessman/v1/validate?serviceKey="+apikey)
                 .method("POST", body)
                 .addHeader("Content-Type", "application/json")
                 .build();
-        Response response;
+        //결과 탐색
         try {
-                response = client.newCall(request).execute();
-                System.out.println(response.body().string());
-        } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-        }
+                Response response = client.newCall(request).execute();
+                String res=response.body().string();
+                JSONParser parser = new JSONParser();
+                Object obj = parser.parse( res );
+                JSONObject jsonObj = (JSONObject) obj;
+                logger.info("변환: "+jsonObj);
+                return jsonObj;
+               
+        } catch (Exception e) {
+                logger.info("사업자 등록 조회실패");
+                throw utillService.makeRuntimeEX("사업자 조회에 실패했습니다", "getCompanyNum");
+        } 
     }
 }

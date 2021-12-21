@@ -17,7 +17,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kimcompay.projectjb.utillService;
 import com.kimcompay.projectjb.jwt.jwtService;
 import com.kimcompay.projectjb.users.principalDetails;
-import com.nimbusds.jose.shaded.json.JSONObject;
+import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.HashOperations;

@@ -2,8 +2,8 @@ package com.kimcompay.projectjb.apis.kakaos;
 
 import com.kimcompay.projectjb.apis.requestTo;
 import com.kimcompay.projectjb.enums.senums;
-import com.nimbusds.jose.shaded.json.JSONObject;
 
+import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
