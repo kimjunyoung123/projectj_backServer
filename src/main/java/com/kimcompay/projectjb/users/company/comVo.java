@@ -55,6 +55,8 @@ public class comVo {
     @Column(name = "crole",nullable = false ,length = 20)
     private String crole;
 
+    @Column(name = "store_name",nullable = false ,length = 100)
+    private String store_name;
 
     @Column(name = "clogin_date")
     private Timestamp clogin_date;
