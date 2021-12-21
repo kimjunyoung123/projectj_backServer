@@ -37,12 +37,12 @@ public class jungbuService {
         map.put("b_no", compay_num);
         map.put("start_dt", start_dt);
         map.put("p_nm", name);
-       /* 필수값이 아닌것들
-        map.put("p_nm2", "홍길동"); 
-        map.put("b_nm", "테스트");
-        map.put("corp_no", "0000000000000");
+       //필수값이 아닌것들
+        map.put("p_nm2", ""); 
+        map.put("b_nm", "");
+        map.put("corp_no", "");
         map.put("b_sector", "");
-        map.put("b_type", "");*/
+        map.put("b_type", "");
         //요청형식이 json 배열임 
         List< Map<String,Object>>jsonObjects=new ArrayList<>();
         jsonObjects.add(map);
