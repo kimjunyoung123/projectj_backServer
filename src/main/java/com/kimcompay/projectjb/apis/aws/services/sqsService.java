@@ -31,7 +31,7 @@ public class sqsService {
         logger.info("sms_sqs");
         logger.info("message: "+message);
         Map<String,String>map=getMessageAndAddress(message);
-        //smsService.sendMessege(map.get("val"),map.get("title")+"\n"+map.get("message"));
+        //smsService.sendMessege(map.get("val"),map.get("title")+"\n"+map.get("message"));문자발송은실제로돈이나가서 막아논것
     }
     @SqsListener("projectj_email_sqs")
     public void loadEmailMessage(String message) {
