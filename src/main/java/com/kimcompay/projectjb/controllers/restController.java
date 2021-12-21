@@ -78,4 +78,14 @@ public class restController {
 
         return utillService.getJson(false, "존재 하지 않는 처리");
     }
+    @RequestMapping("/tokenExpire/{result}")
+    public JSONObject tokenExpire(@PathVariable String result,HttpServletRequest request,HttpServletResponse response) {
+        logger.info("tokenExpire controller");
+        if(result.equals(senums.newToken.get())){
+            return utillService.getJson(true, "new");
+        }else{
+            return utillService.getJson(false, "로그인이 만료되었습니다 다시 로그인 바랍니다");
+        }
+        
+    }
 }

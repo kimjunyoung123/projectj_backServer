@@ -20,7 +20,9 @@ public enum senums {
     company_role("role_company"),
     logint("login"),
     checkt("check"),
-    allt("all");
+    allt("all"),
+    noInRedis("n"),
+    newToken("y");
 
     private String s;
     senums(String s){

@@ -22,6 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
@@ -105,10 +106,13 @@ public class loginFilter extends UsernamePasswordAuthenticationFilter {
                 result.put(s.getKey(), s.getValue().toString());
             }
         }
-        //redis밀어넣기
+        //redis 유저정보 밀어넣기
         HashOperations<String, Object, Object> hashOperations = redisTemplate.opsForHash();
         result.put(refresh_cookie_name, refresh_token);
         hashOperations.putAll(email,result);
+        //redis refresh 토큰 /이메일 밀어넣기
+        ValueOperations<String, String>redisInRefresh=redisTemplate.opsForValue();
+        redisInRefresh.set(refresh_token,email);
         logger.info("로그인 과정완료");
         utillService.goFoward("/login/login/null/?flag=true", request, response);
     }
