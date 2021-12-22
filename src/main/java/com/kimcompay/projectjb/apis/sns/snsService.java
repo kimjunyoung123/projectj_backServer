@@ -46,7 +46,7 @@ public class snsService {
         try {
             keys=senums.valueOf(type).get().split(",");
         } catch (IllegalArgumentException e) {
-            throw utillService.makeRuntimeEX("존재하지 않는 인증방법 혹은 수단입니다 입니다","send");
+            throw utillService.makeRuntimeEX("존재하지 않는 인증방법 혹은 수단입니다","send");
         }
         logger.info("조회할 정보: "+val);
         //db에 전화번호/이메일 찾기 (count 로 가져옴)
@@ -81,6 +81,10 @@ public class snsService {
         httpSession.setMaxInactiveInterval(limiteMin*60*1000);
         httpSession.setAttribute(detail+type, map);
         //이메일/휴대폰 구분전송
+        //비밀번호 찾이요청일경우 이메일로 전송
+        if(type.equals(senums.pwtt.get())){
+            type=senums.emailt.get();
+        }
         if(type.equals(senums.phonet.get())){
             logger.info("휴대폰 전송시도");
             if(utillService.checkOnlyNum(val)){
@@ -115,7 +119,7 @@ public class snsService {
         //비교하기
         String rnum=Optional.ofNullable(jsonObject.get("val").toString()).orElseThrow(()->utillService.throwRuntimeEX("인증번호를 입력해주세요"));
         utillService.checkBlank(rnum);
-        String num=map.get("num").toString();
+        String num=map.get("num").toString().trim();
         if(rnum.equals(num)){
             //용도에 맞춰서 처리
             String message="인증성공";
@@ -138,15 +142,21 @@ public class snsService {
     private String doFindAction(String val,String type) {
         logger.info("doFindAction");
         String res=null;
-        Map<String,Object>map=userService.selectEmailByPhone(val);
-        for(Entry<String, Object>m:map.entrySet()){
-            logger.info(m.getKey());
-            if(m.getValue()==null){
-                continue;
+        //비밀번호 찾기일경구
+        if(type.equals(senums.pwtt.get())){
+            res="이메일로 링크가 전송되었습니다";
+        }else{
+            //이메일찾기일경우
+            Map<String,Object>map=userService.selectEmailByPhone(val);
+            for(Entry<String, Object>m:map.entrySet()){
+                logger.info(m.getKey());
+                if(m.getValue()==null){
+                    continue;
+                }
+                res=m.getValue().toString();
             }
-            res=m.getValue().toString();
+            logger.info("찾은 내용: "+res);
         }
-        logger.info("찾은 내용: "+res);
         return res;
     }
 }

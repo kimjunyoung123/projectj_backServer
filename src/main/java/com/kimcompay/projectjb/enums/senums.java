@@ -11,6 +11,8 @@ public enum senums {
     email("ue,ce"),
     phonet("phone"),
     emailt("email"),
+    pwd("ue,ce"),
+    pwtt("pwd"),
     up("휴대폰번호"),
     cp("휴대폰번호"),
     ue("유저 이메일"),
