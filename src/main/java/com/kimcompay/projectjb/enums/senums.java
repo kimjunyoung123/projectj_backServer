@@ -22,7 +22,8 @@ public enum senums {
     checkt("check"),
     allt("all"),
     noInRedis("n"),
-    newToken("y");
+    newToken("y"),
+    sqsEndPoint("https://sqs.ap-northeast-2.amazonaws.com/527222691614/");
 
     private String s;
     senums(String s){

@@ -24,7 +24,6 @@ import org.springframework.util.concurrent.ListenableFuture;
 @Service
 public class sqsService {
     private Logger logger=LoggerFactory.getLogger(sqsService.class);
-    private String end_point="https://sqs.ap-northeast-2.amazonaws.com/527222691614/";
     @Autowired
     private QueueMessagingTemplate queueMessagingTemplate;
     @Autowired
@@ -48,6 +47,7 @@ public class sqsService {
     }
     public void sendSqs(String text,String type,String val) {
         logger.info("sendSqs");
+        String end_point=senums.sqsEndPoint.get();
         if(type.equals(senums.phonet.get())){
             logger.info("휴대폰 sqs전송시도");
             end_point+="projectj_sms_sqs";
@@ -79,6 +79,7 @@ public class sqsService {
     @Async
     public ListenableFuture<String> sendEmailAsync(String text,String val) {
         logger.info("sendEmailAsync");
+        String end_point=senums.sqsEndPoint.get();
         end_point+="projectj_email_sqs";
         logger.info("sqs주소: "+end_point);
         queueMessagingTemplate.send(end_point,MessageBuilder.withPayload(makeTitleAndText("안녕하세요 장보고입니다", text, val)).build());
