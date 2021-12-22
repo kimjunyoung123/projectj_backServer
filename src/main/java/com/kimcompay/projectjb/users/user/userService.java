@@ -52,6 +52,10 @@ public class userService {
     @Autowired
     private sqsService sqsService;
 
+    public Map<String,Object> selectEmailByPhone(String phone) {
+        logger.info("selectEmailByPhone");
+        return userdao.findEmailByPhone(phone, phone);
+    }
     public JSONObject checkLogin(HttpServletRequest request,String detail) {
         logger.info("checkLogin");
         logger.info("detail: "+detail);

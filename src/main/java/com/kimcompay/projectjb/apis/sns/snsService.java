@@ -3,6 +3,7 @@ package com.kimcompay.projectjb.apis.sns;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Map.Entry;
 
 import javax.servlet.http.HttpSession;
 
@@ -15,6 +16,7 @@ import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.method.P;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -32,7 +34,7 @@ public class snsService {
     public JSONObject send(JSONObject jsonObject,HttpSession httpSession) {
         logger.info("send"+jsonObject.toString());
         //입력값 검사
-        String val= Optional.ofNullable(jsonObject.get("val").toString()).orElseThrow(()-> utillService.makeRuntimeEX("이메일/전화번호를 확인해주세요", "send"));
+        String val= Optional.ofNullable(jsonObject.get("val").toString()).orElseThrow(()-> utillService.makeRuntimeEX("이메일/전화번호를 확인해주세요", "send")).trim();
         if(utillService.checkBlank(val)){
             utillService.throwRuntimeEX("이메일/전화번호가 공백일 수없습니다");
         }
@@ -62,7 +64,7 @@ public class snsService {
             }
         }else if(detail.equals(senums.find.get())){
             logger.info("가입이 되어있어야하는요청");
-            if(upoe.equals("0")||cpoe.equals("0")){
+            if(upoe.equals("0")&&cpoe.equals("0")){
                 logger.info("회원 정보가 존재하지 않습니다");
                 utillService.throwRuntimeEX("가입된 회원정보가 존재하지 않습니다");
             }
@@ -105,6 +107,7 @@ public class snsService {
             logger.info(session.getAttribute(key).toString());
             map=(Map<String,Object>)session.getAttribute(key);
         } catch (NullPointerException e) {
+            e.printStackTrace();
             logger.info("인증 요청 내역없음");
             utillService.throwRuntimeEX("요청 기록이 존재하지 않습니다 다시 요청 해주세요");
         }
@@ -114,13 +117,36 @@ public class snsService {
         utillService.checkBlank(rnum);
         String num=map.get("num").toString();
         if(rnum.equals(num)){
-            map.put("res",true);
-            map.put(map.get("type").toString(), map.get("val"));
-            logger.info("인증후세션 내역: "+map.toString());
-            session.setAttribute(key, map);
-            return utillService.getJson(true, "인증성공");
+            //용도에 맞춰서 처리
+            String message="인증성공";
+            if(key.startsWith(senums.find.get())){
+                logger.info("찾기 인증요청이였음");
+                message="이메일: "+doFindAction(map.get("val").toString(), map.get("type").toString());
+                session.removeAttribute(key);
+            }else{
+                logger.info("일반 인증요청이였음");
+                map.put("res",true);
+                map.put(map.get("type").toString(), map.get("val"));
+                logger.info("인증후세션 내역: "+map.toString());
+                session.setAttribute(key, map);
+            }
+            return utillService.getJson(true, message);
         }
         return utillService.getJson(false, "인증번호 불일치");
         
+    }
+    private String doFindAction(String val,String type) {
+        logger.info("doFindAction");
+        String res=null;
+        Map<String,Object>map=userService.selectEmailByPhone(val);
+        for(Entry<String, Object>m:map.entrySet()){
+            logger.info(m.getKey());
+            if(m.getValue()==null){
+                continue;
+            }
+            res=m.getValue().toString();
+        }
+        logger.info("찾은 내용: "+res);
+        return res;
     }
 }

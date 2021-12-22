@@ -15,4 +15,7 @@ public interface userdao extends JpaRepository<userVo,Integer>{
     Map<String,Object> countByCnumNative(int company_num,String tel);
 
     Optional<userVo>findByEmail(String email);
+
+    @Query(value = "select (select uemail from users where uphone=?)ue,(select cemail from companys where cphone=?)ce",nativeQuery = true)
+    Map<String,Object>findEmailByPhone(String phone,String samPhone);
 }
