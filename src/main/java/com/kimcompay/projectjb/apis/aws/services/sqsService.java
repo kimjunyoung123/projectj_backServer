@@ -8,17 +8,23 @@ import com.kimcompay.projectjb.apis.sns.emailService;
 import com.kimcompay.projectjb.apis.sns.smsService;
 import com.kimcompay.projectjb.enums.senums;
 
+import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.aws.messaging.core.QueueMessagingTemplate;
 import org.springframework.cloud.aws.messaging.listener.annotation.SqsListener;
 import org.springframework.messaging.support.MessageBuilder;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Service;
+import org.springframework.util.concurrent.ListenableFuture;
+
 
 @Service
 public class sqsService {
     private Logger logger=LoggerFactory.getLogger(sqsService.class);
+    private String end_point="https://sqs.ap-northeast-2.amazonaws.com/527222691614/";
     @Autowired
     private QueueMessagingTemplate queueMessagingTemplate;
     @Autowired
@@ -30,19 +36,18 @@ public class sqsService {
     public void loadSMSMessage(String message) {
         logger.info("sms_sqs");
         logger.info("message: "+message);
-        Map<String,String>map=getMessageAndAddress(message);
-        //smsService.sendMessege(map.get("val"),map.get("title")+"\n"+map.get("message"));문자발송은실제로돈이나가서 막아논것
+       JSONObject titleAndTextAndAddress=getMessageAndAddress(message);
+        //smsService.sendMessege(titleAndTextAndAddress.get("val"),titleAndTextAndAddress.get("title")+"\n"+titleAndTextAndAddress.get("text"));문자발송은실제로돈이나가서 막아논것
     }
     @SqsListener("projectj_email_sqs")
     public void loadEmailMessage(String message) {
         logger.info("email_sqs");
         logger.info("message: "+message);
-        Map<String,String> map=getMessageAndAddress(message);
-        emailService.sendEmail(map.get("val"),map.get("title"),map.get("message"));
+        JSONObject titleAndTextAndAddress=getMessageAndAddress(message);
+        emailService.sendEmail(titleAndTextAndAddress.get("val").toString(),titleAndTextAndAddress.get("title").toString(),titleAndTextAndAddress.get("text").toString());
     }
     public void sendSqs(String text,String type,String val) {
         logger.info("sendSqs");
-        String end_point="https://sqs.ap-northeast-2.amazonaws.com/527222691614/";
         if(type.equals(senums.phonet.get())){
             logger.info("휴대폰 sqs전송시도");
             end_point+="projectj_sms_sqs";
@@ -53,17 +58,31 @@ public class sqsService {
             utillService.throwRuntimeEX("sqs 전송 실패 지원하지 않는 인증수단");
         }
         logger.info("sqs주소: "+end_point);
-        queueMessagingTemplate.send(end_point,MessageBuilder.withPayload(text+"/"+val).build());
+        //구성만들기
+        queueMessagingTemplate.send(end_point,MessageBuilder.withPayload(makeTitleAndText("안녕하세요 장보고입니다",text,val)).build());
         
     }
-    private Map<String,String> getMessageAndAddress(String sqsMessage){
+    private JSONObject getMessageAndAddress(String sqsMessage){
         logger.info("getMessageAndAddress");
-        String[] strings=sqsMessage.split("/");
-        sqsMessage=sqsMessage.replace("/"+strings[strings.length-1],"");
-        Map<String,String>map=new HashMap<>();
-        map.put("message", sqsMessage);
-        map.put("val", strings[strings.length-1]);
-        map.put("title", "안녕하세요 장보고 입니다");
-        return map;
+        logger.info("메세지내용: "+sqsMessage);
+        return utillService.stringToJson(sqsMessage);
     }
+    private JSONObject makeTitleAndText(String title,String text,String val) {
+        logger.info("makeTitleAndText");
+        logger.info("제목: "+title+",내용: "+text+",받는주소/번호: "+val);
+        JSONObject jsonObject=new JSONObject();
+        jsonObject.put("title", title);
+        jsonObject.put("text", text);
+        jsonObject.put("val", val);
+        return jsonObject;
+    }
+    @Async
+    public ListenableFuture<String> sendEmailAsync(String text,String val) {
+        logger.info("sendEmailAsync");
+        end_point+="projectj_email_sqs";
+        logger.info("sqs주소: "+end_point);
+        queueMessagingTemplate.send(end_point,MessageBuilder.withPayload(makeTitleAndText("안녕하세요 장보고입니다", text, val)).build());
+        return new AsyncResult<>("결과");
+    }
+    
 }

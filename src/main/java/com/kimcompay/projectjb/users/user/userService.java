@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import com.kimcompay.projectjb.utillService;
+import com.kimcompay.projectjb.apis.aws.services.sqsService;
 import com.kimcompay.projectjb.apis.jungbu.jungbuService;
 import com.kimcompay.projectjb.apis.kakaos.kakaoMapService;
 import com.kimcompay.projectjb.configs.securityConfig;
@@ -48,6 +49,8 @@ public class userService {
     private securityConfig securityConfig;
     @Autowired
     private compayDao compayDao;
+    @Autowired
+    private sqsService sqsService;
 
     public JSONObject checkLogin(HttpServletRequest request,String detail) {
         logger.info("checkLogin");
@@ -95,7 +98,9 @@ public class userService {
         try_insert(tryInsertDto);
         //세션비우기
         session.removeAttribute(senums.auth.get()+senums.emailt.get());
-        session.removeAttribute(senums.auth.get()+senums.phonet.get() );
+        session.removeAttribute(senums.auth.get()+senums.phonet.get());
+        //회원가입 이메일 비동기 전송 
+        sqsService.sendEmailAsync("장보고에 회원가입해주셔서 진심으로 감사합니다", tryInsertDto.getEmail());
         return utillService.getJson(true, "회원가입에 성공하였습니다");
     }
     private void try_insert(tryInsertDto tryInsertDto) {

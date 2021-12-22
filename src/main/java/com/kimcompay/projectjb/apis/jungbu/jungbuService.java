@@ -73,12 +73,7 @@ public class jungbuService {
         //결과 탐색
         try {
                 Response response = client.newCall(request).execute();
-                String res=response.body().string();
-                JSONParser parser = new JSONParser();
-                Object obj = parser.parse( res );
-                JSONObject jsonObj = (JSONObject) obj;
-                logger.info("변환: "+jsonObj);
-                return jsonObj;
+                return utillService.stringToJson(response.body().string());
                
         } catch (Exception e) {
                 logger.info("사업자 등록 조회실패");

@@ -13,7 +13,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.json.simple.JSONObject;
-
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseCookie;
@@ -110,5 +111,18 @@ public class utillService {
             }
         }
         return false;
+    }
+    public static JSONObject stringToJson(String jsonString) {
+        logger.info("stringToJson");
+        JSONParser parser = new JSONParser();
+        Object obj;
+        try {
+            obj = parser.parse(jsonString);
+            JSONObject jsonObj = (JSONObject) obj;
+            logger.info("변환: "+jsonObj);
+            return jsonObj;
+        } catch (ParseException e) {
+            throw makeRuntimeEX("알수없는 에러발생", "stringToJson");
+        }
     }
 }
