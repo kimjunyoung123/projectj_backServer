@@ -74,8 +74,8 @@ public class userService {
             }else{
                 return utillService.getJson(false, "잘못된 요청");
             }
-        } catch (NullPointerException e) {
-            throw utillService.makeRuntimeEX("로그인 실패", "checkLogin");
+        } catch (NullPointerException |ClassCastException e) {
+            throw utillService.makeRuntimeEX("로그인 정보없음", "checkLogin");
         }
     }
     public JSONObject checkLogin(HttpServletRequest request,HttpServletResponse response) {
