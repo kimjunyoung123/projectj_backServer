@@ -18,4 +18,7 @@ public interface userdao extends JpaRepository<userVo,Integer>{
 
     @Query(value = "select (select uemail from users where uphone=?)ue,(select cemail from companys where cphone=?)ce",nativeQuery = true)
     Map<String,Object>findEmailByPhone(String phone,String samPhone);
+
+    @Query(value = "select (select uphone from users where uemail=?)up,(select cphone from companys where cemail=?)cp",nativeQuery = true)
+    Map<String,Object>findPhoneByEmail(String email,String sameEmail);
 }

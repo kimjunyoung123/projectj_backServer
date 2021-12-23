@@ -11,12 +11,13 @@ import com.kimcompay.projectjb.utillService;
 import com.kimcompay.projectjb.apis.aws.services.sqsService;
 import com.kimcompay.projectjb.enums.senums;
 import com.kimcompay.projectjb.users.user.userService;
+import com.kimcompay.projectjb.users.user.userdao;
+
 import org.json.simple.JSONObject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.method.P;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -96,7 +97,7 @@ public class snsService {
             utillService.throwRuntimeEX("지원하지 않는 인증방식입니다");
         }
         //sqs전송요청
-        sqsService.sendSqs("인증번호는 "+num+"입니다", type,val);
+        sqsService.sendSqs("안녕하세요 장보고입니다","인증번호는 "+num+"입니다", type,val);
         return utillService.getJson(true, "인증번호가 "+type+"로 전송되었습니다");
     }
     public JSONObject confrim(JSONObject jsonObject,HttpSession session) {
@@ -125,7 +126,7 @@ public class snsService {
             String message="인증성공";
             if(key.startsWith(senums.find.get())){
                 logger.info("찾기 인증요청이였음");
-                message="이메일: "+doFindAction(map.get("val").toString(), map.get("type").toString());
+                message=doFindAction(map.get("val").toString(), map.get("type").toString());
                 session.removeAttribute(key);
             }else{
                 logger.info("일반 인증요청이였음");
@@ -141,10 +142,25 @@ public class snsService {
     }
     private String doFindAction(String val,String type) {
         logger.info("doFindAction");
-        String res=null;
+        String res="이메일: ";
         //비밀번호 찾기일경구
         if(type.equals(senums.pwtt.get())){
             res="이메일로 링크가 전송되었습니다";
+            String phone=null;
+            //요청알림을 위해 휴대폰 번호 조회
+            Map<String,Object>phones=userService.selectPhoneByEmail(val);
+            for(Entry<String, Object>m:phones.entrySet()){
+                logger.info(m.getKey());
+                if(m.getValue()==null){
+                    continue;
+                }
+                phone=m.getValue().toString();
+            }
+            //비동기 비밀번호 변경요청알림
+            sqsService.sendEmailAsync("비밀번호 변경 요청이 확인되었습니다", val);
+            sqsService.sendPhoneAsync("비밀번호 변경 요청이 확인되었습니다", phone);
+            //비밀번호요청 링크전송
+            sqsService.sendSqs("안녕하세요 장보고입니다","" ,senums.emailt.get(), val);
         }else{
             //이메일찾기일경우
             Map<String,Object>map=userService.selectEmailByPhone(val);
@@ -153,7 +169,7 @@ public class snsService {
                 if(m.getValue()==null){
                     continue;
                 }
-                res=m.getValue().toString();
+                res+=m.getValue().toString();
             }
             logger.info("찾은 내용: "+res);
         }

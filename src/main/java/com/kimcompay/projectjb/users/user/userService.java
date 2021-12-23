@@ -52,6 +52,10 @@ public class userService {
     @Autowired
     private sqsService sqsService;
 
+    public Map<String,Object> selectPhoneByEmail(String email) {
+        logger.info("selectPhoneByEmail");
+        return userdao.findPhoneByEmail(email, email);
+    }
     public Map<String,Object> selectEmailByPhone(String phone) {
         logger.info("selectEmailByPhone");
         return userdao.findEmailByPhone(phone, phone);

@@ -35,8 +35,8 @@ public class sqsService {
     public void loadSMSMessage(String message) {
         logger.info("sms_sqs");
         logger.info("message: "+message);
-       JSONObject titleAndTextAndAddress=getMessageAndAddress(message);
-        //smsService.sendMessege(titleAndTextAndAddress.get("val"),titleAndTextAndAddress.get("title")+"\n"+titleAndTextAndAddress.get("text"));문자발송은실제로돈이나가서 막아논것
+        JSONObject titleAndTextAndAddress=getMessageAndAddress(message);
+        smsService.sendMessege(titleAndTextAndAddress.get("val").toString(),titleAndTextAndAddress.get("title")+"\n"+titleAndTextAndAddress.get("text"));//문자발송은실제로돈이나가서 막아논것
     }
     @SqsListener("projectj_email_sqs")
     public void loadEmailMessage(String message) {
@@ -45,7 +45,7 @@ public class sqsService {
         JSONObject titleAndTextAndAddress=getMessageAndAddress(message);
         emailService.sendEmail(titleAndTextAndAddress.get("val").toString(),titleAndTextAndAddress.get("title").toString(),titleAndTextAndAddress.get("text").toString());
     }
-    public void sendSqs(String text,String type,String val) {
+    public void sendSqs(String title,String text,String type,String val) {
         logger.info("sendSqs");
         String end_point=senums.sqsEndPoint.get();
         if(type.equals(senums.phonet.get())){
@@ -59,7 +59,7 @@ public class sqsService {
         }
         logger.info("sqs주소: "+end_point);
         //구성만들기
-        queueMessagingTemplate.send(end_point,MessageBuilder.withPayload(makeTitleAndText("안녕하세요 장보고입니다",text,val)).build());
+        queueMessagingTemplate.send(end_point,MessageBuilder.withPayload(makeTitleAndText(title,text,val)).build());
         
     }
     private JSONObject getMessageAndAddress(String sqsMessage){
@@ -81,6 +81,15 @@ public class sqsService {
         logger.info("sendEmailAsync");
         String end_point=senums.sqsEndPoint.get();
         end_point+="projectj_email_sqs";
+        logger.info("sqs주소: "+end_point);
+        queueMessagingTemplate.send(end_point,MessageBuilder.withPayload(makeTitleAndText("안녕하세요 장보고입니다", text, val)).build());
+        return new AsyncResult<>("결과");
+    }
+    @Async
+    public ListenableFuture<String> sendPhoneAsync(String text,String val) {
+        logger.info("sendEmailAsync");
+        String end_point=senums.sqsEndPoint.get();
+        end_point+="projectj_sms_sqs";
         logger.info("sqs주소: "+end_point);
         queueMessagingTemplate.send(end_point,MessageBuilder.withPayload(makeTitleAndText("안녕하세요 장보고입니다", text, val)).build());
         return new AsyncResult<>("결과");
