@@ -310,8 +310,8 @@ public class userService {
     public JSONObject findChangePwdToken(String token) {
         logger.info("findChangePwdToken");
         logger.info("토큰: "+token);
-        Map<Object, Object>map=Optional.ofNullable(redisTemplate.opsForHash().entries(token)).orElseThrow(()->utillService.makeRuntimeEX("유효하지 않는 요청입니다", "findChangePwdToken"));
-        Timestamp timestamp=Timestamp.valueOf(map.get("expire").toString().replace("T", " "));
+        Map<Object, Object>map=redisTemplate.opsForHash().entries(token);
+        Timestamp timestamp=Timestamp.valueOf(Optional.ofNullable(map.get("expire").toString().replace("T", " ")).orElseThrow(()->utillService.makeRuntimeEX("유효하지 않는 요청입니다","findChangePwdToken" )));
         logger.info("토큰 유효 날짜: "+timestamp);
         if(LocalDateTime.now().isAfter(timestamp.toLocalDateTime())){
             throw utillService.makeRuntimeEX("유효기간이 만료된 요청입니다", "findChangePwdToken");
