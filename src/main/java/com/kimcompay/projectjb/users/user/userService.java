@@ -1,6 +1,8 @@
 package com.kimcompay.projectjb.users.user;
 
 
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -30,6 +32,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -51,6 +54,8 @@ public class userService {
     private compayDao compayDao;
     @Autowired
     private sqsService sqsService;
+    @Autowired
+    private RedisTemplate<String,String>redisTemplate;
 
     public Map<String,Object> selectPhoneByEmail(String email) {
         logger.info("selectPhoneByEmail");
@@ -301,5 +306,16 @@ public class userService {
             throw utillService.makeRuntimeEX("인증한 이메일과 번호가 다릅니다", "checkAuth");
         }
         logger.info("인증 유효성검사 통과");
+    }
+    public JSONObject findChangePwdToken(String token) {
+        logger.info("findChangePwdToken");
+        logger.info("토큰: "+token);
+        Map<Object, Object>map=Optional.ofNullable(redisTemplate.opsForHash().entries(token)).orElseThrow(()->utillService.makeRuntimeEX("유효하지 않는 요청입니다", "findChangePwdToken"));
+        Timestamp timestamp=Timestamp.valueOf(map.get("expire").toString().replace("T", " "));
+        logger.info("토큰 유효 날짜: "+timestamp);
+        if(LocalDateTime.now().isAfter(timestamp.toLocalDateTime())){
+            throw utillService.makeRuntimeEX("유효기간이 만료된 요청입니다", "findChangePwdToken");
+        }
+        return utillService.getJson(true, "유효한 요청");
     }
 }

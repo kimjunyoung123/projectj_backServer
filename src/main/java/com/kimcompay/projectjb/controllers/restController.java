@@ -9,6 +9,7 @@ import javax.validation.Valid;
 import com.kimcompay.projectjb.utillService;
 import com.kimcompay.projectjb.apis.sns.snsService;
 import com.kimcompay.projectjb.enums.senums;
+import com.kimcompay.projectjb.jwt.jwtService;
 import com.kimcompay.projectjb.users.user.tryInsertDto;
 import com.kimcompay.projectjb.users.user.userService;
 import org.json.simple.JSONObject;
@@ -52,10 +53,15 @@ public class restController {
         logger.info("sendSns Controller");
         return snsService.send(jsonObject, httpSession);
     }
-    @RequestMapping(value = "/confrim/**",method = RequestMethod.POST)
-    public JSONObject checkConfrim(@RequestBody JSONObject jsonObject,HttpSession httpSession) {
+    @RequestMapping(value = "/confrim/{scope}/**",method = RequestMethod.POST)
+    public JSONObject checkConfrim(@PathVariable String scope,@RequestBody JSONObject jsonObject,HttpSession httpSession) {
         logger.info("checkConfrim");
-        return snsService.confrim(jsonObject,httpSession);
+        if(scope.equals(senums.auth.get())){
+            return snsService.confrim(jsonObject,httpSession);
+        }else if(scope.equals("change")){
+             return userService.findChangePwdToken(jsonObject.get("val").toString());
+        }
+        return utillService.getJson(false, "잘못된 요청입니다");
     }
     @RequestMapping(value = "/user/**",method = RequestMethod.POST)
     public JSONObject tryJoin(@Valid @RequestBody tryInsertDto tryInsertDto ,HttpSession session) {

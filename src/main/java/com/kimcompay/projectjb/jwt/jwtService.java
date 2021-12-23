@@ -1,19 +1,11 @@
 package com.kimcompay.projectjb.jwt;
 
-import java.time.LocalDateTime;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
-
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -30,8 +22,7 @@ public class jwtService {
     private int access_expire_min;
     @Value("${refresh_expire_day}")
     private int refresh_expire_day;
-    @Autowired
-    private RedisTemplate<String,String>redisTemplate;
+
 
     public String get_access_token(String email) {
         logger.info("get_access_token");
@@ -45,17 +36,5 @@ public class jwtService {
     public String openJwt(String accessToken) {
         logger.info("openJwt");
         return JWT.require(Algorithm.HMAC512(jwt_sing)).build().verify(accessToken).getClaim("email").asString();
-    }
-    public String getChangePwdToken(String email) {
-        logger.info("getChangePwdLink");
-        String changePwdToken=get_refresh_token();
-        Map<String,Object>map=new HashMap<>();
-        map.put("email", email);
-        map.put("expire", LocalDateTime.now().plusDays(1).toString());
-        redisTemplate.opsForHash().putAll(changePwdToken, map);
-        //유효기간
-        redisTemplate.expire(changePwdToken,1,TimeUnit.DAYS);
-        return changePwdToken;
-
     }
 }

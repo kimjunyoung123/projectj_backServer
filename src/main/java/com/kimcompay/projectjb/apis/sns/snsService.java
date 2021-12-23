@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Map.Entry;
+import java.util.concurrent.TimeUnit;
 
 import javax.servlet.http.HttpSession;
 
@@ -20,6 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -37,6 +39,8 @@ public class snsService {
     private userService userService;
     @Autowired
     private jwtService jwtService;
+    @Autowired
+    private RedisTemplate<String,String>redisTemplate;
     
     public JSONObject send(JSONObject jsonObject,HttpSession httpSession) {
         logger.info("send"+jsonObject.toString());
@@ -165,8 +169,16 @@ public class snsService {
             sqsService.sendEmailAsync("비밀번호 변경 요청이 확인되었습니다", val);
             sqsService.sendPhoneAsync("비밀번호 변경 요청이 확인되었습니다", phone);
             //비밀번호요청 링크전송
-            String cPwdLink=changePwdLink+jwtService.getChangePwdToken(val);
+            String changePwdToken=jwtService.get_refresh_token();
+            String cPwdLink=changePwdLink+changePwdToken;
             logger.info("비밀번호 변경링크: "+cPwdLink);
+            //redis저장 
+            Map<String,Object>map=new HashMap<>();
+            map.put("email", val);
+            map.put("expire", LocalDateTime.now().plusDays(1).toString());
+            redisTemplate.opsForHash().putAll(changePwdToken, map);
+            //유효기간
+            redisTemplate.expire(changePwdToken,1,TimeUnit.DAYS);
             sqsService.sendSqs("안녕하세요 장보고입니다","비밀번호 변경 링크입니다\n"+cPwdLink+"\n 위링크는 하루동안만 유효합니다",senums.emailt.get(), val);
             res="이메일로 링크가 전송되었습니다";
         }else{
