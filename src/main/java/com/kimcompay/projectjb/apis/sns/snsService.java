@@ -1,5 +1,6 @@
 package com.kimcompay.projectjb.apis.sns;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -10,14 +11,15 @@ import javax.servlet.http.HttpSession;
 import com.kimcompay.projectjb.utillService;
 import com.kimcompay.projectjb.apis.aws.services.sqsService;
 import com.kimcompay.projectjb.enums.senums;
+import com.kimcompay.projectjb.jwt.jwtService;
 import com.kimcompay.projectjb.users.user.userService;
-import com.kimcompay.projectjb.users.user.userdao;
 
 import org.json.simple.JSONObject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -27,10 +29,14 @@ public class snsService {
     private final int limiteMin=3;
     private final int len=10;
 
+    @Value("${change.pwd.link}")
+    private String changePwdLink;
     @Autowired
     private sqsService sqsService;
     @Autowired
     private userService userService;
+    @Autowired
+    private jwtService jwtService;
     
     public JSONObject send(JSONObject jsonObject,HttpSession httpSession) {
         logger.info("send"+jsonObject.toString());
@@ -145,7 +151,6 @@ public class snsService {
         String res="이메일: ";
         //비밀번호 찾기일경구
         if(type.equals(senums.pwtt.get())){
-            res="이메일로 링크가 전송되었습니다";
             String phone=null;
             //요청알림을 위해 휴대폰 번호 조회
             Map<String,Object>phones=userService.selectPhoneByEmail(val);
@@ -160,7 +165,10 @@ public class snsService {
             sqsService.sendEmailAsync("비밀번호 변경 요청이 확인되었습니다", val);
             sqsService.sendPhoneAsync("비밀번호 변경 요청이 확인되었습니다", phone);
             //비밀번호요청 링크전송
-            sqsService.sendSqs("안녕하세요 장보고입니다","" ,senums.emailt.get(), val);
+            String cPwdLink=changePwdLink+jwtService.getChangePwdToken(val);
+            logger.info("비밀번호 변경링크: "+cPwdLink);
+            sqsService.sendSqs("안녕하세요 장보고입니다","비밀번호 변경 링크입니다\n"+cPwdLink+"\n 위링크는 하루동안만 유효합니다",senums.emailt.get(), val);
+            res="이메일로 링크가 전송되었습니다";
         }else{
             //이메일찾기일경우
             Map<String,Object>map=userService.selectEmailByPhone(val);

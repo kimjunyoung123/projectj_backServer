@@ -36,7 +36,7 @@ public class sqsService {
         logger.info("sms_sqs");
         logger.info("message: "+message);
         JSONObject titleAndTextAndAddress=getMessageAndAddress(message);
-        smsService.sendMessege(titleAndTextAndAddress.get("val").toString(),titleAndTextAndAddress.get("title")+"\n"+titleAndTextAndAddress.get("text"));//문자발송은실제로돈이나가서 막아논것
+        //smsService.sendMessege(titleAndTextAndAddress.get("val").toString(),titleAndTextAndAddress.get("title")+"\n"+titleAndTextAndAddress.get("text"));//문자발송은실제로돈이나가서 막아논것
     }
     @SqsListener("projectj_email_sqs")
     public void loadEmailMessage(String message) {
