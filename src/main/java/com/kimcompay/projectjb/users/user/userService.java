@@ -43,6 +43,8 @@ public class userService {
     private Logger logger=LoggerFactory.getLogger(userService.class);
     @Value("${refresh_token_cookie}")
     private String refresh_token_cookie_name;
+    @Value("${access_token_cookie}")
+    private String access_token_cookie_name;
     @Autowired
     private jungbuService jungbuService;
     @Autowired
@@ -57,7 +59,37 @@ public class userService {
     private sqsService sqsService;
     @Autowired
     private RedisTemplate<String,String>redisTemplate;
-
+    
+    public JSONObject selectUserAction(String action,HttpServletRequest request,HttpServletResponse response) {
+        logger.info("selectUserAction");
+        if(action.equals(senums.checkt.get())){
+            logger.info("로그인 조회 요청");
+            return checkLogin(request, request.getParameter("detail"));
+        }else if(action.equals("logout")){
+            logger.info("로그아웃요청");
+            return logOut(request, response);
+        }
+        throw utillService.makeRuntimeEX("잘못된 요청", "selectUserAction");
+    }
+    private JSONObject logOut(HttpServletRequest request,HttpServletResponse response) {
+        logger.info("logOut");
+        //쿠키제거
+        List<String>cookieNames=new ArrayList<>();
+        cookieNames.add(access_token_cookie_name);
+        cookieNames.add(refresh_token_cookie_name);
+        for(String cookieName:cookieNames){
+            utillService.deleteCookie(cookieName, request, response);
+        }
+        //redis제거
+        principalDetails principalDetails=(principalDetails)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String email=principalDetails.getUsername();
+        logger.info("로그아웃 이메일: "+email);
+        cookieNames.clear();
+        cookieNames.add(email);
+        cookieNames.add(utillService.getCookieValue(request, refresh_token_cookie_name));
+        redisTemplate.delete(cookieNames);
+        return utillService.getJson(true, "로그아웃완료");
+    }
     public JSONObject changePwdForLost(String scope,tryUpdatePwdDato tryUpdatePwdDato) {
         logger.info("changePwdForLost");
         try {
@@ -126,7 +158,7 @@ public class userService {
         logger.info("selectEmailByPhone");
         return userdao.findEmailByPhone(phone, phone);
     }
-    public JSONObject checkLogin(HttpServletRequest request,String detail) {
+    private JSONObject checkLogin(HttpServletRequest request,String detail) {
         logger.info("checkLogin");
         logger.info("detail: "+detail);
         try {

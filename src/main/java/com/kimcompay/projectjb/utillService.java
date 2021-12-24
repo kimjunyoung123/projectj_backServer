@@ -22,6 +22,17 @@ import org.springframework.http.ResponseCookie;
 public class utillService {
     private final static Logger logger=LoggerFactory.getLogger(utillService.class);
 
+    public static void deleteCookie(String cookieName,HttpServletRequest request,HttpServletResponse response) {
+        logger.info("deleteCookie");
+        logger.info("제걸될 쿠키이름: "+cookieName);
+        ResponseCookie cookie = ResponseCookie.from(cookieName, null) 
+        .sameSite("None") 
+        .secure(true) 
+        .path("/") 
+        .maxAge(0)
+        .build(); 
+        response.addHeader("Set-Cookie", cookie.toString()+";HttpOnly");
+    }
     public static JSONObject getJson(boolean flag,String message) {
         logger.info("getjosn");
         JSONObject jsonObject=new JSONObject();

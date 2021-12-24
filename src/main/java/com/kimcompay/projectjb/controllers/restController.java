@@ -44,6 +44,11 @@ public class restController {
     public void name(HttpSession session) {
         logger.info("test");
     }
+    @RequestMapping(value = "/api/user/{action}",method = RequestMethod.GET)
+    public JSONObject userAction(@PathVariable String action,HttpServletRequest request,HttpServletResponse response) {
+        logger.info("userAction controller");
+        return userService.selectUserAction(action,request,response);
+    }
     @RequestMapping(value = "/message",method =RequestMethod.POST )
     public void sendSqs(HttpServletRequest request,HttpServletResponse response) {
         logger.info("sendSqs");
@@ -87,17 +92,7 @@ public class restController {
     @RequestMapping(value = "/login/{scope}/{detail}",method = RequestMethod.POST)
     public JSONObject tryLogin(@PathVariable String detail,@PathVariable String scope,HttpServletRequest request,HttpServletResponse response) {
         logger.info("tryLogin");
-        try {
-            if(scope.equals(senums.logint.get())){
-                return userService.checkLogin(request, response);
-            }else if(scope.equals(senums.checkt.get())){
-                return userService.checkLogin(request,detail);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return utillService.getJson(false, "존재 하지 않는 처리");
+        return userService.checkLogin(request, response);
     }
     @RequestMapping("/tokenExpire/{result}")
     public JSONObject tokenExpire(@PathVariable String result,HttpServletRequest request,HttpServletResponse response) {
