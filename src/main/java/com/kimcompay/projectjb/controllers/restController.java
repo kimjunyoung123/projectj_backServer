@@ -89,8 +89,8 @@ public class restController {
         logger.info("tryChangeUserInfor controller");
         return userService.changePwdForLost(scope, tryUpdatePwdDato);
     }
-    @RequestMapping(value = "/login/{scope}/{detail}",method = RequestMethod.POST)
-    public JSONObject tryLogin(@PathVariable String detail,@PathVariable String scope,HttpServletRequest request,HttpServletResponse response) {
+    @RequestMapping(value = "/login",method = RequestMethod.POST)
+    public JSONObject tryLogin(HttpServletRequest request,HttpServletResponse response) {
         logger.info("tryLogin");
         return userService.checkLogin(request, response);
     }

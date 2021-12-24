@@ -114,7 +114,7 @@ public class loginFilter extends UsernamePasswordAuthenticationFilter {
         ValueOperations<String, String>redisInRefresh=redisTemplate.opsForValue();
         redisInRefresh.set(refresh_token,email);
         logger.info("로그인 과정완료");
-        utillService.goFoward("/login/login/null/?flag=true", request, response);
+        utillService.goFoward("/login?flag=true", request, response);
     }
     @Override
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response,AuthenticationException failed) throws IOException, ServletException {
@@ -132,6 +132,6 @@ public class loginFilter extends UsernamePasswordAuthenticationFilter {
         }else{
             cause="알수 없는 오류 발생";
         }
-        utillService.goFoward("/login/login/null/?flag=false&cause="+cause, request, response);
+        utillService.goFoward("/login?flag=false&cause="+cause, request, response);
     }
 }
