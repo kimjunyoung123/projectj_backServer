@@ -6,6 +6,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
+import com.kimcompay.projectjb.checkPageService;
 import com.kimcompay.projectjb.utillService;
 import com.kimcompay.projectjb.apis.sns.snsService;
 import com.kimcompay.projectjb.enums.senums;
@@ -35,6 +36,8 @@ public class restController {
     private snsService snsService;
     @Autowired
     private userService userService;
+    @Autowired
+    private checkPageService checkPageService;
 
     //
     @RequestMapping(value = "/api/test",method = RequestMethod.GET)
@@ -63,6 +66,12 @@ public class restController {
              return userService.findChangePwdToken(jsonObject.get("val").toString());
         }
         return utillService.getJson(false, "잘못된 요청입니다");
+    }
+    @RequestMapping(value = "/checkPage/{scope}",method = RequestMethod.GET)
+    public JSONObject checkPage(@PathVariable String scope,HttpServletRequest request,HttpSession session) {
+        logger.info("checkPage controller");
+        return checkPageService.checkPage(request, scope);
+      
     }
     @RequestMapping(value = "/user/**",method = RequestMethod.POST)
     public JSONObject tryJoin(@Valid @RequestBody tryInsertDto tryInsertDto ,HttpSession session) {

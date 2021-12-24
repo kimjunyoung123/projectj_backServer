@@ -63,7 +63,18 @@ public class userService {
         try {
             //요청 redis에서 꺼내기
             String token=tryUpdatePwdDato.getToken();
-            Map<Object,Object>redis=redisTemplate.opsForHash().entries(token);
+            Map<Object,Object>redis=checkRequest(token);
+            //비밀번호 변경
+            updatePwd(redis.get("email").toString(),tryUpdatePwdDato.getPwd(),tryUpdatePwdDato.getPwd2());
+            redisTemplate.delete(token);
+            return utillService.getJson(true, "변경되었습니다");
+        } catch (NullPointerException e) {
+            throw utillService.makeRuntimeEX("빈칸이 존재합니다", "changePwdForLost");
+        }
+    }
+    private Map<Object,Object> checkRequest(String token) {
+        logger.info("checkRequest");
+        Map<Object,Object>redis=redisTemplate.opsForHash().entries(token);
             //요청이 있었는지검사
             if(utillService.checkEmthy(redis)){
                 throw utillService.makeRuntimeEX("잘못된 요청입니다", "changePwdForLost");
@@ -74,13 +85,7 @@ public class userService {
             if(LocalDateTime.now().isAfter(timestamp.toLocalDateTime())){
                 throw utillService.makeRuntimeEX("유효기간이 지난 요청입니다", "changePwdForLost");
             }
-            //비밀번호 변경
-            updatePwd(redis.get("email").toString(),tryUpdatePwdDato.getPwd(),tryUpdatePwdDato.getPwd2());
-            redisTemplate.delete(token);
-            return utillService.getJson(true, "변경되었습니다");
-        } catch (NullPointerException e) {
-            throw utillService.makeRuntimeEX("빈칸이 존재합니다", "changePwdForLost");
-        }
+        return redis;
     }
     private void updatePwd(String email,String pwd,String pwd2) {
         logger.info("updatePwd");
