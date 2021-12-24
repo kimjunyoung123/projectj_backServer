@@ -40,11 +40,11 @@ public class restController {
     private checkPageService checkPageService;
 
     //
-    @RequestMapping(value = "/api/test",method = RequestMethod.GET)
+    @RequestMapping(value = "/auth/test",method = RequestMethod.GET)
     public void name(HttpSession session) {
         logger.info("test");
     }
-    @RequestMapping(value = "/api/user/{action}",method = RequestMethod.GET)
+    @RequestMapping(value = "/auth/user/{action}",method = RequestMethod.GET)
     public JSONObject userAction(@PathVariable String action,HttpServletRequest request,HttpServletResponse response) {
         logger.info("userAction controller");
         return userService.selectUserAction(action,request,response);

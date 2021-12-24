@@ -50,7 +50,7 @@ public class securityConfig extends WebSecurityConfigurerAdapter {
             .addFilter(new loginFilter(jwtService,authenticationManager(),redisTemplate,access_token_cookie_name,refresh_token_cookie_name))
             .addFilter(new authorizationFilter(authenticationManager(),jwtService,redisTemplate,access_token_cookie_name,refresh_token_cookie_name))
             .csrf().disable().formLogin().disable().httpBasic().disable()
-            .authorizeRequests().antMatchers("/api/**").authenticated().anyRequest().permitAll();
+            .authorizeRequests().antMatchers("/auth/**").authenticated().anyRequest().permitAll();
 
     }
 }
