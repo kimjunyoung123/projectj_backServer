@@ -49,6 +49,11 @@ public class restController {
         logger.info("userAction controller");
         return userService.selectUserAction(action,request,response);
     }
+    @RequestMapping(value = "/user/{action}",method = RequestMethod.GET)
+    public JSONObject userActionNotLogin(@PathVariable String action,HttpServletRequest request,HttpServletResponse response) {
+        logger.info("userActionNotLogin controller");
+        return userService.selectUserAction(action,request,response);
+    }
     @RequestMapping(value = "/message",method =RequestMethod.POST )
     public void sendSqs(HttpServletRequest request,HttpServletResponse response) {
         logger.info("sendSqs");

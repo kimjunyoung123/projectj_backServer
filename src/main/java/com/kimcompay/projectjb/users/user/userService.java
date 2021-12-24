@@ -68,8 +68,22 @@ public class userService {
         }else if(action.equals("logout")){
             logger.info("로그아웃요청");
             return logOut(request, response);
+        }else if(action.equals("checkEmail")){
+            logger.info("이메일 중복검사");
+            return utillService.getJson(checkSamEmail(request.getParameter("email")),"");
+            
         }
         throw utillService.makeRuntimeEX("잘못된 요청", "selectUserAction");
+    }
+    private boolean checkSamEmail(String email) {
+        logger.info("checkSamEmail");
+        Map<String,Object>map=userdao.countByEmail(email,email);
+        for(Entry<String,Object>m:map.entrySet()){
+            if(Integer.parseInt(m.getValue().toString())!=0){
+                return true;
+            }
+        }
+        return false;
     }
     private JSONObject logOut(HttpServletRequest request,HttpServletResponse response) {
         logger.info("logOut");
