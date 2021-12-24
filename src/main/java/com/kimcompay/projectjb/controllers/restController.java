@@ -86,6 +86,16 @@ public class restController {
         logger.info("tryLogin");
         return userService.checkLogin(request, response);
     }
+    @RequestMapping(value = "/social/{kind}/{action}",method = RequestMethod.GET)
+    public JSONObject soLogin(@PathVariable String kind,@PathVariable String action,HttpServletRequest request,HttpServletResponse response) {
+        logger.info("soLogin");
+        return checkPageService.selectPage(kind,action);
+    }
+    @RequestMapping(value = "/callback/{kind}/{action}",method = RequestMethod.GET)
+    public void socialCallback(@PathVariable String kind,@PathVariable String action,HttpServletRequest request,HttpServletResponse response) {
+        logger.info("socialCallback");
+        checkPageService.selectCallback(kind,action,request);
+    }
     @RequestMapping("/tokenExpire/{result}")
     public JSONObject tokenExpire(@PathVariable String result,HttpServletRequest request,HttpServletResponse response) {
         logger.info("tokenExpire controller");

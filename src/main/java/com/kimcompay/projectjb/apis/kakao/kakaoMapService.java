@@ -1,4 +1,4 @@
-package com.kimcompay.projectjb.apis.kakaos;
+package com.kimcompay.projectjb.apis.kakao;
 
 import com.kimcompay.projectjb.apis.requestTo;
 import com.kimcompay.projectjb.enums.senums;

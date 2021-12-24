@@ -27,7 +27,9 @@ public enum senums {
     newToken("y"),
     sqsEndPoint("https://sqs.ap-northeast-2.amazonaws.com/527222691614/"),
     newpwd("newpwd"),
-    changepwd("changepwd");
+    changepwd("changepwd"),
+    kakao("kakao"),
+    naver("naver");
 
     private String s;
     senums(String s){

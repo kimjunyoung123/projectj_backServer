@@ -18,7 +18,7 @@ import javax.servlet.http.HttpSession;
 import com.kimcompay.projectjb.utillService;
 import com.kimcompay.projectjb.apis.aws.services.sqsService;
 import com.kimcompay.projectjb.apis.jungbu.jungbuService;
-import com.kimcompay.projectjb.apis.kakaos.kakaoMapService;
+import com.kimcompay.projectjb.apis.kakao.kakaoMapService;
 import com.kimcompay.projectjb.configs.securityConfig;
 import com.kimcompay.projectjb.enums.senums;
 import com.kimcompay.projectjb.users.principalDetails;
