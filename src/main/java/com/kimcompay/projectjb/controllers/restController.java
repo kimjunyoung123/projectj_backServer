@@ -10,7 +10,6 @@ import com.kimcompay.projectjb.checkPageService;
 import com.kimcompay.projectjb.utillService;
 import com.kimcompay.projectjb.apis.sns.snsService;
 import com.kimcompay.projectjb.enums.senums;
-import com.kimcompay.projectjb.jwt.jwtService;
 import com.kimcompay.projectjb.users.user.tryInsertDto;
 import com.kimcompay.projectjb.users.user.tryUpdatePwdDato;
 import com.kimcompay.projectjb.users.user.userService;
@@ -19,8 +18,6 @@ import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cloud.aws.messaging.core.QueueMessagingTemplate;
-import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -31,15 +28,13 @@ import org.springframework.web.bind.annotation.RestController;
 public class restController {
     private Logger logger=LoggerFactory.getLogger(restController.class);
     @Autowired
-    private QueueMessagingTemplate queueMessagingTemplate;
-    @Autowired
     private snsService snsService;
     @Autowired
     private userService userService;
     @Autowired
     private checkPageService checkPageService;
 
-    //
+    //auth가 앞에있으면 로그인후 이용가능한 api
     @RequestMapping(value = "/auth/test",method = RequestMethod.GET)
     public void name(HttpSession session) {
         logger.info("test");
@@ -53,14 +48,6 @@ public class restController {
     public JSONObject userActionNotLogin(@PathVariable String action,HttpServletRequest request,HttpServletResponse response) {
         logger.info("userActionNotLogin controller");
         return userService.selectUserAction(action,request,response);
-    }
-    @RequestMapping(value = "/message",method =RequestMethod.POST )
-    public void sendSqs(HttpServletRequest request,HttpServletResponse response) {
-        logger.info("sendSqs");
-        String url="https://sqs.ap-northeast-2.amazonaws.com/527222691614/testsqs";
-        String message=request.getParameter("message");
-        queueMessagingTemplate.send(url,MessageBuilder.withPayload(message).build());
-        
     }
     @RequestMapping(value = "/sns/**",method = RequestMethod.POST)
     public JSONObject sendSns(@RequestBody JSONObject jsonObject,HttpSession httpSession,HttpServletResponse response) {
