@@ -125,4 +125,11 @@ public class utillService {
             throw makeRuntimeEX("알수없는 에러발생", "stringToJson");
         }
     }
+    public static <T> Boolean checkEmthy(Map<T,T>map) {
+        logger.info("checkEmthy");
+        if(map.isEmpty()||map.size()==0){
+            return true;
+        }
+        return false;
+    }
 }

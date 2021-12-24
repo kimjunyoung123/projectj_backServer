@@ -11,6 +11,7 @@ import com.kimcompay.projectjb.apis.sns.snsService;
 import com.kimcompay.projectjb.enums.senums;
 import com.kimcompay.projectjb.jwt.jwtService;
 import com.kimcompay.projectjb.users.user.tryInsertDto;
+import com.kimcompay.projectjb.users.user.tryUpdatePwdDato;
 import com.kimcompay.projectjb.users.user.userService;
 import org.json.simple.JSONObject;
 
@@ -68,6 +69,11 @@ public class restController {
         logger.info("tryJoin");
         logger.info(tryInsertDto.toString());
         return userService.insert(tryInsertDto, session);
+    }
+    @RequestMapping(value = "/user/{scope}/**",method = RequestMethod.PUT)
+    public JSONObject tryChangeUserInfor(@PathVariable String scope,@Valid @RequestBody tryUpdatePwdDato tryUpdatePwdDato,HttpServletResponse response) {
+        logger.info("tryChangeUserInfor controller");
+        return userService.changePwdForLost(scope, tryUpdatePwdDato);
     }
     @RequestMapping(value = "/login/{scope}/{detail}",method = RequestMethod.POST)
     public JSONObject tryLogin(@PathVariable String detail,@PathVariable String scope,HttpServletRequest request,HttpServletResponse response) {

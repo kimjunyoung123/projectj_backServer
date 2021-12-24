@@ -1,6 +1,7 @@
 package com.kimcompay.projectjb.users.user;
 
 
+import java.lang.StackWalker.Option;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -57,6 +58,61 @@ public class userService {
     @Autowired
     private RedisTemplate<String,String>redisTemplate;
 
+    public JSONObject changePwdForLost(String scope,tryUpdatePwdDato tryUpdatePwdDato) {
+        logger.info("changePwdForLost");
+        try {
+            //요청 redis에서 꺼내기
+            String token=tryUpdatePwdDato.getToken();
+            Map<Object,Object>redis=redisTemplate.opsForHash().entries(token);
+            //요청이 있었는지검사
+            if(utillService.checkEmthy(redis)){
+                throw utillService.makeRuntimeEX("잘못된 요청입니다", "changePwdForLost");
+            }
+            //요청기간검사
+            Timestamp timestamp=Timestamp.valueOf(redis.get("expire").toString().replace("T", " "));
+            logger.info("비밀번호 변경유효 기간: "+timestamp);
+            if(LocalDateTime.now().isAfter(timestamp.toLocalDateTime())){
+                throw utillService.makeRuntimeEX("유효기간이 지난 요청입니다", "changePwdForLost");
+            }
+            //비밀번호 변경
+            updatePwd(redis.get("email").toString(),tryUpdatePwdDato.getPwd(),tryUpdatePwdDato.getPwd2());
+            redisTemplate.delete(token);
+            return utillService.getJson(true, "변경되었습니다");
+        } catch (NullPointerException e) {
+            throw utillService.makeRuntimeEX("빈칸이 존재합니다", "changePwdForLost");
+        }
+    }
+    private void updatePwd(String email,String pwd,String pwd2) {
+        logger.info("updatePwd");
+        if(!pwd.equals(pwd2)){
+            throw utillService.makeRuntimeEX("비밀번호가 일치하지 않습니다", "updatePwd");
+        }
+        Map<String,Object>map=userdao.countByEmail(email, email);
+        String table=null;
+        for(Entry<String, Object> m:map.entrySet()){
+            if(Integer.parseInt(m.getValue().toString())!=0){
+                table=m.getKey();
+                logger.info("비밀번호 변경 테이블: "+table);
+                break;
+            }
+        }
+        String hashPwd=securityConfig.pwdEncoder().encode(pwd);
+        try {
+            if(table.equals("uc")){
+                logger.info("유저 비밀번호변경");
+                userdao.updateUserPwd(hashPwd, email);
+            }else {
+                logger.info("회사 비밀번호 변경");
+                userdao.updateCompanyPwd(hashPwd, email);
+            }
+        } catch (Exception e) {
+            utillService.makeRuntimeEX("알수 없는 오류발생", "updatePwd");
+        }
+    }
+    private void updateUserInfor() {
+        logger.info("updateUserInfor");
+
+    }
     public Map<String,Object> selectPhoneByEmail(String email) {
         logger.info("selectPhoneByEmail");
         return userdao.findPhoneByEmail(email, email);

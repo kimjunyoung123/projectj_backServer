@@ -17,11 +17,11 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class restAdvice {
 
-    private final static Logger LOGGER=LoggerFactory.getLogger(restAdvice.class);
+    private final static Logger logger=LoggerFactory.getLogger(restAdvice.class);
 
     @ExceptionHandler(RuntimeException.class)
     public JSONObject runtimeException(RuntimeException exception) {
-        LOGGER.info("runtimeException");
+        logger.info("runtimeException");
         String message=exception.getMessage();
         if(!message.startsWith("메")){
             message="알수 없는 오류발생";
@@ -32,7 +32,7 @@ public class restAdvice {
     }
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public JSONObject processValidationError(MethodArgumentNotValidException exception) {
-        LOGGER.info("processValidationError 유효성 검사 실패");
+        logger.info("processValidationError 유효성 검사 실패");
         BindingResult bindingResult = exception.getBindingResult();
         StringBuilder builder = new StringBuilder();
         List<String>list=new ArrayList<>();
@@ -40,7 +40,6 @@ public class restAdvice {
             builder.append(fieldError.getDefaultMessage());
             list.add(fieldError.getField());
         }
-
         return utillService.getJson(false, builder.toString());
     }
 }
