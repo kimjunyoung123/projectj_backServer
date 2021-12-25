@@ -37,6 +37,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+
 @Service
 public class userService {
     private Logger logger=LoggerFactory.getLogger(userService.class);
@@ -59,14 +60,14 @@ public class userService {
     @Autowired
     private RedisTemplate<String,String>redisTemplate;
     
-    public JSONObject selectUserAction(String action,HttpServletRequest request,HttpServletResponse response) {
+    public JSONObject selectUserAction(String action,HttpServletRequest request) {
         logger.info("selectUserAction");
         if(action.equals(senums.checkt.get())){
             logger.info("로그인 조회 요청");
             return checkLogin(request, request.getParameter("detail"));
         }else if(action.equals("logout")){
             logger.info("로그아웃요청");
-            return logOut(request, response);
+            return logOut(request);
         }else if(action.equals("checkEmail")){
             logger.info("이메일 중복검사");
             return utillService.getJson(checkSamEmail(request.getParameter("email")),"");
@@ -84,14 +85,14 @@ public class userService {
         }
         return false;
     }
-    private JSONObject logOut(HttpServletRequest request,HttpServletResponse response) {
+    private JSONObject logOut(HttpServletRequest request) {
         logger.info("logOut");
         //쿠키제거
         List<String>cookieNames=new ArrayList<>();
         cookieNames.add(access_token_cookie_name);
         cookieNames.add(refresh_token_cookie_name);
         for(String cookieName:cookieNames){
-            utillService.deleteCookie(cookieName, request, response);
+            utillService.deleteCookie(cookieName, request,utillService.getHttpSerResponse());
         }
         //redis제거
         principalDetails principalDetails=(principalDetails)SecurityContextHolder.getContext().getAuthentication().getPrincipal();

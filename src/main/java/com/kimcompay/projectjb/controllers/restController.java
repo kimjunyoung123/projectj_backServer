@@ -40,17 +40,17 @@ public class restController {
         logger.info("test");
     }
     @RequestMapping(value = "/auth/user/{action}",method = RequestMethod.GET)
-    public JSONObject userAction(@PathVariable String action,HttpServletRequest request,HttpServletResponse response) {
+    public JSONObject userAction(@PathVariable String action,HttpServletRequest request) {
         logger.info("userAction controller");
-        return userService.selectUserAction(action,request,response);
+        return userService.selectUserAction(action,request);
     }
     @RequestMapping(value = "/user/{action}",method = RequestMethod.GET)
-    public JSONObject userActionNotLogin(@PathVariable String action,HttpServletRequest request,HttpServletResponse response) {
+    public JSONObject userActionNotLogin(@PathVariable String action,HttpServletRequest request) {
         logger.info("userActionNotLogin controller");
-        return userService.selectUserAction(action,request,response);
+        return userService.selectUserAction(action,request);
     }
     @RequestMapping(value = "/sns/**",method = RequestMethod.POST)
-    public JSONObject sendSns(@RequestBody JSONObject jsonObject,HttpSession httpSession,HttpServletResponse response) {
+    public JSONObject sendSns(@RequestBody JSONObject jsonObject,HttpSession httpSession) {
         logger.info("sendSns Controller");
         return snsService.send(jsonObject, httpSession);
     }
@@ -77,7 +77,7 @@ public class restController {
         return userService.insert(tryInsertDto, session);
     }
     @RequestMapping(value = "/user/{scope}/**",method = RequestMethod.PUT)
-    public JSONObject tryChangeUserInfor(@PathVariable String scope,@Valid @RequestBody tryUpdatePwdDato tryUpdatePwdDato,HttpServletResponse response) {
+    public JSONObject tryChangeUserInfor(@PathVariable String scope,@Valid @RequestBody tryUpdatePwdDato tryUpdatePwdDato) {
         logger.info("tryChangeUserInfor controller");
         return userService.changePwdForLost(scope, tryUpdatePwdDato);
     }
@@ -87,17 +87,17 @@ public class restController {
         return userService.checkLogin(request, response);
     }
     @RequestMapping(value = "/social/{kind}/{action}",method = RequestMethod.GET)
-    public JSONObject soLogin(@PathVariable String kind,@PathVariable String action,HttpServletRequest request,HttpServletResponse response) {
+    public JSONObject soLogin(@PathVariable String kind,@PathVariable String action) {
         logger.info("soLogin");
         return checkPageService.selectPage(kind,action);
     }
     @RequestMapping(value = "/callback/{kind}/{action}",method = RequestMethod.GET)
-    public void socialCallback(@PathVariable String kind,@PathVariable String action,HttpServletRequest request,HttpServletResponse response) {
+    public void socialCallback(@PathVariable String kind,@PathVariable String action,HttpServletRequest request) {
         logger.info("socialCallback");
         checkPageService.selectCallback(kind,action,request);
     }
     @RequestMapping("/tokenExpire/{result}")
-    public JSONObject tokenExpire(@PathVariable String result,HttpServletRequest request,HttpServletResponse response) {
+    public JSONObject tokenExpire(@PathVariable String result,HttpServletRequest request) {
         logger.info("tokenExpire controller");
         if(result.equals(senums.newToken.get())){
             return utillService.getJson(true, "new");

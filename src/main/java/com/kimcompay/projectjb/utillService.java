@@ -18,6 +18,9 @@ import org.json.simple.parser.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseCookie;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+import org.springframework.web.context.request.ServletWebRequest;
 
 public class utillService {
     private final static Logger logger=LoggerFactory.getLogger(utillService.class);
@@ -142,5 +145,10 @@ public class utillService {
             return true;
         }
         return false;
+    }
+    public static HttpServletResponse getHttpSerResponse() {
+        logger.info("getHttpSerResponse");
+        ServletRequestAttributes attr = (ServletRequestAttributes)RequestContextHolder.currentRequestAttributes();
+        return attr.getResponse();
     }
 }

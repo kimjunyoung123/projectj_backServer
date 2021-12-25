@@ -1,5 +1,8 @@
 package com.kimcompay.projectjb.apis.kakao;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import com.kimcompay.projectjb.utillService;
 import com.kimcompay.projectjb.enums.kenum;
 
@@ -39,5 +42,10 @@ public class kakaoService {
         }
 
     }
+    public void catchCallBack(HttpServletRequest request) {
+        logger.info("catchCallBack");
+        
+    }
+
     
 }
