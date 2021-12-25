@@ -1,5 +1,7 @@
 package com.kimcompay.projectjb.apis.kakao;
 
+import java.util.LinkedHashMap;
+
 import com.kimcompay.projectjb.utillService;
 import com.kimcompay.projectjb.apis.requestTo;
 
@@ -23,10 +25,10 @@ public class kakaoLoginService {
     public void doLogin(String code,String restKey,String redirectUrl) {
         logger.info("doLogin");
         //토큰얻어오기
-        JSONObject kTokens=new JSONObject();
+        JSONObject response=new JSONObject();
         try {
-            kTokens=getToken(code,restKey,redirectUrl);
-            logger.info("카카오응답: "+kTokens);
+            response=getToken(code,restKey,redirectUrl);
+            logger.info("카카오응답: "+response);
         } catch (HttpClientErrorException e) {
             logger.info("카카오 로그인 통신에러 발생");
             logger.info("카카오 에러 메세지: "+e.getMessage());
@@ -41,7 +43,20 @@ public class kakaoLoginService {
             throw utillService.makeRuntimeEX("알 수 없는 에러 발생", "doLogin"); 
         }
         //사용자정보 얻어오기
-        
+        response=getKuserInfor(response);
+        logger.info("카카오응답: "+response);
+        LinkedHashMap<String,Object>linkedHashMap=(LinkedHashMap<String,Object>)response.get("kakao_account");
+        logger.info("유저정보: "+linkedHashMap);
+        //정보분리
+        LinkedHashMap<String,Object>profile=(LinkedHashMap<String,Object>)linkedHashMap.get("profile");
+    }
+    private JSONObject getKuserInfor(JSONObject response) {
+        logger.info("getKuserInfor");
+        HttpHeaders httpHeaders=new HttpHeaders();
+        httpHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        httpHeaders.add("Authorization", "Bearer "+response.get("access_token"));
+        response.clear();
+        return requestTo.requestPost(null, "https://kapi.kakao.com/v2/user/me", httpHeaders);
 
     }
     private JSONObject getToken(String code,String restKey,String redirectUrl) {
