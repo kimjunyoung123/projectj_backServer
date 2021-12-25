@@ -65,7 +65,7 @@ public class checkPageService {
         logger.info("콜백 액션: "+action);
         if(kind.equals(senums.kakao.get())){
             logger.info("카카오콜백 요청");
-            kakaoService.catchCallBack(request);
+            kakaoService.catchCallBack(action,request);
         }else if(kind.equals(senums.naver.get())){
             logger.info("네이버 콜백 요청");
             

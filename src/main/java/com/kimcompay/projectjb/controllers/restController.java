@@ -65,7 +65,7 @@ public class restController {
         return utillService.getJson(false, "잘못된 요청입니다");
     }
     @RequestMapping(value = "/checkPage/{scope}",method = RequestMethod.GET)
-    public JSONObject checkPage(@PathVariable String scope,HttpServletRequest request,HttpSession session) {
+    public JSONObject checkPage(@PathVariable String scope,HttpServletRequest request) {
         logger.info("checkPage controller");
         return checkPageService.checkPage(request, scope);
       

@@ -2,6 +2,7 @@ package com.kimcompay.projectjb.enums;
 
 public enum senums {
     
+    defaultFailMessage("알 수 없는 에러발생"),
     auth("auth"),
     find("find"),
     persnal("0"),

@@ -157,7 +157,7 @@ public class userService {
                 userdao.updateCompanyPwd(hashPwd, email);
             }
         } catch (Exception e) {
-            utillService.makeRuntimeEX("알수 없는 오류발생", "updatePwd");
+            utillService.makeRuntimeEX(senums.defaultFailMessage.get(), "updatePwd");
         }
     }
     private void updateUserInfor() {

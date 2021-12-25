@@ -12,6 +12,8 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.kimcompay.projectjb.enums.senums;
+
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -128,6 +130,7 @@ public class utillService {
     }
     public static JSONObject stringToJson(String jsonString) {
         logger.info("stringToJson");
+        logger.info("json으로 파싱할 문자열: "+jsonString);
         JSONParser parser = new JSONParser();
         Object obj;
         try {
@@ -136,7 +139,9 @@ public class utillService {
             logger.info("변환: "+jsonObj);
             return jsonObj;
         } catch (ParseException e) {
-            throw makeRuntimeEX("알수없는 에러발생", "stringToJson");
+            logger.info("string to json fail");
+            e.printStackTrace();
+            throw makeRuntimeEX(senums.defaultFailMessage.get(), "stringToJson");
         }
     }
     public static <T> Boolean checkEmthy(Map<T,T>map) {

@@ -17,19 +17,14 @@ public class requestTo {
     
     public <T> JSONObject requestPost(T body,String url,HttpHeaders headers) {
         logger.info("requestPost");
-        try {
+
             //body+header합치기
             HttpEntity<T>entity=new HttpEntity<>(body,headers);
             logger.info("요청 정보: "+entity);
             logger.info("요청 url: "+url);
             RestTemplate restTemplate=new RestTemplate();
             return restTemplate.postForObject(url, entity, JSONObject.class);
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw utillService.makeRuntimeEX("통신에 실패하였습니다", "requestPost");
-        }finally{
-            headers.clear();
-        }
+       
     }
 
     public <T> JSONObject requestGet(T body,String url,HttpHeaders headers) {

@@ -9,6 +9,7 @@ import com.kimcompay.projectjb.enums.kenum;
 import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -27,25 +28,31 @@ public class kakaoService {
     @Value("${k_login_callback_url}")
     private String kLoginCallbackUrl;
 
+    @Autowired
+    private kakaoLoginService kakaoLoginService;
+
     public JSONObject callPage(String action) {
         logger.info("callPage");
-        try {
-            String url=null;
-            if(action.equals(kenum.loginPage.get())){
-                logger.info("k로그인요청");
-                logger.info("콜백 url: "+kLoginCallbackUrl);
-                url="https://kauth.kakao.com/oauth/authorize?response_type=code&client_id="+rest_key+"&redirect_uri="+kLoginCallbackUrl;
-            }
-            return utillService.getJson(true, url);
-        } catch (IllegalArgumentException e) {
+        String url=null;
+        if(action.equals(kenum.loginPage.get())){
+            logger.info("k로그인요청");
+            logger.info("콜백 url: "+kLoginCallbackUrl);
+            url="https://kauth.kakao.com/oauth/authorize?response_type=code&client_id="+rest_key+"&redirect_uri="+kLoginCallbackUrl;
+        }else{
             throw utillService.makeRuntimeEX("지원하지 않는 카카오페이지 입니다", "callPage");
         }
-
+        return utillService.getJson(true, url);
     }
-    public void catchCallBack(HttpServletRequest request) {
+    public void catchCallBack(String action,HttpServletRequest request) {
         logger.info("catchCallBack");
-        
-    }
+        String url=null;
+        if(action.equals(kenum.loginPage.get())){
+            logger.info("k로그인 콜백");
+            kakaoLoginService.doLogin(request.getParameter("code"),rest_key,kLoginCallbackUrl);
+        }else{
+            throw utillService.makeRuntimeEX("알 수없는 오류 발생", "catchCallBack");
+        }
+        logger.info("forword");
 
-    
+    }
 }
