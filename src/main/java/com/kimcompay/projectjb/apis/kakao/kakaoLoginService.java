@@ -1,9 +1,11 @@
 package com.kimcompay.projectjb.apis.kakao;
 
 import java.util.LinkedHashMap;
+import java.util.Map;
 
 import com.kimcompay.projectjb.utillService;
 import com.kimcompay.projectjb.apis.requestTo;
+import com.kimcompay.projectjb.enums.senums;
 
 import org.json.simple.JSONObject;
 import org.slf4j.Logger;
@@ -22,7 +24,7 @@ public class kakaoLoginService {
     
     @Autowired
     private requestTo requestTo;
-    public void doLogin(String code,String restKey,String redirectUrl) {
+    public JSONObject doLogin(String code,String restKey,String redirectUrl) {
         logger.info("doLogin");
         //토큰얻어오기
         JSONObject response=new JSONObject();
@@ -38,9 +40,9 @@ public class kakaoLoginService {
             JSONObject error=utillService.stringToJson(message);
             logger.info("에러내용: "+error);
             if(error.get("error_code").equals("KOE320")){
-                throw utillService.makeRuntimeEX("중복요청 입니다 다시 시도 바랍니다", "doLogin");
+                return  utillService.getJson(false,"중복요청 입니다 다시 시도 바랍니다");
             }
-            throw utillService.makeRuntimeEX("알 수 없는 에러 발생", "doLogin"); 
+            return  utillService.getJson(false,senums.defaultFailMessage.get());
         }
         //사용자정보 얻어오기
         response=getKuserInfor(response);
@@ -49,6 +51,9 @@ public class kakaoLoginService {
         logger.info("유저정보: "+linkedHashMap);
         //정보분리
         LinkedHashMap<String,Object>profile=(LinkedHashMap<String,Object>)linkedHashMap.get("profile");
+        //나이검사는 테스트상태로 불가 
+
+        return utillService.getJson(true, "카카오 로그인 완료");
     }
     private JSONObject getKuserInfor(JSONObject response) {
         logger.info("getKuserInfor");
