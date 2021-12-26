@@ -50,6 +50,7 @@ public class userVo {
     private String uphone;
 
     @Column(name = "ulogin_date")
+    @CreationTimestamp
     private Timestamp ulogin_date;
 
     @Column(name = "ucreated")
@@ -61,6 +62,9 @@ public class userVo {
 
     @Column(name = "urole",nullable = false ,length = 20)
     private String urole;
+
+    @Column(name = "ubirth",nullable = false ,length = 30)
+    private String ubirth;
 
 
 

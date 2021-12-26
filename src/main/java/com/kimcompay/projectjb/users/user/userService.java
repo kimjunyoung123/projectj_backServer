@@ -253,7 +253,7 @@ public class userService {
             logger.info("일반 회원 가입 ");
             userVo vo=userVo.builder().email(tryInsertDto.getEmail()).uaddress(tryInsertDto.getAddress()).udetail_address(tryInsertDto.getDetail_address())
                                         .uphone(tryInsertDto.getPhone()).upostcode(post_code).upwd(hash_pwd).urole(senums.user_role.get())
-                                        .usleep(0).build();
+                                        .ubirth(tryInsertDto.getBirth()).usleep(0).build();
                                         userdao.save(vo);
         }else{
             logger.info("기업 회원가입");
@@ -396,7 +396,25 @@ public class userService {
             throw utillService.makeRuntimeEX("이름을 입력해주세요 ", "checkCompanyValues");
         }
         tryInsertDto.setScope_num(Integer.parseInt(scope_num));
-        
+        if(scope_num.equals(senums.persnal.get())){
+            logger.info("일반 회원이므로 생년월일 검사");
+            //나이계산
+            logger.info("생년월일: "+tryInsertDto.getBirth());
+            String[] birth=tryInsertDto.getBirth().split("-");
+            int nowYear=LocalDateTime.now().getYear();
+            int year=Integer.parseInt(birth[0]);
+            int month=Integer.parseInt(birth[1]);
+            int day=Integer.parseInt(birth[2]);
+            if(nowYear-year<18){
+                logger.info("18세미만 가입요청");
+                throw utillService.makeRuntimeEX("18이상 가입가능한 서비스입니다", "checkValues");
+            }
+            if(month>12||month<1){
+                throw utillService.makeRuntimeEX("월은 1이상 12이하입니다", "checkValues");
+            }else if(day<1||day>31){
+                throw utillService.makeRuntimeEX("일은 1이상 31이하입니다", "checkValues");
+            }
+        }
         logger.info("회원가입 유효성검사 통과");
     }
     private void checkAuth(tryInsertDto tryInsertDto,HttpSession httpSession) {

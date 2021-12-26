@@ -41,9 +41,11 @@ public class tryInsertDto {
     private String scope;
     @NotBlank(message = "이름을 입력해주세요")
     private String name;
-    //회사전화번호 기업시에만 따로검사
-    private String tel;
+    //일반인일때만 따로검사
+    //나이스 본인인증만 할 수있어도 필요없는검사로 보임
+    private String birth;
     //기업시에만 따로 검사
+    private String tel;
     private String company_num;
     private String open_time;
     private String close_time;

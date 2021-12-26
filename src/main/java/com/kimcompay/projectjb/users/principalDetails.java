@@ -1,5 +1,7 @@
 package com.kimcompay.projectjb.users;
 
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -19,7 +21,7 @@ public class principalDetails implements UserDetails {
 
     public principalDetails(Map<Object,Object>map){
         this.princi=map;
-        is_can=check_lock(Integer.parseInt(map.get("sleep").toString()));
+        is_can=check_lock(Integer.parseInt(map.get("sleep").toString()),map.get("login_date").toString());
     }
 
 
@@ -71,11 +73,11 @@ public class principalDetails implements UserDetails {
         // TODO Auto-generated method stub
         return is_can;
     }
-    private Boolean check_lock(int num){
-        if(num==0){
-            return true;
+    private Boolean check_lock(int num,String loginDate){
+        if(num!=0||LocalDateTime.now().isAfter(Timestamp.valueOf(loginDate).toLocalDateTime().plusYears(1))){
+            return false;
         }
-        return false;
+        return true;
     }
     
 }

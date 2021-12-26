@@ -54,8 +54,8 @@ public class kakaoLoginService {
         logger.info("유저정보: "+linkedHashMap);
         //정보분리
         LinkedHashMap<String,Object>profile=(LinkedHashMap<String,Object>)linkedHashMap.get("profile");
-        String ageRange=linkedHashMap.get("age_range").toString();
         //나이검사는 테스트어플로 불가
+        
         return utillService.getJson(true, "카카오 로그인 완료");
     }
     private JSONObject getKuserInfor(JSONObject response) {
