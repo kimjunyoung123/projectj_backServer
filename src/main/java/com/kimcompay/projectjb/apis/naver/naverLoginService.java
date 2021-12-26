@@ -29,16 +29,10 @@ public class naverLoginService {
     
     @Value("${oauth.pwd}")
     private String oauthPwd;
-    @Value("${access_token_cookie}")
-    private String accessTokenCookieName;
-    @Value("${refresh_token_cookie}")
-    private String refreshTokenCookieName;
     @Autowired
     private requestTo requestTo;
     @Autowired
     private userService userService;
-    @Autowired
-    private jwtService jwtService;
     @Autowired
     private sqsService sqsService;
 
@@ -77,24 +71,11 @@ public class naverLoginService {
         //map->vo
         String email=profile.get("email").toString();
         userVo userVo=jsonToVo(profile);
-        //로그인처리
-        accessToken=jwtService.get_access_token(email);
-        String refreshToken=jwtService.get_refresh_token();
         try {
-            userService.oauthLogin(userVo,refreshToken);
-        } catch (RuntimeException e) {
-            logger.info("소셜로그인 에러 발생: "+e.getMessage());
-            String message=e.getMessage();
-            if(!message.startsWith("메")){
-                message=senums.defaultFailMessage.get();
-            }
-            return utillService.getJson(false, message);
+            userService.oauthLogin(email, userVo);
+        } catch (Exception e) {
+            return utillService.getJson(false, e.getMessage());
         }
-        //쿠키발급
-        Map<String,Object>cookies=new HashMap<>();
-        cookies.put(accessTokenCookieName, accessToken);
-        cookies.put(refreshTokenCookieName, refreshToken);
-        utillService.makeCookie(cookies, utillService.getHttpSerResponse());
         sqsService.sendEmailAsync("로그인 알림 이메일입니다 로그인일자: "+userVo.getUlogin_date(), email);
         return utillService.getJson(true, "네이버 로그인 완료");
     }

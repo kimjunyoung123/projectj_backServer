@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletRequest;
 import com.kimcompay.projectjb.utillService;
 import com.kimcompay.projectjb.enums.kenum;
 import com.kimcompay.projectjb.enums.nenum;
+import com.kimcompay.projectjb.enums.senums;
 
 import org.json.simple.JSONObject;
 import org.slf4j.Logger;
@@ -57,10 +58,11 @@ public class naverService {
             logger.info("네이버 로그인 콜백");
             result=naverLoginService.login(naverClientId,naverClientPwd,request.getParameter("code"),request.getParameter("state"));
         }else{
-            throw utillService.makeRuntimeEX("알 수없는 오류 발생", "catchCallBack");
+            result.put("flag", false);
+            result.put("message", senums.defaultDetailAddress.get());
         }
         logger.info("처리결과"+result);
-        String url=frontDomain+resultLink+"?kind=kakao&action="+action+"&result="+result.get("flag")+"&message="+result.get("message");
-        //utillService.doRedirect(utillService.getHttpSerResponse(), url);
+        String url=frontDomain+resultLink+"?kind=naver&action="+action+"&result="+result.get("flag")+"&message="+result.get("message");
+        utillService.doRedirect(utillService.getHttpSerResponse(), url);
     }
 }

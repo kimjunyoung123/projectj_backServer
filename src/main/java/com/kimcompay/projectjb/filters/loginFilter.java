@@ -95,21 +95,10 @@ public class loginFilter extends UsernamePasswordAuthenticationFilter {
         String refresh_token=jwtService.get_refresh_token();
         logger.info("엑세스토큰: "+access_token);
         logger.info("리프레시토큰: "+refresh_token);
-        //쿠키저장
-        Map<String,Object>infor=new HashMap<>();
-        infor.put(access_cookie_name, access_token);
-        infor.put(refresh_cookie_name, refresh_token);
-        utillService.makeCookie(infor, response);
-        //redis구격에 맞게 int값 ->string
-        for(Entry<Object, Object> s:result.entrySet()){
-            logger.info(s.getKey().toString());
-            if(Optional.ofNullable(s.getValue()).orElseGet(()->null)==null){
-                logger.info("null발견 무시");
-                continue;
-            }else if(!s.getValue().getClass().getSimpleName().equals("String")){
-                result.put(s.getKey(), s.getValue().toString());
-            }
-        }
+        //토큰 쿠키로 발급
+        utillService.makeLoginCookie(access_token, refresh_token,access_cookie_name,refresh_cookie_name);
+        //redis구격에 맞게 int/timestamp등값 ->string
+        utillService.makeAllToString(result);
         //redis 유저정보 밀어넣기
         HashOperations<String, Object, Object> hashOperations = redisTemplate.opsForHash();
         result.put(refresh_cookie_name, refresh_token);//리프레시토큰 찾기위해 넣는것

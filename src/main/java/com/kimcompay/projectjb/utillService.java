@@ -1,6 +1,7 @@
 package com.kimcompay.projectjb;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
@@ -22,7 +23,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseCookie;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
-import org.springframework.web.context.request.ServletWebRequest;
 
 public class utillService {
     private final static Logger logger=LoggerFactory.getLogger(utillService.class);
@@ -155,5 +155,24 @@ public class utillService {
         logger.info("getHttpSerResponse");
         ServletRequestAttributes attr = (ServletRequestAttributes)RequestContextHolder.currentRequestAttributes();
         return attr.getResponse();
+    }
+    public static void makeAllToString(Map<Object,Object>result) {
+        logger.info("makeAllToString");
+        for(Entry<Object, Object> s:result.entrySet()){
+            logger.info(s.getKey().toString());
+            if(Optional.ofNullable(s.getValue()).orElseGet(()->null)==null){
+                logger.info("null발견 무시");
+                continue;
+            }else if(!s.getValue().getClass().getSimpleName().equals("String")){
+                result.put(s.getKey(), s.getValue().toString());
+            }
+        }
+    }
+    public static void makeLoginCookie(String accessToken,String refreshToken,String accessTokenCookieName,String refreshTokenCookieName) {
+        logger.info("makeLoginCookie");
+        Map<String,Object>cookies=new HashMap<>();
+        cookies.put(accessTokenCookieName, accessToken);
+        cookies.put(refreshTokenCookieName, refreshToken);
+        makeCookie(cookies,getHttpSerResponse());
     }
 }

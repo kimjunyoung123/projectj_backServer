@@ -1,13 +1,12 @@
 package com.kimcompay.projectjb.apis.kakao;
 
-import java.util.HashMap;
-import java.util.Map;
+
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import com.kimcompay.projectjb.utillService;
 import com.kimcompay.projectjb.enums.kenum;
+import com.kimcompay.projectjb.enums.senums;
 
 import org.json.simple.JSONObject;
 import org.slf4j.Logger;
@@ -57,7 +56,8 @@ public class kakaoService {
             logger.info("k로그인 콜백");
             result=kakaoLoginService.doLogin(request.getParameter("code"),rest_key,kLoginCallbackUrl);
         }else{
-            throw utillService.makeRuntimeEX("알 수없는 오류 발생", "catchCallBack");
+            result.put("flag", false);
+            result.put("message", senums.defaultDetailAddress.get());
         }
         logger.info("처리결과"+result);
         String url=frontDomain+resultLink+"?kind=kakao&action="+action+"&result="+result.get("flag")+"&message="+result.get("message");

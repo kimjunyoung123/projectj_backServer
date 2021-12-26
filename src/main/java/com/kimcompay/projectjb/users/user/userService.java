@@ -21,6 +21,7 @@ import com.kimcompay.projectjb.apis.jungbu.jungbuService;
 import com.kimcompay.projectjb.apis.kakao.kakaoMapService;
 import com.kimcompay.projectjb.configs.securityConfig;
 import com.kimcompay.projectjb.enums.senums;
+import com.kimcompay.projectjb.jwt.jwtService;
 import com.kimcompay.projectjb.users.principalDetails;
 import com.kimcompay.projectjb.users.company.comVo;
 import com.kimcompay.projectjb.users.company.compayDao;
@@ -34,7 +35,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Async;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -44,9 +44,9 @@ import org.springframework.transaction.annotation.Transactional;
 public class userService {
     private Logger logger=LoggerFactory.getLogger(userService.class);
     @Value("${refresh_token_cookie}")
-    private String refresh_token_cookie_name;
+    private String refreshTokenCookieName;
     @Value("${access_token_cookie}")
-    private String access_token_cookie_name;
+    private String accessTokenCookieName;
     @Autowired
     private jungbuService jungbuService;
     @Autowired
@@ -63,8 +63,28 @@ public class userService {
     private RedisTemplate<String,String>redisTemplate;
     @Autowired
     private userAdapter userAdapter;
-    
-    public void oauthLogin(userVo userVo,String refreshToken) {
+    @Autowired
+    private jwtService jwtService;
+
+    public void oauthLogin(String email,userVo userVo) {
+        logger.info("oauthLogin");
+        //로그인처리
+        String accessToken=jwtService.get_access_token(email);
+        String refreshToken=jwtService.get_refresh_token();
+        try {
+            oauthLogin(userVo,refreshToken);
+        } catch (RuntimeException e) {
+            logger.info("소셜로그인 에러 발생: "+e.getMessage());
+            String message=e.getMessage();
+            if(!message.startsWith("메")){
+                message=senums.defaultFailMessage.get();
+            }
+            throw utillService.makeRuntimeEX(message, "oauthLogin");
+        }
+        //토큰 쿠키발급
+        utillService.makeLoginCookie(accessToken,refreshToken,accessTokenCookieName,refreshTokenCookieName);
+    }
+    private void oauthLogin(userVo userVo,String refreshToken) {
         logger.info("oauthLogin");
         String email=userVo.getEmail();
         String phone=userVo.getUphone();
@@ -93,16 +113,8 @@ public class userService {
         Map<Object,Object>result=voToMap(userVo);
         //redis에 유저정보 담기
         //redis에 맞게 형변환 
-        for(Entry<Object, Object> s:result.entrySet()){
-            logger.info(s.getKey().toString());
-            if(Optional.ofNullable(s.getValue()).orElseGet(()->null)==null){
-                logger.info("null발견 무시");
-                continue;
-            }else if(!s.getValue().getClass().getSimpleName().equals("String")){
-                result.put(s.getKey(), s.getValue().toString());
-            }
-        }
-        result.put(refresh_token_cookie_name, refreshToken);//리프레시토큰 함께 넣어주기
+        utillService.makeAllToString(result);
+        result.put(refreshTokenCookieName, refreshToken);//리프레시토큰 함께 넣어주기
         result.put("pwd", null);//비밀번호 지우기
         redisTemplate.opsForHash().putAll(email,result);
         redisTemplate.opsForValue().set(refreshToken,email);//리프레시토큰 넣어주기
@@ -144,8 +156,8 @@ public class userService {
         logger.info("logOut");
         //쿠키제거
         List<String>cookieNames=new ArrayList<>();
-        cookieNames.add(access_token_cookie_name);
-        cookieNames.add(refresh_token_cookie_name);
+        cookieNames.add(accessTokenCookieName);
+        cookieNames.add(refreshTokenCookieName);
         for(String cookieName:cookieNames){
             utillService.deleteCookie(cookieName, request,utillService.getHttpSerResponse());
         }
@@ -155,7 +167,7 @@ public class userService {
         logger.info("로그아웃 이메일: "+email);
         cookieNames.clear();
         cookieNames.add(email);
-        cookieNames.add(utillService.getCookieValue(request, refresh_token_cookie_name));
+        cookieNames.add(utillService.getCookieValue(request, refreshTokenCookieName));
         redisTemplate.delete(cookieNames);
         return utillService.getJson(true, "로그아웃완료");
     }
@@ -241,7 +253,7 @@ public class userService {
                 logger.info("비밀번호 제외 후 전달");
                 Map<Object,Object>map=principalDetails.getPrinci();
                 logger.info(map.toString());
-                map.put(refresh_token_cookie_name, null);//refresh token제거 비밀번호는 로그인시 애초에 redis에 저장하지 않음
+                map.put(refreshTokenCookieName, null);//refresh token제거 비밀번호는 로그인시 애초에 redis에 저장하지 않음
                 JSONObject jsonObject=new JSONObject();
                 jsonObject.put("message", map);
                 jsonObject.put("flag", true);
