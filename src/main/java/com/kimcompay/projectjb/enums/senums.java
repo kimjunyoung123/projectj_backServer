@@ -31,7 +31,10 @@ public enum senums {
     newpwd("newpwd"),
     changepwd("changepwd"),
     kakao("kakao"),
-    naver("naver");
+    naver("naver"),
+    defaultPostcode("x"),
+    defaultAddress("x"),
+    defaultDetailAddress("x");
 
     private String s;
     senums(String s){

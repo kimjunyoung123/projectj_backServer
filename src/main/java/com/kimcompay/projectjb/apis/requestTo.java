@@ -1,6 +1,5 @@
 package com.kimcompay.projectjb.apis;
 
-import com.kimcompay.projectjb.utillService;
 import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,16 +28,10 @@ public class requestTo {
 
     public <T> JSONObject requestGet(T body,String url,HttpHeaders headers) {
         logger.info("requestGet");
-        try {
-            RestTemplate restTemplate=new RestTemplate();
-            HttpEntity<T>entity=new HttpEntity<>(body,headers);
-            ResponseEntity<JSONObject>responseEntity=restTemplate.exchange(url,HttpMethod.GET,entity,JSONObject.class);
-            return responseEntity.getBody();
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw utillService.makeRuntimeEX("통신에 실패했습니다","requestget");
-        }
-  
+        RestTemplate restTemplate=new RestTemplate();
+        HttpEntity<T>entity=new HttpEntity<>(body,headers);
+        ResponseEntity<JSONObject>responseEntity=restTemplate.exchange(url,HttpMethod.GET,entity,JSONObject.class);
+        return responseEntity.getBody();
     }
 
 }

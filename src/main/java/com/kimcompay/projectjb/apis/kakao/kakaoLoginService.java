@@ -73,7 +73,12 @@ public class kakaoLoginService {
         logger.info("유저정보: "+linkedHashMap);
         //정보분리
         LinkedHashMap<String,Object>profile=(LinkedHashMap<String,Object>)linkedHashMap.get("profile");
-        //나이검사는 테스트어플로 불가
+        //테스트계정 주소/생일/휴대전화 받을 수 없음 임의로 만들자 
+        profile.put("address", senums.defaultAddress.get());
+        profile.put("postCode", senums.defaultPostcode.get());
+        profile.put("detailAddress", senums.defaultDetailAddress.get());
+        profile.put("phone", "01011113333");
+        profile.put("birth", "1996-01-01");
         //map->vo
         String email=linkedHashMap.get("email").toString();
         userVo userVo=mapToVo(profile,email);
@@ -99,8 +104,8 @@ public class kakaoLoginService {
     }
     private userVo mapToVo(LinkedHashMap<String,Object>profile,String email) {
         logger.info("mapToVo");
-        userVo vo=userVo.builder().email(email).uaddress("테스트주소x").ubirth("1996-01-01").udetail_address("테스트x").ulogin_date(Timestamp.valueOf(LocalDateTime.now())).uphone("01011113333")
-                                    .upostcode("111111").upwd(oauthPwd).urole(senums.user_role.get()).usleep(0).build();
+        userVo vo=userVo.builder().email(email).uaddress(profile.get("address").toString()).ubirth(profile.get("birth").toString()).udetail_address(profile.get("detailAddress").toString()).ulogin_date(Timestamp.valueOf(LocalDateTime.now()))
+                        .uphone(profile.get("phone").toString()).upostcode(profile.get("postCode").toString()).upwd(oauthPwd).urole(senums.user_role.get()).usleep(0).build();
                                     return vo;
     }
     private JSONObject getKuserInfor(JSONObject response) {

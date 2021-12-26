@@ -58,11 +58,19 @@ public class naverLoginService {
         //사용자 정보 가져오기
         result=getUserProfile(accessToken);
         logger.info("네이버 통신결과: "+result);
-        //네이버 주소 찾아오기
-        JSONObject address=getUserPayAddress(accessToken);
-        logger.info("네이버 통신결과: "+address);
         //profile꺼내기
         LinkedHashMap<String,Object> profile=(LinkedHashMap<String,Object>)result.get("response");
+        //네이버 주소 찾아오기
+        JSONObject address=new JSONObject();
+        try {
+            address=getUserPayAddress(accessToken);
+            logger.info("네이버 통신결과: "+address);  
+        } catch (HttpClientErrorException |NullPointerException e) {
+            logger.info("네이버페이 주소정보 얻어오기 실패 디폴드값 밀어넣기");
+            profile.put("postCode",senums.defaultPostcode.get());
+            profile.put("address", senums.defaultAddress.get());
+            profile.put("detailAddress", senums.defaultDetailAddress.get());
+        }
         //map->vo
         String email=profile.get("email").toString();
         userVo userVo=jsonToVo(profile);
@@ -88,8 +96,8 @@ public class naverLoginService {
     }
     private userVo jsonToVo(LinkedHashMap<String,Object> profile) {
         logger.info("jsonToVo");
-        userVo vo=userVo.builder().email(profile.get("email").toString()).uaddress("테스트주소없음").ubirth(profile.get("birthyear")+"-"+profile.get("birthday"))
-                        .udetail_address("테스트주소안줌").ulogin_date(Timestamp.valueOf(LocalDateTime.now())).uphone(profile.get("mobile").toString()).upostcode("테스트안줌")
+        userVo vo=userVo.builder().email(profile.get("email").toString()).uaddress(profile.get("address").toString()).ubirth(profile.get("birthyear")+"-"+profile.get("birthday"))
+                        .udetail_address(profile.get("detailAddress").toString()).ulogin_date(Timestamp.valueOf(LocalDateTime.now())).uphone(profile.get("mobile").toString().replace("-", "")).upostcode(profile.get("postCode").toString())
                         .upwd(oauthPwd).urole(senums.user_role.get()).usleep(0).build();
                         return vo;
     }
