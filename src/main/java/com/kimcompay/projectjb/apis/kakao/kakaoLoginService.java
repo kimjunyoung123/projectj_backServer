@@ -8,6 +8,7 @@ import java.util.Map;
 
 import com.kimcompay.projectjb.utillService;
 import com.kimcompay.projectjb.apis.requestTo;
+import com.kimcompay.projectjb.apis.aws.services.sqsService;
 import com.kimcompay.projectjb.configs.securityConfig;
 import com.kimcompay.projectjb.enums.kenum;
 import com.kimcompay.projectjb.enums.senums;
@@ -43,6 +44,8 @@ public class kakaoLoginService {
     private userService userService;
     @Autowired
     private jwtService jwtService;
+    @Autowired
+    private sqsService sqsService;
 
     public JSONObject doLogin(String code,String restKey,String redirectUrl) {
         logger.info("doLogin");
@@ -100,6 +103,7 @@ public class kakaoLoginService {
         cookies.put(accessTokenCookieName, accessToken);
         cookies.put(refreshTokenCookieName, refreshToken);
         utillService.makeCookie(cookies, utillService.getHttpSerResponse());
+        sqsService.sendEmailAsync("로그인 알림 이메일입니다 로그인일자: "+userVo.getUlogin_date(), email);
         return utillService.getJson(true, "카카오 로그인 완료");
     }
     private userVo mapToVo(LinkedHashMap<String,Object>profile,String email) {

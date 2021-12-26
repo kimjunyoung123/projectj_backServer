@@ -8,6 +8,7 @@ import java.util.Map;
 
 import com.kimcompay.projectjb.utillService;
 import com.kimcompay.projectjb.apis.requestTo;
+import com.kimcompay.projectjb.apis.aws.services.sqsService;
 import com.kimcompay.projectjb.enums.senums;
 import com.kimcompay.projectjb.jwt.jwtService;
 import com.kimcompay.projectjb.users.user.userService;
@@ -38,6 +39,8 @@ public class naverLoginService {
     private userService userService;
     @Autowired
     private jwtService jwtService;
+    @Autowired
+    private sqsService sqsService;
 
 
     public JSONObject login(String clientId,String ClientPwd,String code,String state) {
@@ -92,6 +95,7 @@ public class naverLoginService {
         cookies.put(accessTokenCookieName, accessToken);
         cookies.put(refreshTokenCookieName, refreshToken);
         utillService.makeCookie(cookies, utillService.getHttpSerResponse());
+        sqsService.sendEmailAsync("로그인 알림 이메일입니다 로그인일자: "+userVo.getUlogin_date(), email);
         return utillService.getJson(true, "네이버 로그인 완료");
     }
     private userVo jsonToVo(LinkedHashMap<String,Object> profile) {
