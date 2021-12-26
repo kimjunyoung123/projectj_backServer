@@ -69,14 +69,19 @@ public class userService {
         String email=userVo.getEmail();
         String phone=userVo.getUphone();
         Map<String,Object>map=userdao.findByPhoneAndEmailJoinCompany(phone, phone, email, email);
+        int year=Integer.parseInt(userVo.getUbirth().split("-")[0]);
+        int nowYear=LocalDateTime.now().getYear();
         // 소셜로그인은 보통유저만 가능 이미 사용하는 회사가 있다면 팅겨주기
         if(Integer.parseInt(map.get("ce").toString())!=0||Integer.parseInt(map.get("cp").toString())!=0){
-            throw new RuntimeException("이미 존재하는 회사의 이메일 혹은 전화번호입니다");
+            throw new RuntimeException("메세지: 이미 존재하는 회사의 이메일 혹은 전화번호입니다");
+        }else if(nowYear-year<18){//나이검사
+            throw new RuntimeException("메세지: 18세 미만은 소셜로그인이 불가합니다");
         }else if(Integer.parseInt(map.get("ue").toString())!=0){
             logger.info("이미 존재하는 이메일: "+email);
             userVo=userdao.findByEmail(email).orElseThrow(()->new IllegalAccessError("찾을 수없는 이메일"));//에러가터질확률이 없을거같다  그래서 no trycatch
         }else if(Integer.parseInt(map.get("up").toString())!=0){
             logger.info("이미 존재하는 휴대폰번호: "+phone);
+            userVo.setUpwd(securityConfig.pwdEncoder().encode(userVo.getUpwd()));
             userVo=userdao.findByUphone(phone);//에러가터질확률이 없을거같다  그래서 no trycatch
         }else{
             logger.info("소셜로그인으로 첫로그인 요청 회원가입 진행");
@@ -98,6 +103,7 @@ public class userService {
             }
         }
         result.put(refresh_token_cookie_name, refreshToken);//리프레시토큰 함께 넣어주기
+        result.put("pwd", null);//비밀번호 지우기
         redisTemplate.opsForHash().putAll(email,result);
         redisTemplate.opsForValue().set(refreshToken,email);//리프레시토큰 넣어주기
         //로그인시간갱신
@@ -442,7 +448,7 @@ public class userService {
         }
         tryInsertDto.setScope_num(Integer.parseInt(scope_num));
         if(scope_num.equals(senums.persnal.get())){
-            logger.info("일반 회원이므로 생년월일 검사");
+            logger.info("일반 회원이므로 나이 검사");
             //나이계산
             logger.info("생년월일: "+tryInsertDto.getBirth());
             String[] birth=tryInsertDto.getBirth().split("-");

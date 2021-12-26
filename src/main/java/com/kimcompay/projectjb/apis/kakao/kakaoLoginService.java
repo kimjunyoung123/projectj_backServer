@@ -42,8 +42,6 @@ public class kakaoLoginService {
     @Autowired
     private userService userService;
     @Autowired
-    private securityConfig securityConfig;
-    @Autowired
     private jwtService jwtService;
 
     public JSONObject doLogin(String code,String restKey,String redirectUrl) {
@@ -101,8 +99,8 @@ public class kakaoLoginService {
     }
     private userVo mapToVo(LinkedHashMap<String,Object>profile,String email) {
         logger.info("mapToVo");
-        userVo vo=userVo.builder().email(email).uaddress("테스트주소x").ubirth("테스트x").udetail_address("테스트x").ulogin_date(Timestamp.valueOf(LocalDateTime.now())).uphone("01011113333")
-                                    .upostcode("111111").upwd(securityConfig.pwdEncoder().encode(oauthPwd)).urole(senums.user_role.get()).usleep(0).build();
+        userVo vo=userVo.builder().email(email).uaddress("테스트주소x").ubirth("1996-01-01").udetail_address("테스트x").ulogin_date(Timestamp.valueOf(LocalDateTime.now())).uphone("01011113333")
+                                    .upostcode("111111").upwd(oauthPwd).urole(senums.user_role.get()).usleep(0).build();
                                     return vo;
     }
     private JSONObject getKuserInfor(JSONObject response) {

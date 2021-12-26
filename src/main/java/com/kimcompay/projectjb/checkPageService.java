@@ -68,10 +68,9 @@ public class checkPageService {
             kakaoService.catchCallBack(action,request);
         }else if(kind.equals(senums.naver.get())){
             logger.info("네이버 콜백 요청");
-            
+            naverService.catchCallBack(action, request);
         }else{
             throw utillService.makeRuntimeEX("지원하지 않는 소셜서비스입니다", "selectPage");
         }
-        logger.info("forword");
     }
 }
