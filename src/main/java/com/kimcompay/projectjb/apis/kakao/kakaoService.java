@@ -32,6 +32,8 @@ public class kakaoService {
     private String kLoginCallbackUrl;
     @Value("${front.domain}")
     private String frontDomain;
+    @Value("${front.result.page}")
+    private String resultLink;
 
     @Autowired
     private kakaoLoginService kakaoLoginService;
@@ -50,17 +52,15 @@ public class kakaoService {
     }
     public void catchCallBack(String action,HttpServletRequest request) {
         logger.info("catchCallBack");
-        String url=null;
         JSONObject result=new JSONObject();
         if(action.equals(kenum.loginPage.get())){
             logger.info("k로그인 콜백");
-            url="social";
             result=kakaoLoginService.doLogin(request.getParameter("code"),rest_key,kLoginCallbackUrl);
         }else{
             throw utillService.makeRuntimeEX("알 수없는 오류 발생", "catchCallBack");
         }
-        logger.info("forword");
-        url=frontDomain+url+"?result="+result.get("flag")+"&message="+result.get("message");
+        logger.info("처리결과"+result);
+        String url=frontDomain+resultLink+"?kind=kakao&action="+action+"&result="+result.get("flag")+"&message="+result.get("message");
         utillService.doRedirect(utillService.getHttpSerResponse(), url);
     }
 }

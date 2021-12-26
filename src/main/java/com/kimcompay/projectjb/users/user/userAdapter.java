@@ -65,6 +65,7 @@ public class userAdapter {
             map.put("close_time", comVo.getClose_time());
             map.put("kind", senums.company.get());
         }
+        logger.info("vo->map변환완료");
         return map;
     }
 }

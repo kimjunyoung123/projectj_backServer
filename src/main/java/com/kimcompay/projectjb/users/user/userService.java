@@ -84,15 +84,25 @@ public class userService {
         }
         logger.info("소셜 로그인중 찾은 유저정보: "+userVo);
         //vo->map
-        //redis에 유저정보 담기
+        userVo.setUlogin_date(Timestamp.valueOf(LocalDateTime.now()));//로그인시간 넣어주기
         Map<Object,Object>result=voToMap(userVo);
+        //redis에 유저정보 담기
+        //redis에 맞게 형변환 
+        for(Entry<Object, Object> s:result.entrySet()){
+            logger.info(s.getKey().toString());
+            if(Optional.ofNullable(s.getValue()).orElseGet(()->null)==null){
+                logger.info("null발견 무시");
+                continue;
+            }else if(!s.getValue().getClass().getSimpleName().equals("String")){
+                result.put(s.getKey(), s.getValue().toString());
+            }
+        }
         result.put(refresh_token_cookie_name, refreshToken);//리프레시토큰 함께 넣어주기
         redisTemplate.opsForHash().putAll(email,result);
         redisTemplate.opsForValue().set(refreshToken,email);//리프레시토큰 넣어주기
-        //시큐리티 세션에 담아주기
-        principalDetails principalDetails=new principalDetails(result);
-        SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(principalDetails,null,principalDetails.getAuthorities()));
-        updateLoginDate(Timestamp.valueOf(LocalDateTime.now()), senums.persnal.get());
+        //로그인시간갱신
+        updateLoginDate(senums.persnal.get(),email);
+        logger.info("소셜 로그인 완료");
     }
     private Map<Object, Object> voToMap(userVo userVo) {
         logger.info("voToMap");
@@ -244,19 +254,17 @@ public class userService {
         System.out.println(flag);
         if(flag){
             //로그인일자 수정해주기
-            updateLoginDate(Timestamp.valueOf(request.getParameter("date")),request.getParameter("kind"));
+            principalDetails principalDetails=(principalDetails)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            updateLoginDate(request.getParameter("kind"),principalDetails.getUsername());
             return utillService.getJson(flag, "로그인완료");
         }
         return utillService.getJson(flag, request.getParameter("cause"));
     }
     @Async
-    public void updateLoginDate(Timestamp date,String kind) {
+    public void updateLoginDate(String kind,String email) {
         logger.info("updateLoginDate");
-        //이메일 꺼내기
-        principalDetails principalDetails=(principalDetails)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        String email=principalDetails.getUsername();
         //로그인날짜로 수정
-        logger.info("로그인일자: "+date);
+        Timestamp date=Timestamp.valueOf(LocalDateTime.now());
         if(kind.equals(senums.persnal.get())){
             userdao.updateUserLoginDate(date, email);
         }else if(kind.equals(senums.company.get())){
