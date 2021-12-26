@@ -5,6 +5,7 @@ import java.util.Map;
 
 import com.kimcompay.projectjb.utillService;
 import com.kimcompay.projectjb.apis.requestTo;
+import com.kimcompay.projectjb.enums.kenum;
 import com.kimcompay.projectjb.enums.senums;
 
 import org.json.simple.JSONObject;
@@ -39,10 +40,12 @@ public class kakaoLoginService {
             message=message.substring(1,message.length()-1);
             JSONObject error=utillService.stringToJson(message);
             logger.info("에러내용: "+error);
-            if(error.get("error_code").equals("KOE320")){
-                return  utillService.getJson(false,"중복요청 입니다 다시 시도 바랍니다");
+            try {
+                //if대신 enum사용
+                return  utillService.getJson(false,kenum.valueOf(error.get("error_code").toString()).get());
+            } catch (IllegalArgumentException e2) {
+                return  utillService.getJson(false,senums.defaultFailMessage.get());
             }
-            return  utillService.getJson(false,senums.defaultFailMessage.get());
         }
         //사용자정보 얻어오기
         response=getKuserInfor(response);
@@ -51,8 +54,8 @@ public class kakaoLoginService {
         logger.info("유저정보: "+linkedHashMap);
         //정보분리
         LinkedHashMap<String,Object>profile=(LinkedHashMap<String,Object>)linkedHashMap.get("profile");
-        //나이검사는 테스트상태로 불가 
-
+        String ageRange=linkedHashMap.get("age_range").toString();
+        //나이검사는 테스트어플로 불가
         return utillService.getJson(true, "카카오 로그인 완료");
     }
     private JSONObject getKuserInfor(JSONObject response) {

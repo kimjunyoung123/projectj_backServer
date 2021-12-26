@@ -3,6 +3,7 @@ package com.kimcompay.projectjb.users.user;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.kimcompay.projectjb.enums.senums;
 import com.kimcompay.projectjb.users.company.comVo;
 
 import org.slf4j.Logger;
@@ -43,6 +44,7 @@ public class userAdapter {
             map.put("pwd", userVo.getUpwd());
             map.put("role", userVo.getUrole());
             map.put("sleep", userVo.getUsleep());
+            map.put("kind", senums.persnal.get());
         }else{
             logger.info("com to map");
             map.put("email", comVo.getCemail());
@@ -61,6 +63,7 @@ public class userAdapter {
             map.put("tel", comVo.getCtel());
             map.put("start_time", comVo.getStart_time());
             map.put("close_time", comVo.getClose_time());
+            map.put("kind", senums.company.get());
         }
         return map;
     }

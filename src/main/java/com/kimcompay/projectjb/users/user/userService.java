@@ -33,6 +33,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -198,14 +199,35 @@ public class userService {
             throw utillService.makeRuntimeEX("로그인 정보없음", "checkLogin");
         }
     }
+    @Transactional(rollbackFor = Exception.class)
     public JSONObject checkLogin(HttpServletRequest request,HttpServletResponse response) {
         logger.info("checkLoginAuth");
         boolean flag=Boolean.parseBoolean(request.getParameter("flag"));
         System.out.println(flag);
         if(flag){
+            //로그인일자 수정해주기
+            updateLoginDate(request.getParameter("date"),request.getParameter("kind"));
             return utillService.getJson(flag, "로그인완료");
         }
         return utillService.getJson(flag, request.getParameter("cause"));
+    }
+    @Async
+    public void updateLoginDate(String date,String kind) {
+        logger.info("updateLoginDate");
+        //이메일 꺼내기
+        principalDetails principalDetails=(principalDetails)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String email=principalDetails.getUsername();
+        //로그인날짜로 수정
+        Timestamp loginDate=Timestamp.valueOf(date);
+        logger.info("로그인일자: "+loginDate);
+        if(kind.equals(senums.persnal.get())){
+            userdao.updateUserLoginDate(loginDate, email);
+        }else if(kind.equals(senums.company.get())){
+            userdao.updateCompanyLoginDate(loginDate, email);
+        }else{
+            logger.info("로그인 일자 갱신 실패");
+        }
+        logger.info("로그인일자 갱신완료");
     }
     @Transactional(rollbackFor = Exception.class)
     public JSONObject insert(tryInsertDto tryInsertDto,HttpSession session) {

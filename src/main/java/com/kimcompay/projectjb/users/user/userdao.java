@@ -1,5 +1,6 @@
 package com.kimcompay.projectjb.users.user;
 
+import java.sql.Timestamp;
 import java.util.Map;
 import java.util.Optional;
 
@@ -36,4 +37,16 @@ public interface userdao extends JpaRepository<userVo,Integer>{
     @Transactional
     @Query(value = "update companys set cpwd=? where cemail=?",nativeQuery = true)
     void updateCompanyPwd(String hashPwd,String email);
+
+    
+    @Modifying
+    @Transactional
+    @Query(value = "update users set ulogin_date=? where uemail=?",nativeQuery = true)
+    void updateUserLoginDate(Timestamp loginDate,String email);
+
+    @Modifying
+    @Transactional
+    @Query(value = "update companys set clogin_date=? where cemail=?",nativeQuery = true)
+    void updateCompanyLoginDate(Timestamp loginDate,String email);
+
 }

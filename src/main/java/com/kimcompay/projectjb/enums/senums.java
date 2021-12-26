@@ -6,6 +6,7 @@ public enum senums {
     auth("auth"),
     find("find"),
     persnal("0"),
+    company("1"),
     buyer("1"),
     seller("2"),
     phone("up,cp"),

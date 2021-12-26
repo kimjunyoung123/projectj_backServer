@@ -1,6 +1,8 @@
 package com.kimcompay.projectjb.filters;
 
 import java.io.IOException;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -84,7 +86,9 @@ public class loginFilter extends UsernamePasswordAuthenticationFilter {
        /* //vo->map으로 변환
         ObjectMapper objectMapper=new ObjectMapper();
         Map<String,Object> result= objectMapper.convertValue(map.get("dto"), Map.class);*/
+        Timestamp loginDate=Timestamp.valueOf(LocalDateTime.now());
         result.put("pwd", null);//비밀번호 지우기
+        result.put("loginDate",loginDate);//로그인 날짜부여
         logger.info("로그인정보: "+result.toString());
         //토큰발급
         String access_token=jwtService.get_access_token(email);
@@ -114,7 +118,7 @@ public class loginFilter extends UsernamePasswordAuthenticationFilter {
         ValueOperations<String, String>redisInRefresh=redisTemplate.opsForValue();
         redisInRefresh.set(refresh_token,email);
         logger.info("로그인 과정완료");
-        utillService.goFoward("/login?flag=true", request, response);
+        utillService.goFoward("/login?flag=true&date="+loginDate+"&kind="+result.get("kind") , request, response);
     }
     @Override
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response,AuthenticationException failed) throws IOException, ServletException {
