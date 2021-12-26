@@ -49,4 +49,5 @@ public interface userdao extends JpaRepository<userVo,Integer>{
     @Query(value = "update companys set clogin_date=? where cemail=?",nativeQuery = true)
     void updateCompanyLoginDate(Timestamp loginDate,String email);
 
+    userVo findByUphone(String phone);
 }

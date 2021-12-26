@@ -112,11 +112,10 @@ public class loginFilter extends UsernamePasswordAuthenticationFilter {
         }
         //redis 유저정보 밀어넣기
         HashOperations<String, Object, Object> hashOperations = redisTemplate.opsForHash();
-        result.put(refresh_cookie_name, refresh_token);
+        result.put(refresh_cookie_name, refresh_token);//리프레시토큰 찾기위해 넣는것
         hashOperations.putAll(email,result);
         //redis refresh 토큰 /이메일 밀어넣기
-        ValueOperations<String, String>redisInRefresh=redisTemplate.opsForValue();
-        redisInRefresh.set(refresh_token,email);
+        redisTemplate.opsForValue().set(refresh_token,email);//리프레시토큰을 넣는것
         logger.info("로그인 과정완료");
         utillService.goFoward("/login?flag=true&date="+loginDate+"&kind="+result.get("kind") , request, response);
     }

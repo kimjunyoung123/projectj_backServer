@@ -46,7 +46,7 @@ public class userVo {
     @Column(name = "upostcode",nullable = false ,length =20)
     private String upostcode;
 
-    @Column(name = "uphone",nullable = false ,unique = true,length = 11)
+    @Column(name = "uphone",nullable = false ,length = 11)
     private String uphone;
 
     @Column(name = "ulogin_date")

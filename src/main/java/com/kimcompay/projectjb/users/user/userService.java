@@ -34,6 +34,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -60,7 +61,44 @@ public class userService {
     private sqsService sqsService;
     @Autowired
     private RedisTemplate<String,String>redisTemplate;
+    @Autowired
+    private userAdapter userAdapter;
     
+    public void oauthLogin(userVo userVo,String refreshToken) {
+        logger.info("oauthLogin");
+        String email=userVo.getEmail();
+        String phone=userVo.getUphone();
+        Map<String,Object>map=userdao.findByPhoneAndEmailJoinCompany(phone, phone, email, email);
+        // 소셜로그인은 보통유저만 가능 이미 사용하는 회사가 있다면 팅겨주기
+        if(Integer.parseInt(map.get("ce").toString())!=0||Integer.parseInt(map.get("cp").toString())!=0){
+            throw new RuntimeException("이미 존재하는 회사의 이메일 혹은 전화번호입니다");
+        }else if(Integer.parseInt(map.get("ue").toString())!=0){
+            logger.info("이미 존재하는 이메일: "+email);
+            userVo=userdao.findByEmail(email).orElseThrow(()->new IllegalAccessError("찾을 수없는 이메일"));//에러가터질확률이 없을거같다  그래서 no trycatch
+        }else if(Integer.parseInt(map.get("up").toString())!=0){
+            logger.info("이미 존재하는 휴대폰번호: "+phone);
+            userVo=userdao.findByUphone(phone);//에러가터질확률이 없을거같다  그래서 no trycatch
+        }else{
+            logger.info("소셜로그인으로 첫로그인 요청 회원가입 진행");
+            userdao.save(userVo);
+        }
+        logger.info("소셜 로그인중 찾은 유저정보: "+userVo);
+        //vo->map
+        //redis에 유저정보 담기
+        Map<Object,Object>result=voToMap(userVo);
+        result.put(refresh_token_cookie_name, refreshToken);//리프레시토큰 함께 넣어주기
+        redisTemplate.opsForHash().putAll(email,result);
+        redisTemplate.opsForValue().set(refreshToken,email);//리프레시토큰 넣어주기
+        //시큐리티 세션에 담아주기
+        principalDetails principalDetails=new principalDetails(result);
+        SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(principalDetails,null,principalDetails.getAuthorities()));
+        updateLoginDate(Timestamp.valueOf(LocalDateTime.now()), senums.persnal.get());
+    }
+    private Map<Object, Object> voToMap(userVo userVo) {
+        logger.info("voToMap");
+        userAdapter.adapterUser(userVo);
+        return userAdapter.getMap();
+    }
     public JSONObject selectUserAction(String action,HttpServletRequest request) {
         logger.info("selectUserAction");
         if(action.equals(senums.checkt.get())){
@@ -206,24 +244,23 @@ public class userService {
         System.out.println(flag);
         if(flag){
             //로그인일자 수정해주기
-            updateLoginDate(request.getParameter("date"),request.getParameter("kind"));
+            updateLoginDate(Timestamp.valueOf(request.getParameter("date")),request.getParameter("kind"));
             return utillService.getJson(flag, "로그인완료");
         }
         return utillService.getJson(flag, request.getParameter("cause"));
     }
     @Async
-    public void updateLoginDate(String date,String kind) {
+    public void updateLoginDate(Timestamp date,String kind) {
         logger.info("updateLoginDate");
         //이메일 꺼내기
         principalDetails principalDetails=(principalDetails)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String email=principalDetails.getUsername();
         //로그인날짜로 수정
-        Timestamp loginDate=Timestamp.valueOf(date);
-        logger.info("로그인일자: "+loginDate);
+        logger.info("로그인일자: "+date);
         if(kind.equals(senums.persnal.get())){
-            userdao.updateUserLoginDate(loginDate, email);
+            userdao.updateUserLoginDate(date, email);
         }else if(kind.equals(senums.company.get())){
-            userdao.updateCompanyLoginDate(loginDate, email);
+            userdao.updateCompanyLoginDate(date, email);
         }else{
             logger.info("로그인 일자 갱신 실패");
         }
