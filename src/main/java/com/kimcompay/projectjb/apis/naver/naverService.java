@@ -6,12 +6,16 @@ import com.kimcompay.projectjb.enums.nenum;
 import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class naverService {
     private Logger logger=LoggerFactory.getLogger(naverService.class);
 
+    @Autowired
+    private naverLoginService naverLoginService;
+    
     public JSONObject callPage(String action) {
         logger.info("callPage");
         String url=null;
