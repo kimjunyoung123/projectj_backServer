@@ -61,8 +61,6 @@ public class userAdapter {
             map.put("kind", comVo.getCkind());
             map.put("num", comVo.getCnum());
             map.put("tel", comVo.getCtel());
-            map.put("start_time", comVo.getStart_time());
-            map.put("close_time", comVo.getClose_time());
             map.put("kind", senums.company.get());
         }
         logger.info("vo->map변환완료");

@@ -47,8 +47,6 @@ public class tryInsertDto {
     //기업시에만 따로 검사
     private String tel;
     private String company_num;
-    private String open_time;
-    private String close_time;
     private String store_name;
     private String start_dt;
     //db에는 숫자로 회원유형이 들어감

@@ -73,11 +73,4 @@ public class comVo {
 
     @Column(name = "ckind",nullable = false,columnDefinition = "TINYINT")
     private int ckind;
-
-    @Column(name = "start_time",nullable = false)
-    private String start_time;
-
-    @Column(name = "close_time",nullable = false)
-    private String close_time;
-
 }

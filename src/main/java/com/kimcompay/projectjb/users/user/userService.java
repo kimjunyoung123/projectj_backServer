@@ -322,10 +322,9 @@ public class userService {
             logger.info("기업 회원가입");
             //추가 검사 
             checkCompanyValues(tryInsertDto);
-            checkTimeAndOther(tryInsertDto);
             checkComNum(jungbuService.getCompanyNum(tryInsertDto.getCompany_num(),tryInsertDto.getStart_dt() ,tryInsertDto.getName()));
             comVo vo=comVo.builder().cdetail_address(tryInsertDto.getDetail_address()).caddress(tryInsertDto.getAddress()).cemail(tryInsertDto.getEmail()).ckind(tryInsertDto.getScope_num()).cnum(tryInsertDto.getCompany_num())
-                                    .store_name(tryInsertDto.getStore_name()).crole(senums.company_role.get()).cphone(tryInsertDto.getPhone()).cpostcode(post_code).cpwd(hash_pwd).close_time(tryInsertDto.getClose_time()).csleep(0).ctel(tryInsertDto.getTel()).start_time(tryInsertDto.getOpen_time()).build();
+                                    .store_name(tryInsertDto.getStore_name()).crole(senums.company_role.get()).cphone(tryInsertDto.getPhone()).cpostcode(post_code).cpwd(hash_pwd).csleep(0).ctel(tryInsertDto.getTel()).build();
                                     compayDao.save(vo);
         }
     }
@@ -343,10 +342,10 @@ public class userService {
         }
         logger.info("사업자등록 유효성검사 통과");
     }
-    private void checkTimeAndOther(tryInsertDto tryInsertDto) {
-        logger.info("checkTimeAndOther");
+    private void checkTel(tryInsertDto tryInsertDto) {
+        logger.info("checkTel");
         //요청시간 꺼내기
-        String open_time=utillService.getValue(tryInsertDto.getOpen_time(),"시간값이 규격에 맞지 않습니다", "checkTime");
+        /*String open_time=utillService.getValue(tryInsertDto.getOpen_time(),"시간값이 규격에 맞지 않습니다", "checkTime");
         String close_time=utillService.getValue(tryInsertDto.getClose_time(),"시간값이 규격에 맞지 않습니다", "checkTime");
         logger.info("시작시간: "+open_time);
         logger.info("종료시간: "+close_time);
@@ -373,12 +372,7 @@ public class userService {
         if(times.get(0)>times.get(2)||(times.get(0)==times.get(2)&&times.get(1)>=times.get(3))){
             throw utillService.makeRuntimeEX("종료시간이 시작시간보다 빠를 수없습니다", "checkTime");
         }
-        logger.info("시간 유효성검사 통과");
-        //전화번호 유효성검사
-        if(utillService.checkOnlyNum(tryInsertDto.getTel())||utillService.checkOnlyNum(tryInsertDto.getPhone())){
-            throw utillService.makeRuntimeEX("전화번호는 숫자만 입력가능합니다", "checkTimeAndOther");
-        }
-        logger.info("전화번호 유효성 통과");
+        logger.info("시간 유효성검사 통과");*/
     }
     private void checkCompanyValues(tryInsertDto tryInsertDto){
         logger.info("checkCompanyValues");
@@ -478,7 +472,11 @@ public class userService {
                 throw utillService.makeRuntimeEX("일은 1이상 31이하입니다", "checkValues");
             }
         }
-        logger.info("회원가입 유효성검사 통과");
+        if(utillService.checkOnlyNum(tryInsertDto.getTel())||utillService.checkOnlyNum(tryInsertDto.getPhone())){
+            throw utillService.makeRuntimeEX("전화번호는 숫자만 입력가능합니다", "checkTimeAndOther");
+        }
+        logger.info("전화번호 유효성 통과");
+        logger.info("기업 회원가입 유효성검사 통과");
     }
     private void checkAuth(tryInsertDto tryInsertDto,HttpSession httpSession) {
         logger.info("checkAuth");
