@@ -321,7 +321,7 @@ public class userService {
             logger.info("기업 회원가입");
             //추가 검사 
             checkCompanyValues(tryInsertDto);
-            checkComNum(jungbuService.getCompanyNum(tryInsertDto.getCompany_num(),tryInsertDto.getStart_dt() ,tryInsertDto.getName()));
+            checkComNum(jungbuService.getCompanyNum(tryInsertDto.getCompany_num(),tryInsertDto.getStart_dt().replace("-", ""),tryInsertDto.getName()));
             comVo vo=comVo.builder().cdetail_address(tryInsertDto.getDetail_address()).caddress(tryInsertDto.getAddress()).cemail(tryInsertDto.getEmail()).ckind(tryInsertDto.getScope_num()).cnum(tryInsertDto.getCompany_num())
                                     .store_name(tryInsertDto.getStore_name()).crole(senums.company_role.get()).cphone(tryInsertDto.getPhone()).cpostcode(post_code).cpwd(hash_pwd).csleep(0).ctel(tryInsertDto.getTel()).build();
                                     
@@ -405,10 +405,7 @@ public class userService {
         }
         String start_dt=Optional.ofNullable(tryInsertDto.getStart_dt()).orElseThrow(()->utillService.makeRuntimeEX("개업일자를 입력해 주세요","checkCompanyValues"));
         if(utillService.checkBlank(start_dt)){
-            throw utillService.makeRuntimeEX("개업일자가 비어있거나 숫자만 입력해주세요","checkCompanyValues");
-        }
-        if(utillService.checkOnlyNum(start_dt)){
-            throw utillService.makeRuntimeEX("개업일자는 숫자만 주세요","checkCompanyValues");
+            throw utillService.makeRuntimeEX("개업일자가 비어있습니다","checkCompanyValues");
         }
         logger.info("사업자유효성통과");
     }
