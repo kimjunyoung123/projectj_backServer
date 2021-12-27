@@ -138,7 +138,6 @@ public class userService {
         }else if(action.equals("checkEmail")){
             logger.info("이메일 중복검사");
             return utillService.getJson(checkSamEmail(request.getParameter("email")),"");
-            
         }
         throw utillService.makeRuntimeEX("잘못된 요청", "selectUserAction");
     }
@@ -325,6 +324,7 @@ public class userService {
             checkComNum(jungbuService.getCompanyNum(tryInsertDto.getCompany_num(),tryInsertDto.getStart_dt() ,tryInsertDto.getName()));
             comVo vo=comVo.builder().cdetail_address(tryInsertDto.getDetail_address()).caddress(tryInsertDto.getAddress()).cemail(tryInsertDto.getEmail()).ckind(tryInsertDto.getScope_num()).cnum(tryInsertDto.getCompany_num())
                                     .store_name(tryInsertDto.getStore_name()).crole(senums.company_role.get()).cphone(tryInsertDto.getPhone()).cpostcode(post_code).cpwd(hash_pwd).csleep(0).ctel(tryInsertDto.getTel()).build();
+                                    
                                     compayDao.save(vo);
         }
     }
@@ -472,8 +472,8 @@ public class userService {
                 throw utillService.makeRuntimeEX("일은 1이상 31이하입니다", "checkValues");
             }
         }
-        if(utillService.checkOnlyNum(tryInsertDto.getTel())||utillService.checkOnlyNum(tryInsertDto.getPhone())){
-            throw utillService.makeRuntimeEX("전화번호는 숫자만 입력가능합니다", "checkTimeAndOther");
+        if(utillService.checkOnlyNum(tryInsertDto.getPhone())){
+            throw utillService.makeRuntimeEX("휴대폰번호는 숫자만 입력가능합니다", "checkTimeAndOther");
         }
         logger.info("전화번호 유효성 통과");
         logger.info("기업 회원가입 유효성검사 통과");

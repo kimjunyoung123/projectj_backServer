@@ -59,6 +59,7 @@ public class comVo {
     private String store_name;
 
     @Column(name = "clogin_date")
+    @CreationTimestamp
     private Timestamp clogin_date;
 
     @Column(name = "ccreated")
