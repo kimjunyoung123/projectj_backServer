@@ -1,55 +1,58 @@
-2021-12-14  
-개인 회원db
-1.id  
--고유값  
-2.email  
--가입자 이메일  
-3.pwd  
--가입자 비밀번호  
-4.address  
--가입자 주소
-5.detail_address  
--가입자 상세주소  
-6.post_code  
--가입자 우편번호  
-7.phone  
--가입자 핸드폰번호  
-8.created  
--가입일  
-9.login_date  
--마지막 로그인일자  
-10.sleep  
--휴면계정 여부  
-uservo.java  
+mysql> desc users;
++-----------------+--------------+------+-----+---------+----------------+
+| Field           | Type         | Null | Key | Default | Extra          |
++-----------------+--------------+------+-----+---------+----------------+
+| uid             | int          | NO   | PRI | NULL    | auto_increment |
+| uemail          | varchar(50)  | NO   | UNI | NULL    |                |
+| uaddress        | varchar(50)  | NO   |     | NULL    |                |
+| ucreated        | datetime     | YES  |     | NULL    |                |
+| udetail_address | varchar(50)  | NO   |     | NULL    |                |
+| ulogin_date     | datetime     | YES  |     | NULL    |                |
+| uphone          | varchar(11)  | NO   | UNI | NULL    |                |
+| upostcode       | varchar(20)  | NO   |     | NULL    |                |
+| upwd            | varchar(200) | NO   |     | NULL    |                |
+| urole           | varchar(20)  | NO   |     | NULL    |                |
+| usleep          | tinyint      | NO   |     | NULL    |                |
+| ubirth          | varchar(30)  | NO   |     | NULL    |                |
++-----------------+--------------+------+-----+---------+----------------+
 
-기업회원 db  
-1.cid  
--고유값  
-2.cemail  
--기업이메일  
-3.cphone  
--담장자 전화번호  
-4.ctel  
--회사번호  
-5.caddress  
--회사주소  
-6.cdetail_address  
--회사 상세주소  
-7.cpost_code  
--회사 우편번호  
-8.cnum  
--회사 사업자등록 번호  
-9.cpwd  
--회사비밀번호  
-10.clogin_date  
--마지막로그인일자  
-11.ckind  
--구매회사인지/판매회사인지  
-12.ccreated  
--가입일자  
-13.start_time
--영업시작 시간  
-14.close_time
--영업종료 시간
+mysql> desc companys;
++-----------------+--------------+------+-----+---------+----------------+
+| Field           | Type         | Null | Key | Default | Extra          |
++-----------------+--------------+------+-----+---------+----------------+
+| cid             | int          | NO   | PRI | NULL    | auto_increment |
+| caddress        | varchar(50)  | NO   |     | NULL    |                |
+| ccreated        | datetime     | YES  |     | NULL    |                |
+| cdetail_address | varchar(50)  | NO   |     | NULL    |                |
+| cemail          | varchar(50)  | NO   | UNI | NULL    |                |
+| ckind           | tinyint      | NO   |     | NULL    |                |
+| clogin_date     | datetime     | YES  |     | NULL    |                |
+| cnum            | varchar(255) | NO   | UNI | NULL    |                |
+| cphone          | varchar(11)  | NO   | UNI | NULL    |                |
+| cpostcode       | varchar(20)  | NO   |     | NULL    |                |
+| cpwd            | varchar(200) | NO   |     | NULL    |                |
+| crole           | varchar(20)  | NO   |     | NULL    |                |
+| csleep          | tinyint      | NO   |     | NULL    |                |
+| ctel            | varchar(11)  | NO   | UNI | NULL    |                |
+| store_name      | varchar(100) | NO   |     | NULL    |                |
++-----------------+--------------+------+-----+---------+----------------+
 
-
+mysql> desc stores;
++-----------------+--------------+------+-----+---------+----------------+
+| Field           | Type         | Null | Key | Default | Extra          |
++-----------------+--------------+------+-----+---------+----------------+
+| sid             | int          | NO   | PRI | NULL    | auto_increment |
+| saddress        | varchar(50)  | NO   |     | NULL    |                |
+| screated        | datetime     | YES  |     | NULL    |                |
+| sdetail_address | varchar(50)  | NO   |     | NULL    |                |
+| sname           | varchar(50)  | NO   |     | NULL    |                |
+| snum            | varchar(50)  | NO   |     | NULL    |                |
+| sphone          | varchar(11)  | NO   | UNI | NULL    |                |
+| spostcode       | varchar(20)  | NO   |     | NULL    |                |
+| srole           | varchar(20)  | NO   |     | NULL    |                |
+| ssleep          | tinyint      | NO   |     | NULL    |                |
+| stel            | varchar(11)  | NO   | UNI | NULL    |                |
+| clodse_time     | varchar(20)  | NO   |     | NULL    |                |
+| open_time       | varchar(20)  | NO   |     | NULL    |                |
+| simg            | varchar(255) | NO   |     | NULL    |                |
++-----------------+--------------+------+-----+---------+----------------+

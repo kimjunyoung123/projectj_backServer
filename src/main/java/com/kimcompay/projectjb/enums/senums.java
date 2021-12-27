@@ -34,7 +34,10 @@ public enum senums {
     naver("naver"),
     defaultPostcode("x"),
     defaultAddress("x"),
-    defaultDetailAddress("x");
+    defaultDetailAddress("x"),
+    insert("insert"),
+    update("update"),
+    defaultMessage2("잘못된 요청입니다");
 
     private String s;
     senums(String s){

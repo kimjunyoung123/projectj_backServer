@@ -10,6 +10,7 @@ import com.kimcompay.projectjb.checkPageService;
 import com.kimcompay.projectjb.utillService;
 import com.kimcompay.projectjb.apis.sns.snsService;
 import com.kimcompay.projectjb.enums.senums;
+import com.kimcompay.projectjb.users.company.storeService;
 import com.kimcompay.projectjb.users.user.tryInsertDto;
 import com.kimcompay.projectjb.users.user.tryUpdatePwdDato;
 import com.kimcompay.projectjb.users.user.userService;
@@ -33,11 +34,18 @@ public class restController {
     private userService userService;
     @Autowired
     private checkPageService checkPageService;
+    @Autowired
+    private storeService storeService;
 
     //auth가 앞에있으면 로그인후 이용가능한 api
     @RequestMapping(value = "/auth/test",method = RequestMethod.GET)
     public void name(HttpSession session) {
         logger.info("test");
+    }
+    @RequestMapping(value = "/auth/store/{action}",method = RequestMethod.POST)
+    public void storeAction(@PathVariable String action,@RequestBody JSONObject jsonObject) {
+        logger.info("storeAction");
+        storeService.insertOrUpdate(jsonObject,action);
     }
     @RequestMapping(value = "/auth/user/{action}",method = RequestMethod.GET)
     public JSONObject userAction(@PathVariable String action,HttpServletRequest request) {
