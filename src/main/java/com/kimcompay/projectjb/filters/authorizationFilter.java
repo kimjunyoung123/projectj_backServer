@@ -73,9 +73,9 @@ public class authorizationFilter extends BasicAuthenticationFilter  {
             utillService.goFoward("/tokenExpire/y", request, response);
             return;
         }catch(NullPointerException e2){
-            logger.info("토큰이 없음");
-            utillService.goFoward("/tokenExpire/x", request, response);
-            return;
+            logger.info("토큰이 없음 비로그인 사용자 요청");
+            //utillService.goFoward("/tokenExpire/x", request, response);
+            //return; //어차피 토큰이 없으면 시큐리티가 걸러준다
         }
         logger.info("인증필터 통과");
         chain.doFilter(request, response);

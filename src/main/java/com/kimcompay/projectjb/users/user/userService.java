@@ -257,6 +257,9 @@ public class userService {
                 jsonObject.put("message", map);
                 jsonObject.put("flag", true);
                 return jsonObject;
+            }else if(detail.equals("role")){
+                Map<Object,Object>map=principalDetails.getPrinci();
+                return utillService.getJson(true, map.get("role").toString());
             }else{
                 return utillService.getJson(false, "잘못된 요청");
             }
