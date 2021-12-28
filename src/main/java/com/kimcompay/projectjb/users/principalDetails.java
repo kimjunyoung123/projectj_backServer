@@ -73,6 +73,9 @@ public class principalDetails implements UserDetails {
         // TODO Auto-generated method stub
         return is_can;
     }
+    public String getRole() {
+        return princi.get("role").toString();
+    }
     private Boolean check_lock(int num,String loginDate){
         if(num!=0||LocalDateTime.now().isAfter(Timestamp.valueOf(loginDate).toLocalDateTime().plusYears(1))){
             return false;

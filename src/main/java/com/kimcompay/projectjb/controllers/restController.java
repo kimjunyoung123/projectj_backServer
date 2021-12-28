@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 @RestController
 public class restController {
@@ -112,6 +113,11 @@ public class restController {
         }else{
             return utillService.getJson(false, "로그인이 만료되었습니다 다시 로그인 바랍니다");
         }
+        
+    }
+    @RequestMapping(value = "/auth/file/{action}",method = RequestMethod.POST)
+    public void imgController(@PathVariable String action,MultipartHttpServletRequest multipartHttpServletRequest) {
+        logger.info("imgController");
         
     }
 }

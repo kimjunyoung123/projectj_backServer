@@ -247,7 +247,7 @@ public class userService {
             //요청분류
             if(detail.equals("email")){
                 logger.info("이메일만 전달");
-                return utillService.getJson(true, principalDetails.getUsername());
+                return utillService.getJson(true, principalDetails.getUsername()+","+principalDetails.getRole());
             }else if(detail.equals(senums.allt.get())){
                 logger.info("비밀번호 제외 후 전달");
                 Map<Object,Object>map=principalDetails.getPrinci();

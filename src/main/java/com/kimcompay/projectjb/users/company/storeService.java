@@ -36,7 +36,7 @@ public class storeService {
         logger.info("insert");
         //값 검증
         checkValues(jsonObject);
-
+        return null;
     }
     private storeVo checkValues(JSONObject jsonObject) {
         logger.info("checkValues");
