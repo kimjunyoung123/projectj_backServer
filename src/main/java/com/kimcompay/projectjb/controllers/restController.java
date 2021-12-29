@@ -125,12 +125,6 @@ public class restController {
     @RequestMapping(value = "/auth/file/{action}",method = RequestMethod.POST)
     public JSONObject imgController(@PathVariable String action,MultipartHttpServletRequest request) {
         logger.info("imgController");
-        /*List<MultipartFile> multipartFiles=new ArrayList<MultipartFile>();
-		multipartFiles = request.getFiles("upload");
-        System.out.println("fiel: "+multipartFiles);
-        JSONObject jsonObject=new JSONObject();
-        jsonObject.put("url", "urls");
-        return jsonObject;*/
         return fileService.upload(request);
     }
 }

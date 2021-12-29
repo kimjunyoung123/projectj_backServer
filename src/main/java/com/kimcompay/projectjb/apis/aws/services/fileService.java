@@ -38,7 +38,7 @@ public class fileService {
         if(result){
             logger.info("사진 세션에 담기");
             //주소만들기
-            url=awsUrl+"/"+reseponse.get("message");
+            url=awsUrl+"/"+bucketName+"/"+reseponse.get("message");
             logger.info("s3사진 경로: "+url);
             //세션에담기
             List<String>imgPaths=new ArrayList<>();
