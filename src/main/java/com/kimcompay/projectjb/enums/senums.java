@@ -37,7 +37,9 @@ public enum senums {
     defaultDetailAddress("x"),
     insert("insert"),
     update("update"),
-    defaultMessage2("잘못된 요청입니다");
+    defaultMessage2("잘못된 요청입니다"),
+    thumNail("thumNail"),
+    imgSessionName("imgs");
 
     private String s;
     senums(String s){

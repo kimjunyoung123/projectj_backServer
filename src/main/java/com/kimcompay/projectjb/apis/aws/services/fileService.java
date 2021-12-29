@@ -5,11 +5,14 @@ import java.util.List;
 
 import javax.servlet.http.HttpSession;
 
+import com.kimcompay.projectjb.enums.senums;
+
 import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
@@ -26,7 +29,7 @@ public class fileService {
     @Autowired
     private s3Service s3Service;
 
-    public JSONObject upload(MultipartHttpServletRequest request) {
+    public JSONObject upload(MultipartHttpServletRequest request,String detail) {
         logger.info("upload");
         //파일꺼내기
         List<MultipartFile>files=request.getFiles("upload");
@@ -38,17 +41,23 @@ public class fileService {
         if(result){
             logger.info("사진 세션에 담기");
             //주소만들기
-            url=awsUrl+"/"+bucketName+"/"+reseponse.get("message");
+            String uploadName=reseponse.get("message").toString();
+            url=awsUrl+"/"+bucketName+"/"+uploadName;
             logger.info("s3사진 경로: "+url);
             //세션에담기
             List<String>imgPaths=new ArrayList<>();
+            HttpSession httpSession=request.getSession();
+            String imgSession=senums.imgSessionName.get();
             try {
-                //이미지 배열 꺼내서 넣어주기
-                HttpSession httpSession=request.getSession();
+                //이미지 배열 꺼내서 넣어주기 첫 요청이라면 예외 발생
+                httpSession=request.getSession();
                 imgPaths=(List<String>)httpSession.getAttribute("imgs");
+                imgPaths.add(uploadName);
             } catch (NullPointerException e) {
                 logger.info("첫 사진업로드 요청이므로 예외발생 만들어서 넣어주기");
-                imgPaths.add(url);
+                imgPaths=new ArrayList<>();
+                imgPaths.add(uploadName);
+                httpSession.setAttribute(imgSession, imgPaths);
             }
         }
         reseponse.put("uploaded", result);
