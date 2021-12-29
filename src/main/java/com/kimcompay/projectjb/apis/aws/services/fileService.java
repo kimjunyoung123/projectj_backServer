@@ -29,7 +29,7 @@ public class fileService {
     @Autowired
     private s3Service s3Service;
 
-    public JSONObject upload(MultipartHttpServletRequest request,String detail) {
+    public JSONObject upload(MultipartHttpServletRequest request) {
         logger.info("upload");
         //파일꺼내기
         List<MultipartFile>files=request.getFiles("upload");

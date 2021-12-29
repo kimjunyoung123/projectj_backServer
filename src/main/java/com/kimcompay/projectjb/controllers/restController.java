@@ -122,9 +122,9 @@ public class restController {
         }
         
     }
-    @RequestMapping(value = "/auth/file/{action}/{detail}",method = RequestMethod.POST)
-    public JSONObject imgController(@PathVariable String action,@PathVariable String detail,MultipartHttpServletRequest request) {
+    @RequestMapping(value = "/auth/file/{action}",method = RequestMethod.POST)
+    public JSONObject imgController(@PathVariable String action,MultipartHttpServletRequest request) {
         logger.info("imgController");
-        return fileService.upload(request,detail);
+        return fileService.upload(request);
     }
 }
