@@ -11,6 +11,7 @@ import javax.validation.Valid;
 
 import com.kimcompay.projectjb.checkPageService;
 import com.kimcompay.projectjb.utillService;
+import com.kimcompay.projectjb.apis.aws.services.fileService;
 import com.kimcompay.projectjb.apis.sns.snsService;
 import com.kimcompay.projectjb.enums.senums;
 import com.kimcompay.projectjb.users.company.storeService;
@@ -41,6 +42,8 @@ public class restController {
     private checkPageService checkPageService;
     @Autowired
     private storeService storeService;
+    @Autowired
+    private fileService fileService;
 
     //auth가 앞에있으면 로그인후 이용가능한 api
     @RequestMapping(value = "/auth/test",method = RequestMethod.GET)
@@ -122,11 +125,12 @@ public class restController {
     @RequestMapping(value = "/auth/file/{action}",method = RequestMethod.POST)
     public JSONObject imgController(@PathVariable String action,MultipartHttpServletRequest request) {
         logger.info("imgController");
-        List<MultipartFile> multipartFiles=new ArrayList<MultipartFile>();
+        /*List<MultipartFile> multipartFiles=new ArrayList<MultipartFile>();
 		multipartFiles = request.getFiles("upload");
         System.out.println("fiel: "+multipartFiles);
         JSONObject jsonObject=new JSONObject();
         jsonObject.put("url", "urls");
-        return jsonObject;
+        return jsonObject;*/
+        return fileService.upload(request);
     }
 }
