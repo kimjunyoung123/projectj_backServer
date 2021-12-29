@@ -1,6 +1,9 @@
 package com.kimcompay.projectjb.controllers;
 
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -24,6 +27,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 @RestController
@@ -116,8 +120,13 @@ public class restController {
         
     }
     @RequestMapping(value = "/auth/file/{action}",method = RequestMethod.POST)
-    public void imgController(@PathVariable String action,MultipartHttpServletRequest multipartHttpServletRequest) {
+    public JSONObject imgController(@PathVariable String action,MultipartHttpServletRequest request) {
         logger.info("imgController");
-        
+        List<MultipartFile> multipartFiles=new ArrayList<MultipartFile>();
+		multipartFiles = request.getFiles("upload");
+        System.out.println("fiel: "+multipartFiles);
+        JSONObject jsonObject=new JSONObject();
+        jsonObject.put("url", "urls");
+        return jsonObject;
     }
 }
