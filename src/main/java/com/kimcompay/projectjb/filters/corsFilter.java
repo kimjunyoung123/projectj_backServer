@@ -25,8 +25,8 @@ public class corsFilter {
         //configuration.addAllowedOriginPattern("*");
         configuration.addAllowedHeader("*");
         configuration.addAllowedMethod("*");
-        configuration.addExposedHeader("Authorization");
-        configuration.addExposedHeader("refreshToken");
+        /*configuration.addExposedHeader("Authorization");
+        configuration.addExposedHeader("refreshToken");*/
         source.registerCorsConfiguration("/**", configuration);
         return new CorsFilter(source);
     }
