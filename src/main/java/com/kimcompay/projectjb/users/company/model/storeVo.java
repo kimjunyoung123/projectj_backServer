@@ -69,4 +69,13 @@ public class storeVo {
     @Column(name = "ssleep",nullable = false ,columnDefinition = "TINYINT")
     private int ssleep;
 
+    @Column(name = "minPrice",nullable = false )
+    private int minPrice;
+
+    @Column(name = "deliverRadius",nullable = false ,columnDefinition = "TINYINT")
+    private int deliverRadius;
+
+    @Column(name = "text",nullable = false ,length = 255)
+    private String text;
+
 }

@@ -39,9 +39,19 @@ public class storeService {
         //값 검증
         checkValues(tryInsertStoreDto);
         //저장시도
+        tryInsert(tryInsertStoreDto);
         //결과전송
         doneInsert(tryInsertStoreDto);
         return utillService.getJson(true, "매장등록이 완료되었습니다");
+    }
+    private void tryInsert(tryInsertStoreDto tryInsertStoreDto) {
+        logger.info("dtoToVo");
+        storeVo vo=storeVo.builder().closeTime(tryInsertStoreDto.getCloseTime()).openTime(tryInsertStoreDto.getOpenTime())
+                    .saddress(tryInsertStoreDto.getAddress()).sdetail_address(tryInsertStoreDto.getDetailAddress()).simg(tryInsertStoreDto.getThumbNail())
+                    .sname(tryInsertStoreDto.getStoreName()).snum(tryInsertStoreDto.getNum()).sphone(tryInsertStoreDto.getPhone()).spostcode(tryInsertStoreDto.getPostcode())
+                    .ssleep(0).stel(tryInsertStoreDto.getTel()).text(tryInsertStoreDto.getText()).build();
+                    storeDao.save(vo);
+                    
     }
     @Async
     public void doneInsert(tryInsertStoreDto tryInsertStoreDto) {
