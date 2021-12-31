@@ -21,8 +21,8 @@ public class storeService {
     @Autowired
     private storeDao storeDao;
 
-    public void insertOrUpdate(tryInsertStoreDto tryInsertStoreDto,String action) {
-        logger.info("insertOrUpdate");
+    public void actionHub(tryInsertStoreDto tryInsertStoreDto,String action) {
+        logger.info("actionHub");
         logger.info("요청행위: "+action);
         logger.info("요청정보: "+tryInsertStoreDto);
         if(action.equals(senums.insert.get())){
@@ -31,7 +31,7 @@ public class storeService {
         }else if(action.equals(senums.update.get())){
             logger.info("매장 수정 요청");
         }
-        throw utillService.makeRuntimeEX(senums.defaultMessage2.get(),"insertOrUpdate");
+        throw utillService.makeRuntimeEX(senums.defaultMessage2.get(),"actionHub");
     }
     @Transactional(rollbackFor = Exception.class)
     private JSONObject insert(tryInsertStoreDto tryInsertStoreDto){

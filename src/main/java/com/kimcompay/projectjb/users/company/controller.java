@@ -19,8 +19,8 @@ public class controller {
     private storeService storeService;
 
     @RequestMapping(value = "/auth/store/{action}",method = RequestMethod.POST)
-    public void storeAction(@PathVariable String action,@Valid @RequestBody tryInsertStoreDto tryInsertStoreDto) {
+    public void storeAction(@PathVariable String action, @RequestBody tryInsertStoreDto tryInsertStoreDto) {
         logger.info("storeAction");
-        storeService.insertOrUpdate(tryInsertStoreDto,action);
+        storeService.actionHub(tryInsertStoreDto,action);
     }
 }
