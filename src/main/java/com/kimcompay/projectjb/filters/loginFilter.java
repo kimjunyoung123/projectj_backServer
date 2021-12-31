@@ -3,10 +3,8 @@ package com.kimcompay.projectjb.filters;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
-import java.util.Map.Entry;
+
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -24,7 +22,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
@@ -61,13 +58,13 @@ public class loginFilter extends UsernamePasswordAuthenticationFilter {
             try {
                 jsonObject = objectMapper.readValue(request.getInputStream(), JSONObject.class);
             } catch (StreamReadException e) {
-                // TODO Auto-generated catch block
+                logger.info("로그인 시도중 값 변환에 실패했습니다");
                 e.printStackTrace();
             } catch (DatabindException e) {
-                // TODO Auto-generated catch block
+                logger.info("로그인 시도중 값 변환에 실패했습니다");
                 e.printStackTrace();
             } catch (IOException e) {
-                // TODO Auto-generated catch block
+                logger.info("로그인 시도중 값 변환에 실패했습니다");
                 e.printStackTrace();
             }
             logger.info("로그인시도 정보: "+jsonObject);

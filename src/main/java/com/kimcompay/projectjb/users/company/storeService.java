@@ -3,7 +3,6 @@ package com.kimcompay.projectjb.users.company;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
 
 import com.kimcompay.projectjb.utillService;
 import com.kimcompay.projectjb.enums.senums;
@@ -22,42 +21,39 @@ public class storeService {
     @Autowired
     private storeDao storeDao;
 
-    public void insertOrUpdate(JSONObject jsonObject,String action) {
+    public void insertOrUpdate(tryInsertStoreDto tryInsertStoreDto,String action) {
         logger.info("insertOrUpdate");
+        logger.info("요청행위: "+action);
+        logger.info("요청정보: "+tryInsertStoreDto);
         if(action.equals(senums.insert.get())){
             logger.info("매장등록 요청");
+            insert(tryInsertStoreDto);
         }else if(action.equals(senums.update.get())){
             logger.info("매장 수정 요청");
         }
         throw utillService.makeRuntimeEX(senums.defaultMessage2.get(),"insertOrUpdate");
     }
     @Transactional(rollbackFor = Exception.class)
-    public JSONObject insert(JSONObject jsonObject){
+    private JSONObject insert(tryInsertStoreDto tryInsertStoreDto){
         logger.info("insert");
         //값 검증
-        checkValues(jsonObject);
+        checkValues(tryInsertStoreDto);
         return null;
     }
-    private storeVo checkValues(JSONObject jsonObject) {
+    private storeVo checkValues(tryInsertStoreDto tryInsertStoreDto) {
         logger.info("checkValues");
-        //validation 어노테이션 펀하긴한데 나중에 헷갈려서 그냥 json으로 쓰자
-        storeVo vo=new storeVo();
         try {
-            vo=storeVo.builder().clodseTime(jsonObject.get("closeTime").toString()).openTime(jsonObject.get("openTime").toString())
-                            .saddress(jsonObject.get("address").toString()).sdetail_address(jsonObject.get("detailAddress").toString())
-                            .simg(jsonObject.get("img").toString()).sname(jsonObject.get("storeName").toString()).sphone(jsonObject.get("phone").toString())
-                            .spostcode(jsonObject.get("postCode").toString()).ssleep(0).stel(jsonObject.get("tel").toString())
-                            .build();
+        
         } catch (NullPointerException e) {
            throw utillService.makeRuntimeEX("빈칸이 존재 합니다", "checkValues");
         }
         //사업자등록번호검사
-        checkSnum(vo.getSnum());
-        checkOpenAndCloseTime(vo);
-        if(utillService.checkOnlyNum(vo.getStel())||utillService.checkOnlyNum(vo.getSphone())){
+       // checkSnum(vo.getSnum());
+       // checkOpenAndCloseTime(vo);
+        /*if(utillService.checkOnlyNum(vo.getStel())||utillService.checkOnlyNum(vo.getSphone())){
             throw utillService.makeRuntimeEX("전화번호 혹은 휴대폰번호는 숫자만 가능합니다", "checkValues");
-        }
-        return vo;
+        }*/
+        return null;
     }
     private void checkSnum(String snum) {
         logger.info("checkSnum");
@@ -70,16 +66,16 @@ public class storeService {
         //같은 사업자 번호로 회원 가입한 회사가 있어야함
         if(count==0){
             logger.info("사업자 번호로 회원가입 한 회사가없음");
-            throw utillService.makeRuntimeEX("사업자 번호로 회원가입 한 회사가 없습니다", "checkSnum");
+            throw utillService.makeRuntimeEX("사업자 번호로 회원가입 한 기업이 없습니다", "checkSnum");
         }
         //사업자 번호 검사는 일단 회사로 회원가입 후에 하는 시스템이므로 여기서 안해줘도 된다
         logger.info("사업자 번호 유효성 검사 통과");
     }
-    private void checkOpenAndCloseTime(storeVo storeVo) {
+    private void checkOpenAndCloseTime(tryInsertStoreDto tryInsertStoreDto) {
         logger.info("checkOpenAndCloseTime");
         //요청시간 꺼내기
-        String openTime=storeVo.getOpenTime();
-        String closeTime=storeVo.getClodseTime();
+        String openTime=tryInsertStoreDto.getOpenTime();
+        String closeTime=tryInsertStoreDto.getCloseTime();
         logger.info("시작시간: "+openTime);
         logger.info("종료시간: "+closeTime);
         //시간분리

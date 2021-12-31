@@ -1,8 +1,7 @@
 package com.kimcompay.projectjb.controllers;
 
 
-import java.util.ArrayList;
-import java.util.List;
+
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -15,6 +14,7 @@ import com.kimcompay.projectjb.apis.aws.services.fileService;
 import com.kimcompay.projectjb.apis.sns.snsService;
 import com.kimcompay.projectjb.enums.senums;
 import com.kimcompay.projectjb.users.company.storeService;
+import com.kimcompay.projectjb.users.company.tryInsertStoreDto;
 import com.kimcompay.projectjb.users.user.tryInsertDto;
 import com.kimcompay.projectjb.users.user.tryUpdatePwdDato;
 import com.kimcompay.projectjb.users.user.userService;
@@ -28,7 +28,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 @RestController
@@ -49,11 +48,6 @@ public class restController {
     @RequestMapping(value = "/auth/test",method = RequestMethod.GET)
     public void name(HttpSession session) {
         logger.info("test");
-    }
-    @RequestMapping(value = "/auth/store/{action}",method = RequestMethod.POST)
-    public void storeAction(@PathVariable String action,@RequestBody JSONObject jsonObject) {
-        logger.info("storeAction");
-        storeService.insertOrUpdate(jsonObject,action);
     }
     @RequestMapping(value = "/auth/user/{action}",method = RequestMethod.GET)
     public JSONObject userAction(@PathVariable String action,HttpServletRequest request) {

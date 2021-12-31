@@ -3,7 +3,6 @@ package com.kimcompay.projectjb;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import com.kimcompay.projectjb.apis.kakao.kakaoService;
 import com.kimcompay.projectjb.apis.naver.naverService;

@@ -59,8 +59,8 @@ public class storeVo {
     @Column(name = "openTime",nullable = false ,length = 20)
     private String openTime;
 
-    @Column(name = "clodseTime",nullable = false ,length = 20)
-    private String clodseTime;
+    @Column(name = "closeTime",nullable = false ,length = 20)
+    private String closeTime;
 
     @Column(name = "screated")
     @CreationTimestamp
