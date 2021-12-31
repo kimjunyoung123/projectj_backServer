@@ -43,21 +43,27 @@ public class snsService {
     private RedisTemplate<String,String>redisTemplate;
     
     public JSONObject send(JSONObject jsonObject,HttpSession httpSession) {
-        logger.info("send"+jsonObject.toString());
+        logger.info("send");
+        logger.info("전송요청 정보: "+jsonObject.toString());
         //입력값 검사
-        String val= Optional.ofNullable(jsonObject.get("val").toString()).orElseThrow(()-> utillService.makeRuntimeEX("이메일/전화번호를 확인해주세요", "send")).trim();
-        if(utillService.checkBlank(val)){
-            utillService.throwRuntimeEX("이메일/전화번호가 공백일 수없습니다");
-        }
+        String val= null;
         //사용용도 확인
         String detail=jsonObject.get("detail").toString();
         String type=jsonObject.get("type").toString();
+        try {
+            val= jsonObject.get("val").toString().trim();
+            if(utillService.checkBlank(val)){
+               throw new NullPointerException();
+            }
+        } catch (NullPointerException e) {
+            throw utillService.makeRuntimeEX(senums.valueOf(type+"Null").get(), "send");
+        }
         //사용용도/인증수단 확인 if을 줄이려고 enum으로 대체
         String[] keys=new String[2];
         try {
             keys=senums.valueOf(type).get().split(",");
         } catch (IllegalArgumentException e) {
-            throw utillService.makeRuntimeEX("존재하지 않는 인증방법 혹은 수단입니다","send");
+            throw utillService.makeRuntimeEX("지원하지 않는 인증방법 입니다","send");
         }
         logger.info("조회할 정보: "+val);
         //db에 전화번호/이메일 찾기 (count 로 가져옴)

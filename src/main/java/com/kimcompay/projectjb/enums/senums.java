@@ -39,7 +39,9 @@ public enum senums {
     update("update"),
     defaultMessage2("잘못된 요청입니다"),
     thumNail("thumNail"),
-    imgSessionName("imgs");
+    imgSessionName("imgs"),
+    phoneNull("휴대폰값을 입력해 주세요"),
+    emailNull("이메일값을 입력해 주세요");
 
     private String s;
     senums(String s){
