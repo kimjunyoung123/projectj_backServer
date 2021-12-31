@@ -1,4 +1,4 @@
-package com.kimcompay.projectjb.users.user;
+package com.kimcompay.projectjb.users.user.model;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;

@@ -1,10 +1,10 @@
-package com.kimcompay.projectjb.users.user;
+package com.kimcompay.projectjb.users.user.model;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import com.kimcompay.projectjb.enums.senums;
-import com.kimcompay.projectjb.users.company.comVo;
+import com.kimcompay.projectjb.users.company.model.comVo;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

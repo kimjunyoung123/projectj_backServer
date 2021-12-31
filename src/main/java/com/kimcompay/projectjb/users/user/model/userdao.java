@@ -1,4 +1,4 @@
-package com.kimcompay.projectjb.users.user;
+package com.kimcompay.projectjb.users.user.model;
 
 import java.sql.Timestamp;
 import java.util.Map;

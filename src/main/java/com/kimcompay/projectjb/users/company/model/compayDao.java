@@ -1,4 +1,4 @@
-package com.kimcompay.projectjb.users.company;
+package com.kimcompay.projectjb.users.company.model;
 
 import java.util.Optional;
 

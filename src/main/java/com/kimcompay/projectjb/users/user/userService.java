@@ -23,8 +23,13 @@ import com.kimcompay.projectjb.configs.securityConfig;
 import com.kimcompay.projectjb.enums.senums;
 import com.kimcompay.projectjb.jwt.jwtService;
 import com.kimcompay.projectjb.users.principalDetails;
-import com.kimcompay.projectjb.users.company.comVo;
-import com.kimcompay.projectjb.users.company.compayDao;
+import com.kimcompay.projectjb.users.company.model.comVo;
+import com.kimcompay.projectjb.users.company.model.compayDao;
+import com.kimcompay.projectjb.users.user.model.tryInsertDto;
+import com.kimcompay.projectjb.users.user.model.tryUpdatePwdDato;
+import com.kimcompay.projectjb.users.user.model.userAdapter;
+import com.kimcompay.projectjb.users.user.model.userVo;
+import com.kimcompay.projectjb.users.user.model.userdao;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;

@@ -2,6 +2,8 @@ package com.kimcompay.projectjb.users.company;
 
 import javax.validation.Valid;
 
+import com.kimcompay.projectjb.users.company.model.tryInsertStoreDto;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

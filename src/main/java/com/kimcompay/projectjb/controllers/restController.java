@@ -14,10 +14,11 @@ import com.kimcompay.projectjb.apis.aws.services.fileService;
 import com.kimcompay.projectjb.apis.sns.snsService;
 import com.kimcompay.projectjb.enums.senums;
 import com.kimcompay.projectjb.users.company.storeService;
-import com.kimcompay.projectjb.users.company.tryInsertStoreDto;
-import com.kimcompay.projectjb.users.user.tryInsertDto;
-import com.kimcompay.projectjb.users.user.tryUpdatePwdDato;
+import com.kimcompay.projectjb.users.company.model.tryInsertStoreDto;
 import com.kimcompay.projectjb.users.user.userService;
+import com.kimcompay.projectjb.users.user.model.tryInsertDto;
+import com.kimcompay.projectjb.users.user.model.tryUpdatePwdDato;
+
 import org.json.simple.JSONObject;
 
 import org.slf4j.Logger;

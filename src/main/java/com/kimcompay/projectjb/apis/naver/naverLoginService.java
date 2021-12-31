@@ -12,7 +12,7 @@ import com.kimcompay.projectjb.apis.aws.services.sqsService;
 import com.kimcompay.projectjb.enums.senums;
 import com.kimcompay.projectjb.jwt.jwtService;
 import com.kimcompay.projectjb.users.user.userService;
-import com.kimcompay.projectjb.users.user.userVo;
+import com.kimcompay.projectjb.users.user.model.userVo;
 
 import org.json.simple.JSONObject;
 import org.slf4j.Logger;

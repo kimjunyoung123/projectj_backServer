@@ -3,11 +3,11 @@ package com.kimcompay.projectjb.users;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.kimcompay.projectjb.users.company.comVo;
-import com.kimcompay.projectjb.users.company.compayDao;
-import com.kimcompay.projectjb.users.user.userAdapter;
-import com.kimcompay.projectjb.users.user.userVo;
-import com.kimcompay.projectjb.users.user.userdao;
+import com.kimcompay.projectjb.users.company.model.comVo;
+import com.kimcompay.projectjb.users.company.model.compayDao;
+import com.kimcompay.projectjb.users.user.model.userAdapter;
+import com.kimcompay.projectjb.users.user.model.userVo;
+import com.kimcompay.projectjb.users.user.model.userdao;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
