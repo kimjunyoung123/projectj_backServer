@@ -14,14 +14,14 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-public class controller {
-    private Logger logger=LoggerFactory.getLogger(controller.class);
+public class compayRestController {
+    private Logger logger=LoggerFactory.getLogger(compayRestController.class);
 
     @Autowired
     private storeService storeService;
 
     @RequestMapping(value = "/auth/store/{action}",method = RequestMethod.POST)
-    public void storeAction(@PathVariable String action, @RequestBody tryInsertStoreDto tryInsertStoreDto) {
+    public void storeAction(@PathVariable String action,@Valid @RequestBody tryInsertStoreDto tryInsertStoreDto) {
         logger.info("storeAction");
         storeService.actionHub(tryInsertStoreDto,action);
     }

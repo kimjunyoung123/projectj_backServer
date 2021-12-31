@@ -22,10 +22,10 @@ public class tryInsertStoreDto {
     @NotBlank(message = "휴대폰번호가 빈칸입니다")
     @Size(min = 10,max = 11 ,message = "휴대폰은 10~11자리입니다")
     private String phone;
-    @NotBlank(message = "매장번호가 빈칸입니다")
+    @NotBlank(message = "매장전화번호가 빈칸입니다")
     private String tel;
     @NotBlank(message = "매장이름이 빈칸입니다")
-    private String name;
+    private String storeName;
     @NotBlank(message = "매장사업자번호가 빈칸입니다")
     private String num;
     @NotBlank(message = "썸네일을 선택해주세요")
@@ -35,7 +35,10 @@ public class tryInsertStoreDto {
     @NotBlank(message = "매장종료 시간을 선택해주세요")
     private String closeTime;
     @NotBlank(message = "최소배달금액이 빈칸입니다")
-    private int minPrice;
+    private String minPrice;
     @NotBlank(message = "최대배달반경이 빈칸입니다")
-    private int maxRadius;
+    private String deliverRadius;
+    @NotBlank(message = "간단한 가게 설명을 적어주세요")
+    private String text;
+
 }
