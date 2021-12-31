@@ -27,14 +27,14 @@ public class userRestController {
     @RequestMapping(value = "/auth/user/{action}",method = RequestMethod.GET)
     public JSONObject userAction(@PathVariable String action,HttpServletRequest request) {
         logger.info("userAction controller");
-        return userService.selectUserAction(action,request);
+        return userService.getAuthActionHub(action,request);
     }
     @RequestMapping(value = "/user/{action}",method = RequestMethod.GET)
     public JSONObject userActionNotLogin(@PathVariable String action,HttpServletRequest request) {
         logger.info("userActionNotLogin controller");
-        return userService.selectUserAction(action,request);
+        return userService.getActionHub(action,request);
     }
-    @RequestMapping(value = "/user/**",method = RequestMethod.POST)
+    @RequestMapping(value = "/user/join",method = RequestMethod.POST)
     public JSONObject tryJoin(@Valid @RequestBody tryInsertDto tryInsertDto ,HttpSession session) {
         logger.info("tryJoin");
         logger.info(tryInsertDto.toString());
