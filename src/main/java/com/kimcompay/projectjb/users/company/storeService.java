@@ -41,7 +41,11 @@ public class storeService {
         //저장시도
         tryInsert(tryInsertStoreDto);
         //결과전송
-        doneInsert(tryInsertStoreDto);
+        try {
+            doneInsert(tryInsertStoreDto);
+        } catch (Exception e) {
+            logger.info("등록 되었으므로 예외무시");
+        }
         return utillService.getJson(true, "매장등록이 완료되었습니다");
     }
     private void tryInsert(tryInsertStoreDto tryInsertStoreDto) {
@@ -62,6 +66,7 @@ public class storeService {
         sqsService.sendEmailAsync(insertMessage,principalDetails.getUsername());
         sqsService.sendPhoneAsync(insertMessage, map.get("phone").toString());
         sqsService.sendPhoneAsync(insertMessage, tryInsertStoreDto.getPhone());
+        throw new RuntimeException();
     }
     /*private storeVo dtoToVo(tryInsertStoreDto tryInsertStoreDto) {
         logger.info("dtoToVo");
