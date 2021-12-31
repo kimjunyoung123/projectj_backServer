@@ -6,7 +6,6 @@ package com.kimcompay.projectjb.controllers;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import javax.validation.Valid;
 
 import com.kimcompay.projectjb.checkPageService;
 import com.kimcompay.projectjb.utillService;
@@ -14,8 +13,7 @@ import com.kimcompay.projectjb.apis.aws.services.fileService;
 import com.kimcompay.projectjb.apis.sns.snsService;
 import com.kimcompay.projectjb.enums.senums;
 import com.kimcompay.projectjb.users.user.userService;
-import com.kimcompay.projectjb.users.user.model.tryInsertDto;
-import com.kimcompay.projectjb.users.user.model.tryUpdatePwdDato;
+
 
 import org.json.simple.JSONObject;
 
@@ -54,12 +52,7 @@ public class restController {
     @RequestMapping(value = "/confrim/{scope}/**",method = RequestMethod.POST)
     public JSONObject checkConfrim(@PathVariable String scope,@RequestBody JSONObject jsonObject,HttpSession httpSession) {
         logger.info("checkConfrim");
-        if(scope.equals(senums.auth.get())){
-            return snsService.confrim(jsonObject,httpSession);
-        }else if(scope.equals("change")){
-             return userService.findChangePwdToken(jsonObject.get("val").toString());
-        }
-        return utillService.getJson(false, "잘못된 요청입니다");
+        return snsService.confrim(jsonObject,httpSession);
     }
     @RequestMapping(value = "/checkPage/{scope}",method = RequestMethod.GET)
     public JSONObject checkPage(@PathVariable String scope,HttpServletRequest request) {

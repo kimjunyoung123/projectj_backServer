@@ -91,11 +91,6 @@ public class userService {
         }
         throw utillService.makeRuntimeEX("잘못된 요청", "getActionHub");
     }
-    public <T> void postActionHub(T ob) {
-        ObjectMapper objectMapper=new ObjectMapper();
-        tryInsertDto insertDto=objectMapper.convertValue(ob,tryInsertDto.class);
-        try_insert(insertDto);
-    }
     public void oauthLogin(String email,userVo userVo) {
         logger.info("oauthLogin");
         //로그인처리
@@ -186,7 +181,7 @@ public class userService {
         redisTemplate.delete(cookieNames);
         return utillService.getJson(true, "로그아웃완료");
     }
-    public JSONObject changePwdForLost(String scope,tryUpdatePwdDato tryUpdatePwdDato) {
+    public JSONObject changePwdForLost(tryUpdatePwdDato tryUpdatePwdDato) {
         logger.info("changePwdForLost");
         try {
             //요청 redis에서 꺼내기
@@ -241,10 +236,6 @@ public class userService {
         } catch (Exception e) {
             utillService.makeRuntimeEX(senums.defaultFailMessage.get(), "updatePwd");
         }
-    }
-    private void updateUserInfor() {
-        logger.info("updateUserInfor");
-
     }
     public Map<String,Object> selectPhoneByEmail(String email) {
         logger.info("selectPhoneByEmail");
@@ -363,38 +354,6 @@ public class userService {
             throw utillService.makeRuntimeEX("휴업중이거나 폐업한 사업자번호입니다", "checkComNum");
         }
         logger.info("사업자등록 유효성검사 통과");
-    }
-    private void checkTel(tryInsertDto tryInsertDto) {
-        logger.info("checkTel");
-        //요청시간 꺼내기
-        /*String open_time=utillService.getValue(tryInsertDto.getOpen_time(),"시간값이 규격에 맞지 않습니다", "checkTime");
-        String close_time=utillService.getValue(tryInsertDto.getClose_time(),"시간값이 규격에 맞지 않습니다", "checkTime");
-        logger.info("시작시간: "+open_time);
-        logger.info("종료시간: "+close_time);
-        //시간분리
-        List<Integer>times=new ArrayList<>();
-        try {
-            for(String s:open_time.split(":")){
-                times.add(Integer.parseInt(s));
-            }
-            for(String s:close_time.split(":")){
-                times.add(Integer.parseInt(s));
-            } 
-        } catch (IllegalArgumentException e) {
-            throw utillService.makeRuntimeEX("시간값은 숫자만가능합니다", "checkTime");
-        }
-        //음수가 있는지 검사
-        for(int i:times){
-            logger.info("시/분: "+i);
-            if(i<0){
-                throw utillService.makeRuntimeEX("시간은 0보다 작을수 없습니다", "checkTime");
-            }
-        }
-        //시작시간보다 종료시간이 빠른지 검사
-        if(times.get(0)>times.get(2)||(times.get(0)==times.get(2)&&times.get(1)>=times.get(3))){
-            throw utillService.makeRuntimeEX("종료시간이 시작시간보다 빠를 수없습니다", "checkTime");
-        }
-        logger.info("시간 유효성검사 통과");*/
     }
     private void checkCompanyValues(tryInsertDto tryInsertDto){
         logger.info("checkCompanyValues");

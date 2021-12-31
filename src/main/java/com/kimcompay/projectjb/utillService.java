@@ -118,15 +118,12 @@ public class utillService {
     }
     public static boolean checkOnlyNum(String snum) {
         logger.info("checkOnlyNum");
-        for(char s:snum.toCharArray()){
-            logger.info("문자 분리: "+s);
-            int ss=(int)s;
-            logger.info("문자 아스키코드값: "+ss);
-            if(ss<48||ss>57){
-                return true;
-            }
+        try {
+            Integer.parseInt(snum);
+            return false;
+        } catch (NumberFormatException e) {
+            return true;
         }
-        return false;
     }
     public static JSONObject stringToJson(String jsonString) {
         logger.info("stringToJson");

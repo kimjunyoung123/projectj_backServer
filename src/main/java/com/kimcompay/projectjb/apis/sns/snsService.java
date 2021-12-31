@@ -134,8 +134,16 @@ public class snsService {
         }
         logger.info(map.toString());
         //비교하기
-        String rnum=Optional.ofNullable(jsonObject.get("val").toString()).orElseThrow(()->utillService.throwRuntimeEX("인증번호를 입력해주세요"));
-        utillService.checkBlank(rnum);
+        String rnum=null;
+        try {
+            rnum=Optional.ofNullable(jsonObject.get("val").toString()).orElseThrow(()->new NullPointerException());
+            if(utillService.checkBlank(rnum)){
+                throw new NullPointerException();
+            }
+        } catch (NullPointerException e) {
+           logger.info("인증번호 null");
+           throw utillService.makeRuntimeEX("인증번호를 입력해 주세요", "confrim");
+        }
         String num=map.get("num").toString().trim();
         if(rnum.equals(num)){
             //용도에 맞춰서 처리

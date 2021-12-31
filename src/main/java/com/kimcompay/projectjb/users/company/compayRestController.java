@@ -4,6 +4,7 @@ import javax.validation.Valid;
 
 import com.kimcompay.projectjb.users.company.model.tryInsertStoreDto;
 
+import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,9 +21,10 @@ public class compayRestController {
     @Autowired
     private storeService storeService;
 
-    @RequestMapping(value = "/auth/store/{action}",method = RequestMethod.POST)
-    public void storeAction(@PathVariable String action,@Valid @RequestBody tryInsertStoreDto tryInsertStoreDto) {
-        logger.info("storeAction");
-        storeService.actionHub(tryInsertStoreDto,action);
+    //매장등록
+    @RequestMapping(value = "/auth/store/join",method = RequestMethod.POST)
+    public JSONObject storeInsert(@Valid @RequestBody tryInsertStoreDto tryInsertStoreDto) {
+        logger.info("storeInsert");
+        return storeService.insert(tryInsertStoreDto);
     }
 }

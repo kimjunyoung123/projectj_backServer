@@ -50,7 +50,7 @@ public class fileService {
             try {
                 //이미지 배열 꺼내서 넣어주기 첫 요청이라면 예외 발생
                 httpSession=request.getSession();
-                imgPaths=(List<String>)httpSession.getAttribute("imgs");
+                imgPaths=(List<String>)httpSession.getAttribute(imgSession);
                 imgPaths.add(uploadName);
             } catch (NullPointerException e) {
                 logger.info("첫 사진업로드 요청이므로 예외발생 만들어서 넣어주기");

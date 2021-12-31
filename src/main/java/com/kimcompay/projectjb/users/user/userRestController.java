@@ -40,9 +40,9 @@ public class userRestController {
         logger.info(tryInsertDto.toString());
         return userService.insert(tryInsertDto, session);
     }
-    @RequestMapping(value = "/user/{scope}/**",method = RequestMethod.PUT)
-    public JSONObject tryChangeUserInfor(@PathVariable String scope,@Valid @RequestBody tryUpdatePwdDato tryUpdatePwdDato) {
+    @RequestMapping(value = "/user/change/pwd",method = RequestMethod.PUT)
+    public JSONObject tryChangeUserInfor(@Valid @RequestBody tryUpdatePwdDato tryUpdatePwdDato) {
         logger.info("tryChangeUserInfor controller");
-        return userService.changePwdForLost(scope, tryUpdatePwdDato);
+        return userService.changePwdForLost(tryUpdatePwdDato);
     }
 }
