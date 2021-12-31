@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kimcompay.projectjb.utillService;
 import com.kimcompay.projectjb.apis.aws.services.sqsService;
 import com.kimcompay.projectjb.apis.jungbu.jungbuService;
@@ -71,6 +72,30 @@ public class userService {
     @Autowired
     private jwtService jwtService;
 
+    public JSONObject getAuthActionHub(String action,HttpServletRequest request) {
+        logger.info("getAuthActionHub");
+        if(action.equals(senums.checkt.get())){
+            logger.info("로그인 조회 요청");
+            return checkLogin(request, request.getParameter("detail"));
+        }else if(action.equals("logout")){
+            logger.info("로그아웃요청");
+            return logOut(request);
+        }
+        throw utillService.makeRuntimeEX("잘못된 요청", "getActionHub");
+    }
+    public JSONObject getActionHub(String action,HttpServletRequest request) {
+        logger.info("getActionHub");
+        if(action.equals("checkEmail")){
+            logger.info("이메일 중복검사");
+            return utillService.getJson(checkSamEmail(request.getParameter("email")),"");
+        }
+        throw utillService.makeRuntimeEX("잘못된 요청", "getActionHub");
+    }
+    public <T> void postActionHub(T ob) {
+        ObjectMapper objectMapper=new ObjectMapper();
+        tryInsertDto insertDto=objectMapper.convertValue(ob,tryInsertDto.class);
+        try_insert(insertDto);
+    }
     public void oauthLogin(String email,userVo userVo) {
         logger.info("oauthLogin");
         //로그인처리
@@ -131,20 +156,6 @@ public class userService {
         logger.info("voToMap");
         userAdapter.adapterUser(userVo);
         return userAdapter.getMap();
-    }
-    public JSONObject selectUserAction(String action,HttpServletRequest request) {
-        logger.info("selectUserAction");
-        if(action.equals(senums.checkt.get())){
-            logger.info("로그인 조회 요청");
-            return checkLogin(request, request.getParameter("detail"));
-        }else if(action.equals("logout")){
-            logger.info("로그아웃요청");
-            return logOut(request);
-        }else if(action.equals("checkEmail")){
-            logger.info("이메일 중복검사");
-            return utillService.getJson(checkSamEmail(request.getParameter("email")),"");
-        }
-        throw utillService.makeRuntimeEX("잘못된 요청", "selectUserAction");
     }
     private boolean checkSamEmail(String email) {
         logger.info("checkSamEmail");
@@ -298,6 +309,9 @@ public class userService {
             logger.info("로그인 일자 갱신 실패");
         }
         logger.info("로그인일자 갱신완료");
+    }
+    public void postActionHub() {
+        logger.info("postActionHub");
     }
     @Transactional(rollbackFor = Exception.class)
     public JSONObject insert(tryInsertDto tryInsertDto,HttpSession session) {
