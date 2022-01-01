@@ -12,6 +12,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import com.kimcompay.projectjb.enums.senums;
 
@@ -153,6 +154,11 @@ public class utillService {
         ServletRequestAttributes attr = (ServletRequestAttributes)RequestContextHolder.currentRequestAttributes();
         return attr.getResponse();
     }
+    public static HttpServletRequest getHttpServletRequest() {
+        logger.info("getHttpSerResponse");
+        ServletRequestAttributes attr = (ServletRequestAttributes)RequestContextHolder.currentRequestAttributes();
+        return attr.getRequest();
+    }
     public static void makeAllToString(Map<Object,Object>result) {
         logger.info("makeAllToString");
         for(Entry<Object, Object> s:result.entrySet()){
@@ -172,4 +178,45 @@ public class utillService {
         cookies.put(refreshTokenCookieName, refreshToken);
         makeCookie(cookies,getHttpSerResponse());
     }
+    public static String checkAuthPhone() {
+        logger.info("checkAuthPhone");
+        Map<String,Object>authInfor=new HashMap<>();
+        boolean checkFlag=false;
+        String sphone=null;
+        //인증정보꺼내기
+        try {
+            HttpSession httpSession=getHttpServletRequest().getSession();
+            authInfor=(Map<String,Object>)httpSession.getAttribute(senums.auth.get()+senums.phonet.get());
+            logger.info("휴대폰인증내역: "+authInfor);
+            sphone=authInfor.get("val").toString();
+            checkFlag=Boolean.parseBoolean(authInfor.get("res").toString());
+        } catch (NullPointerException e) {
+            logger.info("휴대폰 인증 요청내역이없음");
+            throw utillService.makeRuntimeEX("휴대폰 인증을 먼저 해주세요", "checkAuth");
+        }
+        if(!checkFlag){
+            throw utillService.makeRuntimeEX("휴대폰 인증이 되지 않았습니다", "checkAuth");
+        }
+        return sphone;
+    }
+    public static String checkAuthEmail() {
+        logger.info("checkAuthEmail");
+        Map<String,Object>authInfor=new HashMap<>();
+        boolean checkFlag=false;
+        String sEmail=null;
+        try {
+            HttpSession httpSession=getHttpServletRequest().getSession();
+            authInfor=(Map<String,Object>)httpSession.getAttribute(senums.auth.get()+senums.emailt.get());
+            logger.info("이메일인증내역: "+authInfor);
+            sEmail=authInfor.get("val").toString();
+            checkFlag=Boolean.parseBoolean(authInfor.get("res").toString());
+        } catch (Exception e) {
+            throw utillService.makeRuntimeEX("이메일 인증을 먼저 해주세요", "checkAuth");
+        }
+        if(!checkFlag){
+            throw utillService.makeRuntimeEX("이메일 인증이 되지 않았습니다", "checkAuth");
+        }
+        return sEmail;
+    }
+    
 }

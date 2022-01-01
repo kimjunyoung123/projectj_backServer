@@ -6,7 +6,7 @@ import java.util.Map;
 
 import com.kimcompay.projectjb.utillService;
 import com.kimcompay.projectjb.apis.aws.services.sqsService;
-import com.kimcompay.projectjb.enums.senums;
+import com.kimcompay.projectjb.apis.kakao.kakaoMapService;
 import com.kimcompay.projectjb.users.principalDetails;
 import com.kimcompay.projectjb.users.company.model.storeDao;
 import com.kimcompay.projectjb.users.company.model.storeVo;
@@ -29,13 +29,15 @@ public class storeService {
     private storeDao storeDao;
     @Autowired
     private sqsService sqsService;
+    @Autowired
+    private kakaoMapService kakaoMapService;
 
     @Transactional(rollbackFor = Exception.class)
     public JSONObject insert(tryInsertStoreDto tryInsertStoreDto){
         logger.info("insert");
         logger.info("요청정보: "+tryInsertStoreDto);
         //휴대폰 인증 검증
-
+        checkAuth(tryInsertStoreDto.getPhone());
         //값 검증
         checkValues(tryInsertStoreDto);
         //저장시도
@@ -47,6 +49,14 @@ public class storeService {
             logger.info("등록 되었으므로 예외무시");
         }
         return utillService.getJson(true, "매장등록이 완료되었습니다");
+    }
+    private void checkAuth(String phone) {
+        logger.info("checkAuth");
+        String sPhone=utillService.checkAuthPhone();
+        if(!phone.trim().equals(sPhone.trim())){
+            throw utillService.makeRuntimeEX("인증받은 전화번화 일치하지 않습니다", "checkAuth");
+        }
+        logger.info("휴대폰 유효성검사 통과");
     }
     private void tryInsert(tryInsertStoreDto tryInsertStoreDto) {
         logger.info("dtoToVo");
@@ -68,19 +78,26 @@ public class storeService {
         sqsService.sendPhoneAsync(insertMessage, tryInsertStoreDto.getPhone());
         throw new RuntimeException();
     }
-    /*private storeVo dtoToVo(tryInsertStoreDto tryInsertStoreDto) {
-        logger.info("dtoToVo");
-
-    }*/
     private void checkValues(tryInsertStoreDto tryInsertStoreDto) {
         logger.info("checkValues");
         //사업자등록번호검사
         checkCompayNum(tryInsertStoreDto.getNum());
+        //매장오픈/마감시간검사
         checkOpenAndCloseTime(tryInsertStoreDto);
+        //같은매장이있는지 검사
         checkSameStore(tryInsertStoreDto);
-        if(utillService.checkOnlyNum(tryInsertStoreDto.getTel())||utillService.checkOnlyNum(tryInsertStoreDto.getPhone())){
+        //일반/휴대전화검사
+        checkPhoneAndTel(tryInsertStoreDto.getPhone(),tryInsertStoreDto.getTel());
+        //주소검사
+        kakaoMapService.checkAddress(tryInsertStoreDto.getAddress());
+        logger.info("매장등록 유효성검사 통과");
+    }
+    private void checkPhoneAndTel(String phone ,String tel) {
+        logger.info("checkPhoneAndTel");
+        if(utillService.checkOnlyNum(tel)||utillService.checkOnlyNum(phone)){
             throw utillService.makeRuntimeEX("전화번호 혹은 휴대폰번호는 숫자만 가능합니다", "checkValues");
         }
+        logger.info("휴대/일반전화 유효성검사 통과");
     }
     private void checkSameStore(tryInsertStoreDto tryInsertStoreDto) {
         logger.info("checkSameStore");

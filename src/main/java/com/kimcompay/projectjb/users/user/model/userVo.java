@@ -66,6 +66,9 @@ public class userVo {
     @Column(name = "ubirth",nullable = false ,length = 30)
     private String ubirth;
 
+    @Column(name = "provider",nullable = false,length = 30)
+    private String provider;
+
 
 
 

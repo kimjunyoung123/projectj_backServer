@@ -45,6 +45,7 @@ public class userAdapter {
             map.put("role", userVo.getUrole());
             map.put("sleep", userVo.getUsleep());
             map.put("kind", senums.persnal.get());
+            map.put("provier", userVo.getProvider());
         }else{
             logger.info("com to map");
             map.put("email", comVo.getCemail());

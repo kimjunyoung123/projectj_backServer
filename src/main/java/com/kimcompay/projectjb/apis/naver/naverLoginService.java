@@ -83,7 +83,7 @@ public class naverLoginService {
         logger.info("jsonToVo");
         userVo vo=userVo.builder().email(profile.get("email").toString()).uaddress(profile.get("address").toString()).ubirth(profile.get("birthyear")+"-"+profile.get("birthday"))
                         .udetail_address(profile.get("detailAddress").toString()).ulogin_date(Timestamp.valueOf(LocalDateTime.now())).uphone(profile.get("mobile").toString().replace("-", "")).upostcode(profile.get("postCode").toString())
-                        .upwd(oauthPwd).urole(senums.user_role.get()).usleep(0).build();
+                        .provider(senums.naver.get()).upwd(oauthPwd).urole(senums.user_role.get()).usleep(0).build();
                         return vo;
     }
     private JSONObject getToken(String code,String clientId,String clientPwd,String state) {

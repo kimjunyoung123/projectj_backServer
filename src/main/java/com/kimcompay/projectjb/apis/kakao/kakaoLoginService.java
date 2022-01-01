@@ -91,8 +91,8 @@ public class kakaoLoginService {
     private userVo mapToVo(LinkedHashMap<String,Object>profile,String email) {
         logger.info("mapToVo");
         userVo vo=userVo.builder().email(email).uaddress(profile.get("address").toString()).ubirth(profile.get("birth").toString()).udetail_address(profile.get("detailAddress").toString()).ulogin_date(Timestamp.valueOf(LocalDateTime.now()))
-                        .uphone(profile.get("phone").toString()).upostcode(profile.get("postCode").toString()).upwd(oauthPwd).urole(senums.user_role.get()).usleep(0).build();
-                                    return vo;
+                        .provider(senums.kakao.get()).uphone(profile.get("phone").toString()).upostcode(profile.get("postCode").toString()).upwd(oauthPwd).urole(senums.user_role.get()).usleep(0).build();
+                        return vo;
     }
     private JSONObject getKuserInfor(JSONObject response) {
         logger.info("getKuserInfor");
