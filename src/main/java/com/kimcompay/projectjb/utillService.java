@@ -119,7 +119,7 @@ public class utillService {
     public static boolean checkOnlyNum(String snum) {
         logger.info("checkOnlyNum");
         try {
-            Integer.parseInt(snum);
+            Long.parseLong(snum);
             return false;
         } catch (NumberFormatException e) {
             return true;

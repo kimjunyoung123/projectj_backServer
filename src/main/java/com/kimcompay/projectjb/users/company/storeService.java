@@ -84,7 +84,7 @@ public class storeService {
     }
     private void checkSameStore(tryInsertStoreDto tryInsertStoreDto) {
         logger.info("checkSameStore");
-        if(storeDao.countBySnameAndAddress(tryInsertStoreDto.getStoreName() , tryInsertStoreDto.getNum(), tryInsertStoreDto.getAddress())!=0){
+        if(storeDao.countBySnameAndAddress(tryInsertStoreDto.getNum(), tryInsertStoreDto.getAddress())!=0){
             logger.info("같은위치에서 같은사업자번호로 이미 등록된 매장발견");
             throw utillService.makeRuntimeEX("같은위치에서 같은사업자번호로 이미 등록된 매장발견", "checkSameStore");
         }
@@ -93,7 +93,8 @@ public class storeService {
         logger.info("checkCompayNum");
         int count=0;
         try {
-            count=storeDao.countBySnum(Integer.parseInt(snum));
+            logger.info(snum);
+            count=storeDao.countBySnum(Long.parseLong(snum));
         } catch (NumberFormatException e) {
             logger.info("사업자등록번호중 문자발견");
             throw utillService.makeRuntimeEX("사업자 번호는 숫자만 입력해주세요 ", "checkCompayNum");
