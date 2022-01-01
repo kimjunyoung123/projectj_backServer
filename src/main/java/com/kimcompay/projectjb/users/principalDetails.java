@@ -7,14 +7,17 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import lombok.Data;
 
 @Data
 public class principalDetails implements UserDetails {
-    
+    private Logger logger=LoggerFactory.getLogger(principalDetails.class);
     private Map<Object,Object>princi=new HashMap<>();
     private boolean is_can=false;
 
@@ -27,14 +30,11 @@ public class principalDetails implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
+        logger.info("getAuthorities");
+        String role=princi.get("role").toString();
         Collection<GrantedAuthority>roles=new ArrayList<>();
-        roles.add(new GrantedAuthority(){
-            @Override
-            public String getAuthority() {
-                System.out.println(princi.get("role")+"권한 가져오기");
-                return princi.get("role").toString();
-            }
-        });
+        logger.info("유저의 권한: "+role);
+        roles.add(new SimpleGrantedAuthority(role));
         return roles;
     }
 
@@ -77,6 +77,7 @@ public class principalDetails implements UserDetails {
         return princi.get("role").toString();
     }
     private Boolean check_lock(int num,String loginDate){
+        logger.info("check_lock");
         if(num!=0||LocalDateTime.now().isAfter(Timestamp.valueOf(loginDate).toLocalDateTime().plusYears(1))){
             return false;
         }

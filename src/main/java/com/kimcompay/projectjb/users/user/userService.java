@@ -317,7 +317,11 @@ public class userService {
         session.removeAttribute(senums.auth.get()+senums.emailt.get());
         session.removeAttribute(senums.auth.get()+senums.phonet.get());
         //회원가입 이메일 비동기 전송 
-        sqsService.sendEmailAsync("장보고에 회원가입해주셔서 진심으로 감사합니다", tryInsertDto.getEmail());
+        try {
+            sqsService.sendEmailAsync("장보고에 회원가입해주셔서 진심으로 감사합니다", tryInsertDto.getEmail());
+        } catch (Exception e) {
+            logger.info("회원가입 후 알림메세지 전송실패");
+        }
         return utillService.getJson(true, "회원가입에 성공하였습니다");
     }
     private void try_insert(tryInsertDto tryInsertDto) {

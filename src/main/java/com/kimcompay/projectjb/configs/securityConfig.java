@@ -50,7 +50,8 @@ public class securityConfig extends WebSecurityConfigurerAdapter {
             .addFilter(new loginFilter(jwtService,authenticationManager(),redisTemplate,access_token_cookie_name,refresh_token_cookie_name))
             .addFilter(new authorizationFilter(authenticationManager(),jwtService,redisTemplate,access_token_cookie_name,refresh_token_cookie_name))
             .csrf().disable().formLogin().disable().httpBasic().disable()
-            .authorizeRequests().antMatchers("/auth/**").authenticated().anyRequest().permitAll();
+            .authorizeRequests().antMatchers("/auth/store/**").access("hasRole('ROLE_COMPANY') or hasRole('ROLE_ADMIN')").antMatchers("/auth/**").authenticated() 
+            .anyRequest().permitAll();
 
     }
 }
