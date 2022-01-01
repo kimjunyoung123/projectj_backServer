@@ -52,7 +52,7 @@ public class storeService {
     }
     private void checkAuth(String phone) {
         logger.info("checkAuth");
-        String sPhone=utillService.checkAuthPhone();
+        String sPhone=utillService.checkAuthPhone("auth2");
         if(!phone.trim().equals(sPhone.trim())){
             throw utillService.makeRuntimeEX("인증받은 전화번화 일치하지 않습니다", "checkAuth");
         }

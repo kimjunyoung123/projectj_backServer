@@ -178,7 +178,7 @@ public class utillService {
         cookies.put(refreshTokenCookieName, refreshToken);
         makeCookie(cookies,getHttpSerResponse());
     }
-    public static String checkAuthPhone() {
+    public static String checkAuthPhone(String authText) {
         logger.info("checkAuthPhone");
         Map<String,Object>authInfor=new HashMap<>();
         boolean checkFlag=false;
@@ -186,7 +186,7 @@ public class utillService {
         //인증정보꺼내기
         try {
             HttpSession httpSession=getHttpServletRequest().getSession();
-            authInfor=(Map<String,Object>)httpSession.getAttribute(senums.auth.get()+senums.phonet.get());
+            authInfor=(Map<String,Object>)httpSession.getAttribute(authText+senums.phonet.get());
             logger.info("휴대폰인증내역: "+authInfor);
             sphone=authInfor.get("val").toString();
             checkFlag=Boolean.parseBoolean(authInfor.get("res").toString());
@@ -217,6 +217,6 @@ public class utillService {
             throw utillService.makeRuntimeEX("이메일 인증이 되지 않았습니다", "checkAuth");
         }
         return sEmail;
-    }
-    
+    }  
+ 
 }

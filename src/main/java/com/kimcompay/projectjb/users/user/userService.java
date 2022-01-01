@@ -483,7 +483,7 @@ public class userService {
             throw utillService.makeRuntimeEX("휴대폰번호는 숫자만 입력가능합니다", "checkAuth");
         }
         //세션에서 인증정보가져오기
-        String phone=utillService.checkAuthPhone();
+        String phone=utillService.checkAuthPhone(senums.auth.get());
         String email=utillService.checkAuthEmail();
         if(!tryInsertDto.getPhone().equals(phone)){
             throw utillService.makeRuntimeEX("인증한 휴대폰과 번호가 다릅니다", "checkAuth");
