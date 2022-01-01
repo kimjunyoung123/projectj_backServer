@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import com.kimcompay.projectjb.enums.senums;
+import com.kimcompay.projectjb.users.principalDetails;
 
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -22,6 +23,7 @@ import org.json.simple.parser.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseCookie;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
@@ -218,5 +220,10 @@ public class utillService {
         }
         return sEmail;
     }  
+    public static Map<Object,Object> getLoginInfor() {
+        logger.info("getLoginInfor");
+        principalDetails principalDetails=(principalDetails)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return principalDetails.getPrinci();
+    }
  
 }

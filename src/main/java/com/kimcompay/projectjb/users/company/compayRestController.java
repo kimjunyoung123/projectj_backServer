@@ -1,5 +1,6 @@
 package com.kimcompay.projectjb.users.company;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import com.kimcompay.projectjb.users.company.model.tryInsertStoreDto;
@@ -26,5 +27,10 @@ public class compayRestController {
     public JSONObject storeInsert(@Valid @RequestBody tryInsertStoreDto tryInsertStoreDto) {
         logger.info("storeInsert");
         return storeService.insert(tryInsertStoreDto);
+    }
+    @RequestMapping(value = "/auth/store/get/{action}",method = RequestMethod.GET)
+    public JSONObject getStoreInfor(@PathVariable String action,HttpServletRequest request) {
+        logger.info("getStoreInfor");
+        return null;
     }
 }

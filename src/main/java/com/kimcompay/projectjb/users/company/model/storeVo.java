@@ -78,4 +78,7 @@ public class storeVo {
     @Column(name = "text",nullable = false ,length = 255)
     private String text;
 
+    @Column(name = "semail",nullable = false ,length = 50)
+    private String semail;
+
 }
