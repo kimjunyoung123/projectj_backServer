@@ -225,5 +225,21 @@ public class utillService {
         principalDetails principalDetails=(principalDetails)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         return principalDetails.getPrinci();
     }
+    public static int getTotalPage(int totalCount,int pageSize) {
+        logger.info("getTotalPage");
+        int totalPage=totalCount/pageSize;
+        int remainder=totalCount%pageSize;
+        if(totalPage==0){
+            return 1;
+        }else if(remainder>0){
+            totalPage+=1;
+        }
+        return totalPage;
+    }
+    public static int getStart(int page,int pageSize) {
+        logger.info("getStart");
+        logger.info("요청페이지 :"+page);
+        return (page-1)*pageSize+1;//+1 이있는 이유는 1페이질때 대응하기 위해이다  
+    }
  
 }

@@ -1,5 +1,7 @@
 package com.kimcompay.projectjb.users.company;
 
+import java.util.Map;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
@@ -28,9 +30,9 @@ public class compayRestController {
         logger.info("storeInsert");
         return storeService.insert(tryInsertStoreDto);
     }
-    @RequestMapping(value = "/auth/store/get/{action}",method = RequestMethod.GET)
-    public JSONObject getStoreInfor(@PathVariable String action,HttpServletRequest request) {
+    @RequestMapping(value = "/auth/store/get/all",method = RequestMethod.GET)
+    public Map<String,Object> getStoreInfor(HttpServletRequest request) {
         logger.info("getStoreInfor");
-        return null;
+        return storeService.getStoresByEmail(request);
     }
 }

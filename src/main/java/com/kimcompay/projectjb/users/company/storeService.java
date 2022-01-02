@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+
 import com.kimcompay.projectjb.utillService;
 import com.kimcompay.projectjb.apis.aws.services.sqsService;
 import com.kimcompay.projectjb.apis.kakao.kakaoMapService;
@@ -24,14 +26,21 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class storeService {
     private Logger logger=LoggerFactory.getLogger(storeService.class);
-
+    private int pageSize=2;
     @Autowired
     private storeDao storeDao;
     @Autowired
     private sqsService sqsService;
     @Autowired
     private kakaoMapService kakaoMapService;
-
+    
+    public Map<String,Object> getStoresByEmail(HttpServletRequest request) {
+        logger.info("getStoresByEmail");
+        Object email=utillService.getLoginInfor().get("email");
+        int requestPage=1;
+        Map<String,Object>storeSelectInfor=storeDao.findByEmail(email,email,utillService.getStart(requestPage, pageSize)-1,pageSize);
+        return storeSelectInfor;
+    }
     @Transactional(rollbackFor = Exception.class)
     public JSONObject insert(tryInsertStoreDto tryInsertStoreDto){
         logger.info("insert");
@@ -101,7 +110,7 @@ public class storeService {
     }
     private void checkSameStore(tryInsertStoreDto tryInsertStoreDto) {
         logger.info("checkSameStore");
-        if(storeDao.countBySnameAndAddress(tryInsertStoreDto.getNum(), tryInsertStoreDto.getAddress())!=0){
+        if(storeDao.countBySnameAndAddress(tryInsertStoreDto.getStoreName(),tryInsertStoreDto.getNum(), tryInsertStoreDto.getAddress())!=0){
             logger.info("같은위치에서 같은사업자번호로 이미 등록된 매장발견");
             throw utillService.makeRuntimeEX("같은위치에서 같은사업자번호로 이미 등록된 매장발견", "checkSameStore");
         }
