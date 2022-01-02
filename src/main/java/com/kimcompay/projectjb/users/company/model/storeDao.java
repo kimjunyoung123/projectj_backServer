@@ -1,5 +1,6 @@
 package com.kimcompay.projectjb.users.company.model;
 
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -14,5 +15,5 @@ public interface storeDao extends JpaRepository<storeVo,Integer> {
     int countBySnameAndAddress(String storeName,String companyNum,String address);
 
     @Query(value = "select sname,simg,saddress,(select count(*) from stores where semail=?)totalCount from stores where semail=? order by sid limit ?,?",nativeQuery = true)
-    Map<String,Object>findByEmail(Object email,Object sameEmail,Object start,Object pageSize);
+    List<Map<String,Object>> findByEmail(Object email,Object sameEmail,Object start,Object pageSize);
 }

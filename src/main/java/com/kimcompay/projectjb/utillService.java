@@ -2,6 +2,7 @@ package com.kimcompay.projectjb;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
@@ -41,7 +42,7 @@ public class utillService {
         .build(); 
         response.addHeader("Set-Cookie", cookie.toString()+";HttpOnly");
     }
-    public static JSONObject getJson(boolean flag,String message) {
+    public static JSONObject getJson(boolean flag,Object message) {
         logger.info("getjosn");
         JSONObject jsonObject=new JSONObject();
         jsonObject.put("flag", flag);
@@ -147,6 +148,13 @@ public class utillService {
     public static <T> Boolean checkEmthy(Map<T,T>map) {
         logger.info("checkEmthy");
         if(map.isEmpty()||map.size()==0){
+            return true;
+        }
+        return false;
+    }
+    public static <T> boolean checkEmthy(List<T>arr) {
+        logger.info("checkEmthy");
+        if(arr.size()==0||arr.isEmpty()){
             return true;
         }
         return false;

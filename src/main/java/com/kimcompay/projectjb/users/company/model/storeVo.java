@@ -40,10 +40,10 @@ public class storeVo {
     @Column(name = "spostcode",nullable = false,length = 20 )
     private String spostcode;
 
-    @Column(name = "sphone",nullable = false ,unique = true,length = 11)
+    @Column(name = "sphone",nullable = false ,length = 11)
     private String sphone;
 
-    @Column(name = "stel",nullable = false ,unique = true,length = 11)
+    @Column(name = "stel",nullable = false ,length = 11)
     private String stel;
 
     @Column(name = "sname",nullable = false ,length = 50)

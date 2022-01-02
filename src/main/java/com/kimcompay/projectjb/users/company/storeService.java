@@ -34,12 +34,21 @@ public class storeService {
     @Autowired
     private kakaoMapService kakaoMapService;
     
-    public Map<String,Object> getStoresByEmail(HttpServletRequest request) {
+    public JSONObject getStoresByEmail(HttpServletRequest request) {
         logger.info("getStoresByEmail");
         Object email=utillService.getLoginInfor().get("email");
-        int requestPage=1;
-        Map<String,Object>storeSelectInfor=storeDao.findByEmail(email,email,utillService.getStart(requestPage, pageSize)-1,pageSize);
-        return storeSelectInfor;
+        int requestPage=Integer.parseInt(request.getParameter("page").toString());
+        List<Map<String,Object>>storeSelectInfor=storeDao.findByEmail(email,email,utillService.getStart(requestPage, pageSize)-1,pageSize);
+        int totalPage=utillService.getTotalPage(Integer.parseInt(storeSelectInfor.get(0).get("totalCount").toString()),pageSize);
+        if(utillService.checkEmthy(storeSelectInfor)){
+            logger.info("스토어 결과 미존재");
+            if(totalPage<requestPage){
+                logger.info("페이지 범위 초과");
+                throw utillService.makeRuntimeEX("요청페이지가 전체페이지를 초과합니다", "getStoresByEmail");
+            }
+            throw utillService.makeRuntimeEX("매장이 존재하지 않습니다", "getStoresByEmail");
+        }
+        return utillService.getJson(true, storeSelectInfor);
     }
     @Transactional(rollbackFor = Exception.class)
     public JSONObject insert(tryInsertStoreDto tryInsertStoreDto){
