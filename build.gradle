@@ -19,6 +19,8 @@ repositories {
 }
 
 dependencies {
+	// https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-websocket
+	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-websocket', version: '2.6.2'
 	// https://mvnrepository.com/artifact/com.squareup.okhttp3/okhttp
 	implementation group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.9.3'
 	// https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-data-redis
