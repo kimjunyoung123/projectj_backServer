@@ -48,7 +48,9 @@ public class storeService {
             }
             throw utillService.makeRuntimeEX("매장이 존재하지 않습니다", "getStoresByEmail");
         }
-        return utillService.getJson(true, storeSelectInfor);
+        JSONObject reponse=utillService.getJson(true, storeSelectInfor);
+        reponse.put("totalPage", totalPage);
+        return utillService.getJson(true, reponse);
     }
     @Transactional(rollbackFor = Exception.class)
     public JSONObject insert(tryInsertStoreDto tryInsertStoreDto){
