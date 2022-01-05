@@ -25,12 +25,11 @@ public class textHandler extends TextWebSocketHandler {
       logger.info("handleTextMessage");
       logger.info(message.toString());
       logger.info(session.toString());
+      JSONObject whoAreYou=new JSONObject();
+      whoAreYou.put("id", session.getId());
+      whoAreYou.put("message", message);
       for(Entry<String, WebSocketSession> webSession:socketSessions.entrySet()){
          try {
-            WebSocketSession socketSession=webSession.getValue();
-            JSONObject whoAreYou=new JSONObject();
-            whoAreYou.put("id", socketSession.getId());
-            whoAreYou.put("message", message);
             webSession.getValue().sendMessage(new TextMessage(whoAreYou.toString()));
          } catch (IllegalStateException e) {
             e.printStackTrace();
