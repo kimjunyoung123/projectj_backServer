@@ -30,9 +30,9 @@ public class compayRestController {
         logger.info("storeInsert");
         return storeService.insert(tryInsertStoreDto);
     }
-    @RequestMapping(value = "/auth/store/get/all",method = RequestMethod.GET)
-    public Map<String,Object> getStoreInfor(HttpServletRequest request) {
+    @RequestMapping(value = "/auth/store/get/all/{page}",method = RequestMethod.GET)
+    public Map<String,Object> getStoreInfor(@PathVariable String page) {
         logger.info("getStoreInfor");
-        return storeService.getStoresByEmail(request);
+        return storeService.getStoresByEmail(page);
     }
 }

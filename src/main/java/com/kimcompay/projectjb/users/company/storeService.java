@@ -34,10 +34,10 @@ public class storeService {
     @Autowired
     private kakaoMapService kakaoMapService;
     
-    public JSONObject getStoresByEmail(HttpServletRequest request) {
+    public JSONObject getStoresByEmail(String page) {
         logger.info("getStoresByEmail");
         Object email=utillService.getLoginInfor().get("email");
-        int requestPage=Integer.parseInt(request.getParameter("page").toString());
+        int requestPage=Integer.parseInt(page);
         List<Map<String,Object>>storeSelectInfor=storeDao.findByEmail(email,email,utillService.getStart(requestPage, pageSize)-1,pageSize);
         int totalPage=utillService.getTotalPage(Integer.parseInt(storeSelectInfor.get(0).get("totalCount").toString()),pageSize);
         if(utillService.checkEmthy(storeSelectInfor)){
