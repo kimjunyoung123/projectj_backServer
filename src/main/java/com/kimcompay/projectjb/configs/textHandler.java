@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -26,7 +27,11 @@ public class textHandler extends TextWebSocketHandler {
       logger.info(session.toString());
       for(Entry<String, WebSocketSession> webSession:socketSessions.entrySet()){
          try {
-            webSession.getValue().sendMessage(new TextMessage(message.getPayload()));
+            WebSocketSession socketSession=webSession.getValue();
+            JSONObject whoAreYou=new JSONObject();
+            whoAreYou.put("id", socketSession.getId());
+            whoAreYou.put("message", message);
+            webSession.getValue().sendMessage(new TextMessage(whoAreYou.toString()));
          } catch (IllegalStateException e) {
             e.printStackTrace();
             logger.info("닫힌 소켓 무시");
