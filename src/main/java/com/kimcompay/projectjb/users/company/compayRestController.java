@@ -31,8 +31,13 @@ public class compayRestController {
         return storeService.insert(tryInsertStoreDto);
     }
     @RequestMapping(value = "/auth/store/gets/{page}/{keyword}",method = RequestMethod.GET)
-    public JSONObject getStoreInfor(@PathVariable String page,@PathVariable String keyword) {
-        logger.info("getStoreInfor");
+    public JSONObject getStores(@PathVariable String page,@PathVariable String keyword) {
+        logger.info("getStores");
         return storeService.getStoresByEmail(page,keyword);
+    }
+    @RequestMapping(value = "/auth/store/get/{id}",method = RequestMethod.GET)
+    public JSONObject getStore(@PathVariable int id) {
+        logger.info("getStore");
+        return storeService.getStore(id);
     }
 }

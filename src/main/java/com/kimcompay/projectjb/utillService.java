@@ -235,8 +235,12 @@ public class utillService {
     }  
     public static Map<Object,Object> getLoginInfor() {
         logger.info("getLoginInfor");
-        principalDetails principalDetails=(principalDetails)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return principalDetails.getPrinci();
+        try {
+            principalDetails principalDetails=(principalDetails)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            return principalDetails.getPrinci();
+        } catch (Exception e) {
+           throw makeRuntimeEX("로그인 정보를 불러오는데 실패했습니다", "getLoginInfor");
+        }
     }
     public static int getTotalPage(int totalCount,int pageSize) {
         logger.info("getTotalPage");

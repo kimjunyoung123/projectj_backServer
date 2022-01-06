@@ -34,6 +34,18 @@ public class storeService {
     @Autowired
     private kakaoMapService kakaoMapService;
     
+    public JSONObject getStore(int id) {
+        logger.info("getStore");
+        logger.info("조회 매장 고유번호: "+id);
+        storeVo storeVo=storeDao.findBySid(id).orElseThrow(()->utillService.makeRuntimeEX("존재하지 않는 매장입니다", "getStore"));
+        logger.info("메징조회 정보: "+storeVo.toString());
+        Map<Object, Object> loginInfor=utillService.getLoginInfor();
+        //매장 소유 회사 계정인지 검사
+        if(!storeVo.getSemail().equals(loginInfor.get("email"))){
+            throw utillService.makeRuntimeEX("매장 소유자의 계정이 아닙니다", "getStore");
+        }
+        return utillService.getJson(true, storeVo);
+    }
     public JSONObject getStoresByEmail(String page,String keyword) {
         logger.info("getStoresByEmail");
         String email=utillService.getLoginInfor().get("email").toString();
