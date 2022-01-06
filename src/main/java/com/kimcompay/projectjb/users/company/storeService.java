@@ -34,11 +34,18 @@ public class storeService {
     @Autowired
     private kakaoMapService kakaoMapService;
     
-    public JSONObject getStoresByEmail(String page) {
+    public JSONObject getStoresByEmail(String page,String keyword) {
         logger.info("getStoresByEmail");
-        Object email=utillService.getLoginInfor().get("email");
+        String email=utillService.getLoginInfor().get("email").toString();
         int requestPage=Integer.parseInt(page);
-        List<Map<String,Object>>storeSelectInfor=storeDao.findByEmail(email,email,utillService.getStart(requestPage, pageSize)-1,pageSize);
+        List<Map<String,Object>>storeSelectInfor=getStoresInfor(email, keyword, requestPage);
+        if(utillService.checkEmthy(storeSelectInfor)){
+            logger.info("검색키워드: "+keyword);
+            if(utillService.checkBlank(keyword)){
+                throw utillService.makeRuntimeEX("가게 목록이 없습니다 등록해주세요", "getStoresByEmail");
+            }
+            throw utillService.makeRuntimeEX("검색결과가 없습니다", "getStoresByEmail");
+        }
         int totalPage=utillService.getTotalPage(Integer.parseInt(storeSelectInfor.get(0).get("totalCount").toString()),pageSize);
         if(utillService.checkEmthy(storeSelectInfor)){
             logger.info("스토어 결과 미존재");
@@ -51,6 +58,13 @@ public class storeService {
         JSONObject reponse=utillService.getJson(true, storeSelectInfor);
         reponse.put("totalPage", totalPage);
         return utillService.getJson(true, reponse);
+    }
+    private List<Map<String,Object>> getStoresInfor(String email,String keyword,int requestPage) {
+        logger.info("getStoresInfor");
+        if(utillService.checkBlank(keyword)){
+            return storeDao.findByStoreNameNokeyword(email,email,utillService.getStart(requestPage, pageSize)-1,pageSize);
+        }
+        return storeDao.findByStoreInKeyword(email,keyword,email,keyword,utillService.getStart(requestPage, pageSize)-1,pageSize);
     }
     @Transactional(rollbackFor = Exception.class)
     public JSONObject insert(tryInsertStoreDto tryInsertStoreDto){

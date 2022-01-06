@@ -61,7 +61,12 @@ public class utillService {
     }
     public static boolean checkBlank(String ob) {
         logger.info("checkBlank");
-        if(ob.isBlank()){
+        if(ob==null){
+            return true;
+        }else if(ob.equals("null")||ob.equals("undifined")){
+            return true;
+        }
+        else if(ob.isBlank()){
             return true;
         }
         return false;

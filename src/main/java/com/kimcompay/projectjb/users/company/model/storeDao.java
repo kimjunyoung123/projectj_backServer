@@ -15,5 +15,8 @@ public interface storeDao extends JpaRepository<storeVo,Integer> {
     int countBySnameAndAddress(String storeName,String companyNum,String address);
 
     @Query(value = "select sname,simg,saddress,ssleep,(select count(*) from stores where semail=?)totalCount from stores where semail=? order by sid desc limit ?,?",nativeQuery = true)
-    List<Map<String,Object>> findByEmail(Object email,Object sameEmail,Object start,Object pageSize);
+    List<Map<String,Object>> findByStoreNameNokeyword(Object email,Object sameEmail,Object start,Object pageSize);
+
+    @Query(value = "select sname,simg,saddress,ssleep,(select count(*) from stores where semail=? and sname like %?%)totalCount from stores where semail=? and sname like %?% order by sid desc limit ?,?",nativeQuery = true)
+    List<Map<String,Object>> findByStoreInKeyword(Object email,Object keyword,Object sameEmail,Object sameKeyword,Object start,Object pageSize);
 }
