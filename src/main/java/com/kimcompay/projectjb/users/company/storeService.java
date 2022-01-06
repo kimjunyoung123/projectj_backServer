@@ -40,7 +40,6 @@ public class storeService {
         int requestPage=Integer.parseInt(page);
         List<Map<String,Object>>storeSelectInfor=getStoresInfor(email, keyword, requestPage);
         if(utillService.checkEmthy(storeSelectInfor)){
-            logger.info("검색키워드: "+keyword);
             if(utillService.checkBlank(keyword)){
                 throw utillService.makeRuntimeEX("가게 목록이 없습니다 등록해주세요", "getStoresByEmail");
             }
@@ -61,6 +60,7 @@ public class storeService {
     }
     private List<Map<String,Object>> getStoresInfor(String email,String keyword,int requestPage) {
         logger.info("getStoresInfor");
+        logger.info("검색키워드: "+keyword);
         if(utillService.checkBlank(keyword)){
             return storeDao.findByStoreNameNokeyword(email,email,utillService.getStart(requestPage, pageSize)-1,pageSize);
         }
