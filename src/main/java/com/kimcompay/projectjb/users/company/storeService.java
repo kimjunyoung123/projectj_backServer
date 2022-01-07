@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 import com.kimcompay.projectjb.utillService;
 import com.kimcompay.projectjb.apis.aws.services.sqsService;
 import com.kimcompay.projectjb.apis.kakao.kakaoMapService;
+import com.kimcompay.projectjb.enums.senums;
 import com.kimcompay.projectjb.users.principalDetails;
 import com.kimcompay.projectjb.users.company.model.storeDao;
 import com.kimcompay.projectjb.users.company.model.storeVo;
@@ -123,7 +124,8 @@ public class storeService {
         sqsService.sendEmailAsync(insertMessage,principalDetails.getUsername());
         sqsService.sendPhoneAsync(insertMessage, map.get("phone").toString());
         sqsService.sendPhoneAsync(insertMessage, tryInsertStoreDto.getPhone());
-        throw new RuntimeException();
+        //인증 세션 비우기
+        utillService.getHttpServletRequest().getSession().removeAttribute(senums.auth.get()+senums.phonet.get());
     }
     private void checkValues(tryInsertStoreDto tryInsertStoreDto) {
         logger.info("checkValues");
