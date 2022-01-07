@@ -173,12 +173,13 @@ public class userService {
             utillService.deleteCookie(cookieName, request,utillService.getHttpSerResponse());
         }
         //redis제거
-        principalDetails principalDetails=(principalDetails)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        String email=principalDetails.getUsername();
-        logger.info("로그아웃 이메일: "+email);
-        cookieNames.clear();
-        cookieNames.add(email);
-        cookieNames.add(utillService.getCookieValue(request, refreshTokenCookieName));
+        cookieNames.clear();//배열하나로 돌려쓰기
+        String id=Integer.toString(utillService.getLoginId());
+        logger.info("로그아웃 회원번호: "+id);
+        cookieNames.add(id);
+        String refreshTokenValue=utillService.getCookieValue(request, refreshTokenCookieName);
+        logger.info("레디스 삭제: "+refreshTokenValue);
+        cookieNames.add(refreshTokenValue);
         redisTemplate.delete(cookieNames);
         return utillService.getJson(true, "로그아웃완료");
     }
