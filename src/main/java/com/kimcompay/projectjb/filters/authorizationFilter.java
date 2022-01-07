@@ -46,11 +46,11 @@ public class authorizationFilter extends BasicAuthenticationFilter  {
             //엑세스 토큰&이메일 가져오기
             access_token=utillService.getCookieValue(request, access_cookie_name);
             logger.info("엑세스 토큰: "+access_token);
-            String email=jwtService.openJwt(access_token);
-            logger.info("이메일: "+email);
+            String id=jwtService.openJwt(access_token);
+            logger.info("검증시도 회원번호: "+id);
             //redis에서 꺼내기
             //시큐리티 인증세션 주입
-            principalDetails principalDetails=new principalDetails(redisTemplate.opsForHash().entries(email));
+            principalDetails principalDetails=new principalDetails(redisTemplate.opsForHash().entries(id));
             SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(principalDetails,null,principalDetails.getAuthorities()));
 
         } catch (TokenExpiredException e) {
@@ -59,14 +59,14 @@ public class authorizationFilter extends BasicAuthenticationFilter  {
             String refreshToken=Optional.ofNullable(utillService.getCookieValue(request,refreshTokenCookieName)).orElseGet(()->null);
             logger.info("리프레시토큰: "+refreshToken);
             //레디스에서 이메일 가져오기
-            String email=Optional.ofNullable(redisTemplate.opsForValue().get(refreshToken)).orElseGet(()->null);
-            logger.info("redis에 서 찾은 이메일: "+email);
-            if(refreshToken==null||email==null){
+            String id=Optional.ofNullable(redisTemplate.opsForValue().get(refreshToken)).orElseGet(()->null);
+            logger.info("redis에 서 찾은 고유번호: "+id);
+            if(refreshToken==null||id==null){
                 utillService.goFoward("/tokenExpire/x", request, response);
                 return;
             }
             //새 엑세스 토큰 발급
-            String accessToken=jwtService.get_access_token(email);
+            String accessToken=jwtService.get_access_token(id);
             Map<String,Object>infor=new HashMap<>();
             infor.put(access_cookie_name, accessToken);
             utillService.makeCookie(infor, response);

@@ -30,6 +30,9 @@ public class storeVo {
     @Column(name = "sid",nullable = false,unique = true)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int sid;
+ 
+    @Column(name = "scid",nullable = false)
+    private int cid;
 
     @Column(name = "saddress",nullable = false ,length = 50)
     private String saddress;

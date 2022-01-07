@@ -24,10 +24,10 @@ public class jwtService {
     private int refresh_expire_day;
 
 
-    public String get_access_token(String email) {
+    public String get_access_token(String id) {
         logger.info("get_access_token");
-        logger.info("토큰 발급 이메일: "+email);
-        return JWT.create().withSubject(access_name).withClaim("email",email).withExpiresAt(new Date(System.currentTimeMillis()+1000*10)).sign(Algorithm.HMAC512(jwt_sing));
+        logger.info("토큰 발급 회원번호: "+id);
+        return JWT.create().withSubject(access_name).withClaim("id",id).withExpiresAt(new Date(System.currentTimeMillis()+1000*10)).sign(Algorithm.HMAC512(jwt_sing));
     }
     public String get_refresh_token() {
         logger.info("get_refresh_token");
@@ -35,6 +35,6 @@ public class jwtService {
     }
     public String openJwt(String accessToken) {
         logger.info("openJwt");
-        return JWT.require(Algorithm.HMAC512(jwt_sing)).build().verify(accessToken).getClaim("email").asString();
+        return JWT.require(Algorithm.HMAC512(jwt_sing)).build().verify(accessToken).getClaim("id").asString();
     }
 }

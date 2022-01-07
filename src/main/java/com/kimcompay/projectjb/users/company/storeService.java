@@ -39,11 +39,12 @@ public class storeService {
         logger.info("조회 매장 고유번호: "+id);
         storeVo storeVo=storeDao.findBySid(id).orElseThrow(()->utillService.makeRuntimeEX("존재하지 않는 매장입니다", "getStore"));
         logger.info("메징조회 정보: "+storeVo.toString());
-        Map<Object, Object> loginInfor=utillService.getLoginInfor();
         //매장 소유 회사 계정인지 검사
-        if(!storeVo.getSemail().equals(loginInfor.get("email"))){
+        if(storeVo.getCid()!=utillService.getLoginId()){
             throw utillService.makeRuntimeEX("매장 소유자의 계정이 아닙니다", "getStore");
         }
+        //유저 고유번호 노출방지
+        storeVo.setCid(0);
         return utillService.getJson(true, storeVo);
     }
     public JSONObject getStoresByEmail(String page,String keyword) {
@@ -109,7 +110,7 @@ public class storeService {
         storeVo vo=storeVo.builder().closeTime(tryInsertStoreDto.getCloseTime()).openTime(tryInsertStoreDto.getOpenTime())
                     .saddress(tryInsertStoreDto.getAddress()).sdetail_address(tryInsertStoreDto.getDetailAddress()).simg(tryInsertStoreDto.getThumbNail())
                     .sname(tryInsertStoreDto.getStoreName()).snum(tryInsertStoreDto.getNum()).sphone(tryInsertStoreDto.getPhone()).spostcode(tryInsertStoreDto.getPostcode())
-                    .semail(utillService.getLoginInfor().get("email").toString()).ssleep(0).stel(tryInsertStoreDto.getTel()).text(tryInsertStoreDto.getText()).build();
+                    .cid(utillService.getLoginId()).semail(utillService.getLoginInfor().get("email").toString()).ssleep(0).stel(tryInsertStoreDto.getTel()).text(tryInsertStoreDto.getText()).build();
                     storeDao.save(vo);
                     
     }

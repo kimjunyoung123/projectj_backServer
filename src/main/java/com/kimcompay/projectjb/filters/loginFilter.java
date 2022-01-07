@@ -74,12 +74,12 @@ public class loginFilter extends UsernamePasswordAuthenticationFilter {
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain,Authentication authResult) throws IOException, ServletException {
         logger.info("successfulAuthentication");
-        String email=null;
+        String id=null;
         SecurityContextHolder.getContext().setAuthentication(authResult);
         //프린시펄디에일 꺼내기
         principalDetails principalDetails=(principalDetails)authResult.getPrincipal();
         Map<Object,Object>result=principalDetails.getPrinci();
-        email=principalDetails.getUsername();
+        id=result.get("id").toString();
        /* //vo->map으로 변환
         ObjectMapper objectMapper=new ObjectMapper();
         Map<String,Object> result= objectMapper.convertValue(map.get("dto"), Map.class);*/
@@ -88,7 +88,7 @@ public class loginFilter extends UsernamePasswordAuthenticationFilter {
         result.put("loginDate",loginDate);//로그인 날짜부여
         logger.info("로그인정보: "+result.toString());
         //토큰발급
-        String access_token=jwtService.get_access_token(email);
+        String access_token=jwtService.get_access_token(id);
         String refresh_token=jwtService.get_refresh_token();
         logger.info("엑세스토큰: "+access_token);
         logger.info("리프레시토큰: "+refresh_token);
@@ -99,9 +99,9 @@ public class loginFilter extends UsernamePasswordAuthenticationFilter {
         //redis 유저정보 밀어넣기
         HashOperations<String, Object, Object> hashOperations = redisTemplate.opsForHash();
         result.put(refresh_cookie_name, refresh_token);//리프레시토큰 찾기위해 넣는것
-        hashOperations.putAll(email,result);
+        hashOperations.putAll(id,result);
         //redis refresh 토큰 /이메일 밀어넣기
-        redisTemplate.opsForValue().set(refresh_token,email);//리프레시토큰을 넣는것
+        redisTemplate.opsForValue().set(refresh_token,id);//리프레시토큰을 넣는것
         logger.info("로그인 과정완료");
         utillService.goFoward("/login?flag=true&date="+loginDate+"&kind="+result.get("kind") , request, response);
     }

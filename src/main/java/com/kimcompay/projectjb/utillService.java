@@ -242,6 +242,22 @@ public class utillService {
            throw makeRuntimeEX("로그인 정보를 불러오는데 실패했습니다", "getLoginInfor");
         }
     }
+    public static int getLoginId(){
+        logger.info("getLoginId");
+        try {
+            return Integer.parseInt(getLoginInfor().get("id").toString());
+        } catch (Exception e) {
+           throw makeRuntimeEX("로그인 고유값 정보를 불러오는데 실패했습니다", "getLoginInfor");
+        }
+    }
+    public static String getLoginEmail() {
+        logger.info("getLoginEmail");
+        try {
+            return getLoginInfor().get("email").toString();
+        } catch (Exception e) {
+           throw makeRuntimeEX("로그인 이메일 정보를 불러오는데 실패했습니다", "getLoginInfor");
+        }
+    }
     public static int getTotalPage(int totalCount,int pageSize) {
         logger.info("getTotalPage");
         int totalPage=totalCount/pageSize;
