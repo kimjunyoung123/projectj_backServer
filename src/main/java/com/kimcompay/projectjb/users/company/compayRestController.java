@@ -1,5 +1,6 @@
 package com.kimcompay.projectjb.users.company;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -8,6 +9,7 @@ import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
 import com.kimcompay.projectjb.utillService;
+import com.kimcompay.projectjb.apis.google.ocrService;
 import com.kimcompay.projectjb.users.company.model.tryInsertStoreDto;
 
 import org.json.simple.JSONObject;
@@ -26,6 +28,7 @@ public class compayRestController {
 
     @Autowired
     private storeService storeService;
+    
 
     //매장등록
     @RequestMapping(value = "/auth/store/join",method = RequestMethod.POST)
@@ -44,8 +47,14 @@ public class compayRestController {
         return storeService.getStore(id);
     }
     @RequestMapping(value = "/testimg",method = RequestMethod.POST)
-    public void testimg(@RequestBody JSONObject jsonObject,HttpSession httpSession) {
+    public void testimg() {
         logger.info("testimg");
+        try {
+            ocrService.detectText();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
        
 
     }
