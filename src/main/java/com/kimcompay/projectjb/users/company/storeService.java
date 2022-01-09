@@ -5,8 +5,10 @@ import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 import com.kimcompay.projectjb.utillService;
+import com.kimcompay.projectjb.apis.aws.services.fileService;
 import com.kimcompay.projectjb.apis.aws.services.sqsService;
 import com.kimcompay.projectjb.apis.kakao.kakaoMapService;
 import com.kimcompay.projectjb.enums.senums;
@@ -34,6 +36,8 @@ public class storeService {
     private sqsService sqsService;
     @Autowired
     private kakaoMapService kakaoMapService;
+    @Autowired
+    private fileService fileService;
     
     public JSONObject getStore(int id) {
         logger.info("getStore");
@@ -85,7 +89,7 @@ public class storeService {
         logger.info("insert");
         logger.info("요청정보: "+tryInsertStoreDto);
         //휴대폰 인증 검증
-        checkAuth(tryInsertStoreDto.getPhone());
+        //checkAuth(tryInsertStoreDto.getPhone());
         //값 검증
         checkValues(tryInsertStoreDto);
         //저장시도
@@ -125,7 +129,14 @@ public class storeService {
         sqsService.sendPhoneAsync(insertMessage, map.get("phone").toString());
         sqsService.sendPhoneAsync(insertMessage, tryInsertStoreDto.getPhone());
         //인증 세션 비우기
-        utillService.getHttpServletRequest().getSession().removeAttribute(senums.auth.get()+senums.phonet.get());
+        HttpSession httpSession=utillService.getHttpServletRequest().getSession();
+        httpSession.removeAttribute(senums.auth.get()+senums.phonet.get());
+        //사용하지 않는 사진 지우기
+        //이미지가 있다면 path제거후 이름만 얻어내기
+        List<String>usingImgs=utillService.getOnlyImgNames(tryInsertStoreDto.getText());
+        usingImgs.add(tryInsertStoreDto.getThumbNail().split("/")[4]);
+        fileService.deleteFile(httpSession,usingImgs);
+        httpSession.removeAttribute(senums.imgSessionName.get());
     }
     private void checkValues(tryInsertStoreDto tryInsertStoreDto) {
         logger.info("checkValues");

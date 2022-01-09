@@ -1,12 +1,15 @@
 package com.kimcompay.projectjb;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
 import java.util.Map.Entry;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -31,6 +34,16 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 public class utillService {
     private final static Logger logger=LoggerFactory.getLogger(utillService.class);
 
+    public static List<String> getImgSrc(String text) {
+    	System.out.println("getImgSrc");
+    	List<String>array=new ArrayList<>();
+    	Pattern nonValidPattern = Pattern.compile("<img[^>]*src=[\"']?([^>\"']+)[\"']?[^>]*>");
+		Matcher matcher = nonValidPattern.matcher(text);
+		while (matcher.find()) {
+			array.add(matcher.group(1));
+		}
+		return array;
+    }
     public static void deleteCookie(String cookieName,HttpServletRequest request,HttpServletResponse response) {
         logger.info("deleteCookie");
         logger.info("제걸될 쿠키이름: "+cookieName);
@@ -274,5 +287,21 @@ public class utillService {
         logger.info("요청페이지 :"+page);
         return (page-1)*pageSize+1;//+1 이있는 이유는 1페이질때 대응하기 위해이다  
     }
+    public static List<String> getOnlyImgNames(String text) {
+        logger.info("getOnlyImgNames");
+        List<String>imgPaths=getImgSrc(text);
+        List<String>imgNames=new ArrayList<>();
+        if(!imgPaths.isEmpty()){
+            logger.info("가게 간단설명에 이미지 존재");
+            for(String path:imgPaths){
+                imgNames.add(path.split("/")[4]);
+            }
+            return imgNames;
+        }else{
+            logger.info("이미지가 존재하지 않습니다");
+        }
+        return imgNames;
+    }
+    
  
 }

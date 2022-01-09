@@ -44,23 +44,43 @@ public class fileService {
             url=awsUrl+"/"+bucketName+"/"+uploadName;
             logger.info("s3사진 경로: "+url);
             //세션에담기
-            List<String>imgPaths=new ArrayList<>();
+            List<String>imgNames=new ArrayList<>();
             HttpSession httpSession=request.getSession();
             String imgSession=senums.imgSessionName.get();
             try {
                 //이미지 배열 꺼내서 넣어주기 첫 요청이라면 예외 발생
                 httpSession=request.getSession();
-                imgPaths=(List<String>)httpSession.getAttribute(imgSession);
-                imgPaths.add(uploadName);
+                imgNames=(List<String>)httpSession.getAttribute(imgSession);
+                imgNames.add(uploadName);
             } catch (NullPointerException e) {
                 logger.info("첫 사진업로드 요청이므로 예외발생 만들어서 넣어주기");
-                imgPaths=new ArrayList<>();
-                imgPaths.add(uploadName);
-                httpSession.setAttribute(imgSession, imgPaths);
+                imgNames=new ArrayList<>();
+                imgNames.add(uploadName);
+                httpSession.setAttribute(imgSession, imgNames);
             }
         }
         reseponse.put("uploaded", result);
         reseponse.put("url", url);
         return reseponse;
+    }
+    public void deleteFile(HttpSession httpSession,List<String>usingImgs) {
+        logger.info("deleteFile sesion");
+        try {
+            List<String>imgNames=(List<String>)httpSession.getAttribute(senums.imgSessionName.get());
+            for(String img:imgNames){
+                if(!usingImgs.contains(img)){
+                    logger.info("삭제할 이미지: "+img);
+                    deleteFile(img);
+                }
+            }
+        } catch(NullPointerException e){
+            logger.info("삭제할 이미지가 없습니다");
+        }catch (Exception e) {
+           logger.info("이미지 삭제 실패");
+        }
+    }
+    public void deleteFile(String fileName) {
+        logger.info("deleteFile");
+        s3Service.deleteFile(bucketName, fileName);
     }
 }

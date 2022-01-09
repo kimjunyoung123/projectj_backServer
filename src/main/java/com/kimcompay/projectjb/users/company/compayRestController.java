@@ -1,10 +1,13 @@
 package com.kimcompay.projectjb.users.company;
 
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
+import com.kimcompay.projectjb.utillService;
 import com.kimcompay.projectjb.users.company.model.tryInsertStoreDto;
 
 import org.json.simple.JSONObject;
@@ -39,5 +42,11 @@ public class compayRestController {
     public JSONObject getStore(@PathVariable int id) {
         logger.info("getStore");
         return storeService.getStore(id);
+    }
+    @RequestMapping(value = "/testimg",method = RequestMethod.POST)
+    public void testimg(@RequestBody JSONObject jsonObject,HttpSession httpSession) {
+        logger.info("testimg");
+       
+
     }
 }
