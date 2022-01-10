@@ -47,13 +47,14 @@ public class compayRestController {
         return storeService.getStore(id);
     }
     @RequestMapping(value = "/testimg",method = RequestMethod.POST)
-    public void testimg() {
+    public JSONObject testimg() {
         logger.info("testimg");
         try {
-            ocrService.detectText();
+           return ocrService.detectText();
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
+            return null;
         }
        
 
