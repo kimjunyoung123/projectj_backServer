@@ -89,7 +89,7 @@ public class storeService {
         logger.info("insert");
         logger.info("요청정보: "+tryInsertStoreDto);
         //휴대폰 인증 검증
-        //checkAuth(tryInsertStoreDto.getPhone());
+        checkAuth(tryInsertStoreDto.getPhone());
         //값 검증
         checkValues(tryInsertStoreDto);
         //저장시도
@@ -115,6 +115,7 @@ public class storeService {
         storeVo vo=storeVo.builder().closeTime(tryInsertStoreDto.getCloseTime()).openTime(tryInsertStoreDto.getOpenTime())
                     .saddress(tryInsertStoreDto.getAddress()).sdetail_address(tryInsertStoreDto.getDetailAddress()).simg(tryInsertStoreDto.getThumbNail())
                     .sname(tryInsertStoreDto.getStoreName()).snum(tryInsertStoreDto.getNum()).sphone(tryInsertStoreDto.getPhone()).spostcode(tryInsertStoreDto.getPostcode())
+                    .minPrice(Integer.parseInt(tryInsertStoreDto.getMinPrice())).deliverRadius(Integer.parseInt(tryInsertStoreDto.getDeliverRadius()))
                     .cid(utillService.getLoginId()).semail(utillService.getLoginInfor().get("email").toString()).ssleep(0).stel(tryInsertStoreDto.getTel()).text(tryInsertStoreDto.getText()).build();
                     storeDao.save(vo);
                     

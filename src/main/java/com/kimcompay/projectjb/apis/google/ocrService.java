@@ -22,7 +22,7 @@ import java.util.List;
 public class ocrService {
   public static JSONObject detectText() throws IOException {
     // TODO(developer): Replace these variables before running the sample.
-    String filePath = "C:/Users/Administrator/Desktop/test.jpg";
+    String filePath = "/Users/sesisoft/Desktop/test2.jpeg";
     return detectText(filePath);
   }
 
