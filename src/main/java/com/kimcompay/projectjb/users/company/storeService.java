@@ -43,11 +43,10 @@ public class storeService {
     @Autowired
     private RedisTemplate<String,String>redisTemplate;
     
-    public void findDeliver(int loginId) {
+    public String findDeliver(String loginId) {
         logger.info("findDeliver");
-        redisTemplate.opsForValue().get(loginId);
-        
-
+        logger.info("배달목록 찾는 상점:  "+loginId);
+        return redisTemplate.opsForValue().get(loginId+"delivery");
     }
     public JSONObject getStore(int id) {
         logger.info("getStore");

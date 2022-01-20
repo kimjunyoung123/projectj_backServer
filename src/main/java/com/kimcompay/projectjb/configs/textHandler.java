@@ -3,9 +3,11 @@ package com.kimcompay.projectjb.configs;
 import java.security.Principal;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Map.Entry;
 
 import com.kimcompay.projectjb.utillService;
+import com.kimcompay.projectjb.enums.senums;
 import com.kimcompay.projectjb.users.principalDetails;
 import com.kimcompay.projectjb.users.company.storeService;
 
@@ -56,14 +58,32 @@ public class textHandler extends TextWebSocketHandler {
       String id=session.getId();
       logger.info("소켓 연결 아이디: "+id);
       socketSessions.put(id, session);
-      System.out.println(session.getPrincipal());//웹소켓에서 로그인 인증정보 꺼내는법
+      logger.info("웹소켓 인증정보: "+session.getPrincipal());
       AbstractAuthenticationToken principal=(AbstractAuthenticationToken) session.getPrincipal();
       principalDetails  principalDetails=(com.kimcompay.projectjb.users.principalDetails) principal.getPrincipal();
-      System.out.println(principalDetails.getPrinci().get("id"));
-      //storeService.findDeliver(Integer.parseInt(principalDetails.getPrinci().get("id").toString()));
+      checkUser(principalDetails);
+     
    }
    @Override //연결이끊기면 자동으로 작동하는함수
    public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
       logger.info("afterConnectionClosed");
+   }
+   private void checkUser(principalDetails principalDetails) {
+      logger.info("checkUser");
+      Map<Object,Object>infor=principalDetails.getPrinci();
+      String role=infor.get("role").toString();
+      if(role.equals(senums.company_role.get())){
+         logger.info("회사이용자");
+         try {
+            String buyers=Optional.ofNullable(storeService.findDeliver(principalDetails.getPrinci().get("id").toString())).orElseThrow(()->new NullPointerException());
+         } catch (NullPointerException e) {
+            throw utillService.makeRuntimeEX("상점: "+principalDetails.getPrinci().get("id")+" 배달목록 존재하지 않음", "afterConnectionEstablished");
+         }
+      }else if(role.equals(senums.user_role.get())){
+         logger.info("일반이용자");
+      }
+     
+
+      
    }
 }
