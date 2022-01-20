@@ -21,6 +21,8 @@ import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -38,7 +40,15 @@ public class storeService {
     private kakaoMapService kakaoMapService;
     @Autowired
     private fileService fileService;
+    @Autowired
+    private RedisTemplate<String,String>redisTemplate;
     
+    public void findDeliver(int loginId) {
+        logger.info("findDeliver");
+        redisTemplate.opsForValue().get(loginId);
+        
+
+    }
     public JSONObject getStore(int id) {
         logger.info("getStore");
         logger.info("조회 매장 고유번호: "+id);
