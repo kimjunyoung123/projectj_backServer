@@ -4,9 +4,15 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import com.kimcompay.projectjb.utillService;
+
 import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.ListOperations;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.web.socket.CloseStatus;
@@ -19,6 +25,8 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 public class textHandler extends TextWebSocketHandler {
     private Logger logger=LoggerFactory.getLogger(textHandler.class);
     Map<String, WebSocketSession> socketSessions = new HashMap<>(); 
+
+
 
     @Override//메세지가오는함수
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
@@ -43,6 +51,7 @@ public class textHandler extends TextWebSocketHandler {
       String id=session.getId();
       logger.info("소켓 연결 아이디: "+id);
       socketSessions.put(id, session);
+      System.out.println(session.getPrincipal());
    }
    @Override //연결이끊기면 자동으로 작동하는함수
    public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
