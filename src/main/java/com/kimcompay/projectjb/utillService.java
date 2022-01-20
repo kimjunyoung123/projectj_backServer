@@ -102,8 +102,8 @@ public class utillService {
         for(Entry<String, Object> key:infor.entrySet()){
             ResponseCookie cookie = ResponseCookie.from(key.getKey(),key.getValue().toString()) 
             .sameSite("None") 
-            .secure(true) 
-            .path("/") 
+            .secure(true)
+            .path("/")
             .build(); 
             response.addHeader("Set-Cookie", cookie.toString()+";HttpOnly");  
         }

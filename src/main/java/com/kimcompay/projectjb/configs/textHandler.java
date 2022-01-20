@@ -40,7 +40,7 @@ public class textHandler extends TextWebSocketHandler {
          try {
             webSession.getValue().sendMessage(new TextMessage(whoAreYou.toString()));
          } catch (IllegalStateException e) {
-            e.printStackTrace();
+            //e.printStackTrace();
             logger.info("닫힌 소켓 무시");
          }
       }
