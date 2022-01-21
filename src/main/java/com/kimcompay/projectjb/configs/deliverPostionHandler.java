@@ -79,11 +79,12 @@ public class deliverPostionHandler extends TextWebSocketHandler {
       if(role.equals(senums.company_role.get())){
          logger.info("회사이용자");
          try {
-            //배달 요청이 있는지 검사
+            //배달 요청이 있는지 검사 로직 추가해야함
             //배달이 있다면 방 생성
             if(deliveryService.checkAlreadyRoom(id)==0){
                logger.info("새방 생성");
                deliveryService.makeDeliverRoom(id);
+               //유저들에게 방번호 만들어졌다고 db로직추가해야함 아마 주문테이블에 추가할듯
             }
             //방생성기록이 있다면 그냥 유지
          } catch (NullPointerException e) {
@@ -92,12 +93,11 @@ public class deliverPostionHandler extends TextWebSocketHandler {
          }
       }else if(role.equals(senums.user_role.get())){
          logger.info("일반이용자");
-         //상점에서준 방번호 꺼내기
+         //상점에서준 방번호 꺼내기 로직 추가해야함
          //방에 입장/재입장하기 db수정
          deliveryService.enterRoom(1,session.getId(),id);
          Map<String,Object>roomDetail=new HashMap<>();
          List<Map<String,Object>>room=new ArrayList<>();
-         boolean findFlag=false;
          //배달번호로 된 방이 있나검사
          try {
             room=roomList.get(1);
@@ -107,7 +107,6 @@ public class deliverPostionHandler extends TextWebSocketHandler {
                   logger.info("소켓 세션 변경");
                   rd.put("sessionId", session.getId());
                   rd.put("session", session);
-                  findFlag=true;
                   break;
                }
             }
@@ -121,18 +120,7 @@ public class deliverPostionHandler extends TextWebSocketHandler {
             room=new ArrayList<>();
             room.add(roomDetail);
             roomList.put(1, room);
-            findFlag=true;
          }
-         //방이 없다면 만듬
-         if(!findFlag){
-            roomDetail.put("roomNumber", 1);
-            roomDetail.put("userId",id);
-            roomDetail.put("sessionId", session.getId());
-            roomDetail.put("session", session);
-            room.add(roomDetail);
-            roomList.put(1, room);
-         }
-
       }      
    }
 }

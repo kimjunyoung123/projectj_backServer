@@ -36,9 +36,9 @@ public class deliveryService {
     @Transactional(rollbackFor = Exception.class)
     public void enterRoom(int roomId,String userSocketId,int userId) {
         logger.info("enterRoom");
-        //배송요청조회
+        //배송요청조회 로직추가해야함 
         //배송방정보조회 null=첫배송조회 페이지 입장인경우 빈객체 생성
-        deliverRoomDetailVo vo=deliverRoomDetailDao.findByFlagAndUserId(senums.notFlag.get(), userId).orElseGet(()->new deliverRoomDetailVo());
+        deliverRoomDetailVo vo=deliverRoomDetailDao.findByFlagAndUserId(roomId,0, userId).orElseGet(()->new deliverRoomDetailVo());
         //logger.info(vo.toString());
         if(vo.getDdId()==0){
             logger.info("첫 배송조회 페이지 입장");
