@@ -38,12 +38,13 @@ public class deliveryService {
         logger.info("enterRoom");
         //배송요청조회 로직추가해야함 
         //배송방정보조회 null=첫배송조회 페이지 입장인경우 빈객체 생성
+        logger.info(roomId+""+userId);
         deliverRoomDetailVo vo=deliverRoomDetailDao.findByFlagAndUserId(roomId,0, userId).orElseGet(()->new deliverRoomDetailVo());
         //logger.info(vo.toString());
         if(vo.getDdId()==0){
             logger.info("첫 배송조회 페이지 입장");
             vo.setDoneFlag(Integer.parseInt(senums.notFlag.get()));
-            vo.setRoomId(1);
+            vo.setRoomId(roomId);
             vo.setUserID(userId);
             vo.setUserSocketId(userSocketId);
             deliverRoomDetailDao.save(vo);

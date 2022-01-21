@@ -67,6 +67,7 @@ public class deliverPostionHandler extends TextWebSocketHandler {
    @Override //연결이끊기면 자동으로 작동하는함수
    public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
       logger.info("afterConnectionClosed");
+      roomList.get(1).clear();
    }
    private void checkUser(principalDetails principalDetails,WebSocketSession session) {
       logger.info("checkUser");
@@ -93,33 +94,51 @@ public class deliverPostionHandler extends TextWebSocketHandler {
          }
       }else if(role.equals(senums.user_role.get())){
          logger.info("일반이용자");
-         //상점에서준 방번호 꺼내기 로직 추가해야함
+         int roomId=0;//상점에서준 방번호 꺼내기 로직 추가해야함
+         //테스트를 위한 로직
+         if(id==11){
+            roomId=1;
+         }else{
+            roomId=2;
+         }
+         logger.info("룸번호: "+roomId);
          //방에 입장/재입장하기 db수정
-         deliveryService.enterRoom(1,session.getId(),id);
+         deliveryService.enterRoom(roomId,session.getId(),id);
          Map<String,Object>roomDetail=new HashMap<>();
          List<Map<String,Object>>room=new ArrayList<>();
+         boolean findFlag=false;
          //배달번호로 된 방이 있나검사
          try {
-            room=roomList.get(1);
+            room=roomList.get(roomId);
             for(Map<String,Object>rd:room){
                if(rd.get("userId").equals(id)){
-                  //방이 있다면 소켓정보 수정
+                  //방이 있고 기존유저 소켓정보 수정
                   logger.info("소켓 세션 변경");
                   rd.put("sessionId", session.getId());
                   rd.put("session", session);
+                  findFlag=true;
                   break;
                }
+            }
+            //방이 이미 있고 새유저가 왔을때
+            if(!findFlag){
+               logger.info("roomId번방에 새유저 추가");
+               roomDetail.put("roomNumber", roomId);
+               roomDetail.put("userId",id);
+               roomDetail.put("sessionId", session.getId());
+               roomDetail.put("session", session);
+               room.add(roomDetail);
             }
          } catch (NullPointerException e) {
             //배달번호 관계없이 방이 하나도 없을경우만듬
             logger.info("첫룸생성");
-            roomDetail.put("roomNumber", 1);
+            roomDetail.put("roomNumber", roomId);
             roomDetail.put("userId",id);
             roomDetail.put("sessionId", session.getId());
             roomDetail.put("session", session);
             room=new ArrayList<>();
             room.add(roomDetail);
-            roomList.put(1, room);
+            roomList.put(roomId, room);
          }
       }      
    }
