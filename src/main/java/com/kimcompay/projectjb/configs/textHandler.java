@@ -1,12 +1,15 @@
 package com.kimcompay.projectjb.configs;
 
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Map.Entry;
 
 import com.kimcompay.projectjb.utillService;
+import com.kimcompay.projectjb.delivery.deliveryService;
 import com.kimcompay.projectjb.enums.senums;
 import com.kimcompay.projectjb.users.principalDetails;
 import com.kimcompay.projectjb.users.company.storeService;
@@ -31,8 +34,11 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 public class textHandler extends TextWebSocketHandler {
     private Logger logger=LoggerFactory.getLogger(textHandler.class);
     Map<String, WebSocketSession> socketSessions = new HashMap<>(); 
+    List<HashMap<String, Object>> rls = new ArrayList<>(); //웹소켓 세션을 담아둘 리스트 ---roomListSessions
    @Autowired
    private storeService storeService;
+   @Autowired
+   private deliveryService deliveryService;
 
 
     @Override//메세지가오는함수
@@ -60,7 +66,7 @@ public class textHandler extends TextWebSocketHandler {
       socketSessions.put(id, session);
       logger.info("웹소켓 인증정보: "+session.getPrincipal());
       AbstractAuthenticationToken principal=(AbstractAuthenticationToken) session.getPrincipal();
-      principalDetails  principalDetails=(com.kimcompay.projectjb.users.principalDetails) principal.getPrincipal();
+      principalDetails  principalDetails=(com.kimcompay.projectjb.users.principalDetails) principal.getPrincipal();;
       checkUser(principalDetails);
      
    }
@@ -72,18 +78,21 @@ public class textHandler extends TextWebSocketHandler {
       logger.info("checkUser");
       Map<Object,Object>infor=principalDetails.getPrinci();
       String role=infor.get("role").toString();
+      int id=Integer.parseInt(infor.get("id").toString());
       if(role.equals(senums.company_role.get())){
          logger.info("회사이용자");
          try {
-            String buyers=Optional.ofNullable(storeService.findDeliver(principalDetails.getPrinci().get("id").toString())).orElseThrow(()->new NullPointerException());
+            if(deliveryService.checkAlreadyRoom(id)==0){//없다면 방생성
+               logger.info("새방 생성");
+               deliveryService.makeDeliverRoom(id);
+            }
+            //String buyers=Optional.ofNullable(storeService.findDeliver(principalDetails.getPrinci().get("id").toString())).orElseThrow(()->new NullPointerException());
          } catch (NullPointerException e) {
             throw utillService.makeRuntimeEX("상점: "+principalDetails.getPrinci().get("id")+" 배달목록 존재하지 않음", "afterConnectionEstablished");
          }
       }else if(role.equals(senums.user_role.get())){
          logger.info("일반이용자");
-      }
-     
-
-      
+         deliveryService.enterRoom(1, id);
+      }      
    }
 }
