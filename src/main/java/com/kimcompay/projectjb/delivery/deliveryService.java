@@ -2,6 +2,8 @@ package com.kimcompay.projectjb.delivery;
 
 import java.util.Optional;
 
+import com.kimcompay.projectjb.delivery.model.deliverRoomDetailDao;
+import com.kimcompay.projectjb.delivery.model.deliverRoomDetailVo;
 import com.kimcompay.projectjb.delivery.model.deliveryRoomDao;
 import com.kimcompay.projectjb.delivery.model.deliveryRoomVo;
 
@@ -17,6 +19,8 @@ public class deliveryService {
 
     @Autowired
     private deliveryRoomDao deliveryRoomDao;
+    @Autowired
+    private deliverRoomDetailDao deliverRoomDetailDao;
 
     public void makeDeliverRoom(int compayId) {
         logger.info("makeDeliverRoom");
@@ -29,17 +33,16 @@ public class deliveryService {
         return deliveryRoomDao.findCountByRoomMaster(companyId);
     }
     @Transactional(rollbackFor = Exception.class)
-    public void enterRoom(int roomId,int userId) {
+    public void enterRoom(int roomId,String userSocketId,int userId) {
         logger.info("enterRoom");
-        deliveryRoomVo vo=deliveryRoomDao.findById(roomId).orElseThrow();
-        String custermersIds=Optional.ofNullable(vo.getDeliverRoomCustomerIds()).orElseGet(()->"");
-        if(custermersIds.equals("")){
-            logger.info("첫손님");
-            custermersIds+=userId+",";
-        }else{
-            custermersIds+=","+userId+",";
+        deliverRoomDetailVo deliverRoomDetailVo=deliverRoomDetailDao.findByRoomIdAndUserId(roomId, userId);
+        logger.info(deliverRoomDetailVo.toString());
+        if(!Optional.ofNullable(deliverRoomDetailVo.getUserSocketId()).orElseGet(()->"").equals(userSocketId)){
+            deliverRoomDetailVo.setUserSocketId(userSocketId);
         }
-        vo.setDeliverRoomCustomerIds(custermersIds);
-
+    }
+    public void findAllByRoomId(int roomId) {
+        logger.info("findAllByRoomId");
+        
     }
 }

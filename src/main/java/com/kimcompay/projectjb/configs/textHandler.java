@@ -13,6 +13,7 @@ import com.kimcompay.projectjb.delivery.deliveryService;
 import com.kimcompay.projectjb.enums.senums;
 import com.kimcompay.projectjb.users.principalDetails;
 import com.kimcompay.projectjb.users.company.storeService;
+import com.mysql.cj.Session;
 
 import org.json.simple.JSONObject;
 import org.slf4j.Logger;
@@ -34,7 +35,7 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 public class textHandler extends TextWebSocketHandler {
     private Logger logger=LoggerFactory.getLogger(textHandler.class);
     Map<String, WebSocketSession> socketSessions = new HashMap<>(); 
-    List<HashMap<String, Object>> rls = new ArrayList<>(); //웹소켓 세션을 담아둘 리스트 ---roomListSessions
+    List<Map<String, Object>> roomList = new ArrayList<>(); //웹소켓 세션을 담아둘 리스트 ---roomListSessions
    @Autowired
    private storeService storeService;
    @Autowired
@@ -49,13 +50,16 @@ public class textHandler extends TextWebSocketHandler {
       JSONObject whoAreYou=new JSONObject();
       whoAreYou.put("id", session.getId());
       whoAreYou.put("message", message);
-      for(Entry<String, WebSocketSession> webSession:socketSessions.entrySet()){
-         try {
-            webSession.getValue().sendMessage(new TextMessage(whoAreYou.toString()));
-         } catch (IllegalStateException e) {
-            //e.printStackTrace();
-            logger.info("닫힌 소켓 무시");
+      try {
+         //보내기만 하면됨
+         for(Map<String,Object>room:roomList){
+            if(Integer.parseInt(room.get("roomNumber").toString())==1){
+               WebSocketSession wss = (WebSocketSession) room.get("session");
+               wss.sendMessage(new TextMessage(whoAreYou.toJSONString()));
+            }
          }
+      } catch (Exception e) {
+         //TODO: handle exception
       }
     }
    @Override//연결이되면 자동으로 작동하는함수
@@ -67,14 +71,14 @@ public class textHandler extends TextWebSocketHandler {
       logger.info("웹소켓 인증정보: "+session.getPrincipal());
       AbstractAuthenticationToken principal=(AbstractAuthenticationToken) session.getPrincipal();
       principalDetails  principalDetails=(com.kimcompay.projectjb.users.principalDetails) principal.getPrincipal();;
-      checkUser(principalDetails);
+      checkUser(principalDetails,session);
      
    }
    @Override //연결이끊기면 자동으로 작동하는함수
    public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
       logger.info("afterConnectionClosed");
    }
-   private void checkUser(principalDetails principalDetails) {
+   private void checkUser(principalDetails principalDetails,WebSocketSession session) {
       logger.info("checkUser");
       Map<Object,Object>infor=principalDetails.getPrinci();
       String role=infor.get("role").toString();
@@ -86,13 +90,22 @@ public class textHandler extends TextWebSocketHandler {
                logger.info("새방 생성");
                deliveryService.makeDeliverRoom(id);
             }
+
             //String buyers=Optional.ofNullable(storeService.findDeliver(principalDetails.getPrinci().get("id").toString())).orElseThrow(()->new NullPointerException());
          } catch (NullPointerException e) {
             throw utillService.makeRuntimeEX("상점: "+principalDetails.getPrinci().get("id")+" 배달목록 존재하지 않음", "afterConnectionEstablished");
          }
       }else if(role.equals(senums.user_role.get())){
          logger.info("일반이용자");
-         deliveryService.enterRoom(1, id);
+         deliveryService.enterRoom(1,session.getId(),id);
+         //바꿔줘야함
+      
+         Map<String,Object>map=new HashMap<>();
+         map.put("roomNumber", 1);
+         map.put("userId",id);
+         map.put("sessionId", session.getId());
+         map.put("session", session);
+         roomList.add(map);
       }      
    }
 }

@@ -19,18 +19,19 @@ import lombok.ToString;
 @Data
 @Builder
 @ToString
-@Table(name = "delivery_rooms")
+@Table(name = "deliver_room_details")
 @Entity
-public class deliveryRoomVo {
+public class deliverRoomDetailVo {
+
     @Id
-    @Column(name = "dr_id",nullable = false,unique = true)
+    @Column(name = "dd_id",nullable = false,unique = true)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int drId;
+    private int ddId;
 
-    @Column(name = "deliver_room_master")
-    private int deliverRoomMaster;
-
-
-
-
+    @Column(name = "room_id")
+    private int roomId;
+    @Column(name = "user_id")
+    private int userID;
+    @Column(name = "user_socket_id")
+    private String userSocketId;
 }
