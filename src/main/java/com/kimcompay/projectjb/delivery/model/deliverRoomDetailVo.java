@@ -27,11 +27,12 @@ public class deliverRoomDetailVo {
     @Column(name = "dd_id",nullable = false,unique = true)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int ddId;
-
     @Column(name = "room_id")
     private int roomId;
     @Column(name = "user_id")
     private int userID;
     @Column(name = "user_socket_id")
     private String userSocketId;
+    @Column(name = "done_flag",columnDefinition = "TINYINT")
+    private int  doneFlag;
 }

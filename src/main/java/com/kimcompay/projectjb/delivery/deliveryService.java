@@ -6,6 +6,7 @@ import com.kimcompay.projectjb.delivery.model.deliverRoomDetailDao;
 import com.kimcompay.projectjb.delivery.model.deliverRoomDetailVo;
 import com.kimcompay.projectjb.delivery.model.deliveryRoomDao;
 import com.kimcompay.projectjb.delivery.model.deliveryRoomVo;
+import com.kimcompay.projectjb.enums.senums;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,14 +36,26 @@ public class deliveryService {
     @Transactional(rollbackFor = Exception.class)
     public void enterRoom(int roomId,String userSocketId,int userId) {
         logger.info("enterRoom");
-        deliverRoomDetailVo deliverRoomDetailVo=deliverRoomDetailDao.findByRoomIdAndUserId(roomId, userId);
-        logger.info(deliverRoomDetailVo.toString());
-        if(!Optional.ofNullable(deliverRoomDetailVo.getUserSocketId()).orElseGet(()->"").equals(userSocketId)){
-            deliverRoomDetailVo.setUserSocketId(userSocketId);
+        //배송요청조회
+        //배송방정보조회 null=첫배송조회 페이지 입장인경우 빈객체 생성
+        deliverRoomDetailVo vo=deliverRoomDetailDao.findByFlagAndUserId(senums.notFlag.get(), userId).orElseGet(()->new deliverRoomDetailVo());
+        //logger.info(vo.toString());
+        if(vo.getDdId()==0){
+            logger.info("첫 배송조회 페이지 입장");
+            vo.setDoneFlag(Integer.parseInt(senums.notFlag.get()));
+            vo.setRoomId(1);
+            vo.setUserID(userId);
+            vo.setUserSocketId(userSocketId);
+            deliverRoomDetailDao.save(vo);
+            return;
+        }else{
+            //새로고침,페이지이동이 일어나서 소켓 아이디가 달라졌을경우
+            if(!vo.getUserSocketId().equals(userSocketId)){
+                logger.info("웹세션이 변경되었습니다");
+                vo.setUserSocketId(userSocketId);
+                return;
+            }
         }
-    }
-    public void findAllByRoomId(int roomId) {
-        logger.info("findAllByRoomId");
-        
+        logger.info("첫입장도 아니고 웹세션도 그대로임");
     }
 }

@@ -1,29 +1,22 @@
 package com.kimcompay.projectjb.configs;
 
-import java.security.Principal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-import java.util.Map.Entry;
+
 
 import com.kimcompay.projectjb.utillService;
 import com.kimcompay.projectjb.delivery.deliveryService;
 import com.kimcompay.projectjb.enums.senums;
 import com.kimcompay.projectjb.users.principalDetails;
 import com.kimcompay.projectjb.users.company.storeService;
-import com.mysql.cj.Session;
 
 import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.ListOperations;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
@@ -34,8 +27,7 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 @Service
 public class deliverPostionHandler extends TextWebSocketHandler {
     private Logger logger=LoggerFactory.getLogger(deliverPostionHandler.class);
-    Map<String, WebSocketSession> socketSessions = new HashMap<>(); 
-    List<Map<String, Object>> roomList = new ArrayList<>(); //웹소켓 세션을 담아둘 리스트 ---roomListSessions
+    Map<Integer, List<Map<String,Object>>> roomList =new HashMap<>(); //웹소켓 세션을 담아둘 리스트 ---roomListSessions
    @Autowired
    private storeService storeService;
    @Autowired
@@ -51,8 +43,8 @@ public class deliverPostionHandler extends TextWebSocketHandler {
       whoAreYou.put("id", session.getId());
       whoAreYou.put("message", message);
       try {
-         //보내기만 하면됨
-         for(Map<String,Object>room:roomList){
+         //보내기만 하면됨 n번방 세션 들 다꺼내기
+         for(Map<String,Object>room:roomList.get(1)){
             if(Integer.parseInt(room.get("roomNumber").toString())==1){
                WebSocketSession wss = (WebSocketSession) room.get("session");
                wss.sendMessage(new TextMessage(whoAreYou.toJSONString()));
@@ -60,17 +52,15 @@ public class deliverPostionHandler extends TextWebSocketHandler {
          }
       } catch (Exception e) {
          //TODO: handle exception
+         
       }
     }
    @Override//연결이되면 자동으로 작동하는함수
    public void afterConnectionEstablished(WebSocketSession session) throws Exception {
       logger.info("afterConnectionEstablished");
-      String id=session.getId();
-      logger.info("소켓 연결 아이디: "+id);
-      socketSessions.put(id, session);
-      logger.info("웹소켓 인증정보: "+session.getPrincipal());
+      //로그인정보 꺼내기
       AbstractAuthenticationToken principal=(AbstractAuthenticationToken) session.getPrincipal();
-      principalDetails  principalDetails=(com.kimcompay.projectjb.users.principalDetails) principal.getPrincipal();;
+      principalDetails  principalDetails=(com.kimcompay.projectjb.users.principalDetails) principal.getPrincipal();
       checkUser(principalDetails,session);
      
    }
@@ -80,32 +70,69 @@ public class deliverPostionHandler extends TextWebSocketHandler {
    }
    private void checkUser(principalDetails principalDetails,WebSocketSession session) {
       logger.info("checkUser");
+      //로그인 상세정보 꺼내기
       Map<Object,Object>infor=principalDetails.getPrinci();
+      //권한 체크
       String role=infor.get("role").toString();
       int id=Integer.parseInt(infor.get("id").toString());
+      //권한에 따라 방생성 or 입장 
       if(role.equals(senums.company_role.get())){
          logger.info("회사이용자");
          try {
-            if(deliveryService.checkAlreadyRoom(id)==0){//없다면 방생성
+            //배달 요청이 있는지 검사
+            //배달이 있다면 방 생성
+            if(deliveryService.checkAlreadyRoom(id)==0){
                logger.info("새방 생성");
                deliveryService.makeDeliverRoom(id);
             }
-
-            //String buyers=Optional.ofNullable(storeService.findDeliver(principalDetails.getPrinci().get("id").toString())).orElseThrow(()->new NullPointerException());
+            //방생성기록이 있다면 그냥 유지
          } catch (NullPointerException e) {
+            //주문 요청이 한건도 없다면 예외발생
             throw utillService.makeRuntimeEX("상점: "+principalDetails.getPrinci().get("id")+" 배달목록 존재하지 않음", "afterConnectionEstablished");
          }
       }else if(role.equals(senums.user_role.get())){
          logger.info("일반이용자");
+         //상점에서준 방번호 꺼내기
+         //방에 입장/재입장하기 db수정
          deliveryService.enterRoom(1,session.getId(),id);
-         //바꿔줘야함
-      
-         Map<String,Object>map=new HashMap<>();
-         map.put("roomNumber", 1);
-         map.put("userId",id);
-         map.put("sessionId", session.getId());
-         map.put("session", session);
-         roomList.add(map);
+         Map<String,Object>roomDetail=new HashMap<>();
+         List<Map<String,Object>>room=new ArrayList<>();
+         boolean findFlag=false;
+         //배달번호로 된 방이 있나검사
+         try {
+            room=roomList.get(1);
+            for(Map<String,Object>rd:room){
+               if(rd.get("userId").equals(id)){
+                  //방이 있다면 소켓정보 수정
+                  logger.info("소켓 세션 변경");
+                  rd.put("sessionId", session.getId());
+                  rd.put("session", session);
+                  findFlag=true;
+                  break;
+               }
+            }
+         } catch (NullPointerException e) {
+            //배달번호 관계없이 방이 하나도 없을경우만듬
+            logger.info("첫룸생성");
+            roomDetail.put("roomNumber", 1);
+            roomDetail.put("userId",id);
+            roomDetail.put("sessionId", session.getId());
+            roomDetail.put("session", session);
+            room=new ArrayList<>();
+            room.add(roomDetail);
+            roomList.put(1, room);
+            findFlag=true;
+         }
+         //방이 없다면 만듬
+         if(!findFlag){
+            roomDetail.put("roomNumber", 1);
+            roomDetail.put("userId",id);
+            roomDetail.put("sessionId", session.getId());
+            roomDetail.put("session", session);
+            room.add(roomDetail);
+            roomList.put(1, room);
+         }
+
       }      
    }
 }

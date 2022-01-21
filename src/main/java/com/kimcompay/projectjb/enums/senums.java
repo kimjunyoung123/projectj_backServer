@@ -42,7 +42,9 @@ public enum senums {
     imgSessionName("imgs"),
     phoneNull("휴대폰값을 입력해 주세요"),
     emailNull("이메일값을 입력해 주세요"),
-    defaultProvider("no");
+    defaultProvider("no"),
+    doneFlag("1"),
+    notFlag("0");
 
     private String s;
     senums(String s){
