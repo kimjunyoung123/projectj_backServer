@@ -15,11 +15,11 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 public class webSocketConfig implements WebSocketConfigurer {
     
     @Autowired
-    private  textHandler chatHandler;
+    private  deliverPostionHandler deliverPostionHandler;
 
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-        registry.addHandler(chatHandler, "/auth/ws/chat").setAllowedOrigins("*");
+        registry.addHandler(deliverPostionHandler, "/auth/ws/deliver").setAllowedOrigins("*");
     }
 
 }

@@ -32,8 +32,8 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 
 @Service
-public class textHandler extends TextWebSocketHandler {
-    private Logger logger=LoggerFactory.getLogger(textHandler.class);
+public class deliverPostionHandler extends TextWebSocketHandler {
+    private Logger logger=LoggerFactory.getLogger(deliverPostionHandler.class);
     Map<String, WebSocketSession> socketSessions = new HashMap<>(); 
     List<Map<String, Object>> roomList = new ArrayList<>(); //웹소켓 세션을 담아둘 리스트 ---roomListSessions
    @Autowired
