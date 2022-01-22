@@ -20,9 +20,9 @@ public class corsFilter {
         UrlBasedCorsConfigurationSource source=new UrlBasedCorsConfigurationSource();
         CorsConfiguration configuration=new CorsConfiguration();
         configuration.setAllowCredentials(true);
-        configuration.addAllowedOrigin(front_domain);
-        configuration.addAllowedOrigin(foword_front);
-        //configuration.addAllowedOriginPattern("*");
+        //configuration.addAllowedOrigin(front_domain);
+        //configuration.addAllowedOrigin(foword_front);
+        configuration.addAllowedOriginPattern("*");
         configuration.addAllowedHeader("*");
         configuration.addAllowedMethod("*");
         /*configuration.addExposedHeader("Authorization");
