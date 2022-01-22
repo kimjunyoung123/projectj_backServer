@@ -106,6 +106,8 @@ public class utillService {
             .path("/")
             .build(); 
             response.addHeader("Set-Cookie", cookie.toString()+";HttpOnly");  
+            //Cookie c=new Cookie(key.getKey(), key.getValue().toString());
+            //response.addCookie(c); 테스트용
         }
     }
     public static String getCookieValue(HttpServletRequest request,String cookieName) {

@@ -43,12 +43,13 @@ public class deliverPostionHandler extends TextWebSocketHandler {
       whoAreYou.put("id", session.getId());
       whoAreYou.put("message", message);
       try {
+         int roomId=2;//만든방 번호 꺼내는 로직 추가해야함
          //보내기만 하면됨 n번방 세션 들 다꺼내기
-         for(Map<String,Object>room:roomList.get(1)){
-            if(Integer.parseInt(room.get("roomNumber").toString())==1){
+         for(Map<String,Object>room:roomList.get(roomId)){
+         
                WebSocketSession wss = (WebSocketSession) room.get("session");
                wss.sendMessage(new TextMessage(whoAreYou.toJSONString()));
-            }
+            
          }
       } catch (Exception e) {
          //TODO: handle exception
