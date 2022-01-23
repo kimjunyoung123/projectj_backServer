@@ -68,7 +68,9 @@ public class deliverPostionHandler extends TextWebSocketHandler {
    @Override //연결이끊기면 자동으로 작동하는함수
    public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
       logger.info("afterConnectionClosed");
-      roomList.get(1).clear();
+      //회사가 배달완료를 누르면 =배열전체삭제
+      roomList.get(1).clear();//예제코드
+      //유저가 퇴장하면 현재 가지고있던 배열에서 자기 제거 내일 구현해보자
    }
    private void checkUser(principalDetails principalDetails,WebSocketSession session) {
       logger.info("checkUser");
