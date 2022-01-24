@@ -39,20 +39,23 @@ public class deliverPostionHandler extends TextWebSocketHandler {
       logger.info("handleTextMessage");
       logger.info(message.toString());
       logger.info(session.toString());
-      JSONObject whoAreYou=new JSONObject();
-      whoAreYou.put("id", session.getId());
-      whoAreYou.put("message", message);
+      JSONObject xAndY=utillService.stringToJson(message.getPayload());
+      System.out.println(xAndY);
       int roomId=2;//만든방 번호 꺼내는 로직 추가해야함
-      for(Map<String,Object>room:roomList.get(roomId)){
-         try {
-            //보내기만 하면됨 n번방 세션 들 다꺼내기
-            WebSocketSession wss = (WebSocketSession) room.get("session");
-            wss.sendMessage(new TextMessage(whoAreYou.toJSONString()));
-         } catch (Exception e) {
-            //TODO: handle exception
-            
+      try {
+         for(Map<String,Object>room:roomList.get(roomId)){
+            try {
+               //보내기만 하면됨 n번방 세션 들 다꺼내기
+               WebSocketSession wss = (WebSocketSession) room.get("session");
+               wss.sendMessage(new TextMessage(xAndY.toJSONString()));
+            } catch (Exception e) {
+                              
+            }
          }
+      } catch (NullPointerException e) {
+         logger.info("만들어진 방이 없습니다");
       }
+      
    }
    @Override//연결이되면 자동으로 작동하는함수
    public void afterConnectionEstablished(WebSocketSession session) throws Exception {
