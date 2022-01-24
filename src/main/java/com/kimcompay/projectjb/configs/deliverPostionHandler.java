@@ -42,20 +42,18 @@ public class deliverPostionHandler extends TextWebSocketHandler {
       JSONObject whoAreYou=new JSONObject();
       whoAreYou.put("id", session.getId());
       whoAreYou.put("message", message);
-      try {
-         int roomId=2;//만든방 번호 꺼내는 로직 추가해야함
-         //보내기만 하면됨 n번방 세션 들 다꺼내기
-         for(Map<String,Object>room:roomList.get(roomId)){
-         
-               WebSocketSession wss = (WebSocketSession) room.get("session");
-               wss.sendMessage(new TextMessage(whoAreYou.toJSONString()));
+      int roomId=2;//만든방 번호 꺼내는 로직 추가해야함
+      for(Map<String,Object>room:roomList.get(roomId)){
+         try {
+            //보내기만 하면됨 n번방 세션 들 다꺼내기
+            WebSocketSession wss = (WebSocketSession) room.get("session");
+            wss.sendMessage(new TextMessage(whoAreYou.toJSONString()));
+         } catch (Exception e) {
+            //TODO: handle exception
             
          }
-      } catch (Exception e) {
-         //TODO: handle exception
-         
       }
-    }
+   }
    @Override//연결이되면 자동으로 작동하는함수
    public void afterConnectionEstablished(WebSocketSession session) throws Exception {
       logger.info("afterConnectionEstablished");
@@ -69,7 +67,7 @@ public class deliverPostionHandler extends TextWebSocketHandler {
    public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
       logger.info("afterConnectionClosed");
       //회사가 배달완료를 누르면 =배열전체삭제
-      roomList.get(1).clear();//예제코드
+      //roomList.get(1).clear();//예제코드
       //유저가 퇴장하면 현재 가지고있던 배열에서 자기 제거 내일 구현해보자
    }
    private void checkUser(principalDetails principalDetails,WebSocketSession session) {
