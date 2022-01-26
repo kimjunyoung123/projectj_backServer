@@ -18,29 +18,25 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@RequestMapping(value = "/user")
 public class userRestController {
     private Logger logger=LoggerFactory.getLogger(userRestController.class);
     
     @Autowired
     private userService userService;
 
-    @RequestMapping(value = "/auth/user/{action}",method = RequestMethod.GET)
-    public JSONObject userAction(@PathVariable String action,HttpServletRequest request) {
-        logger.info("userAction controller");
-        return userService.getAuthActionHub(action,request);
-    }
-    @RequestMapping(value = "/user/{action}",method = RequestMethod.GET)
+    @RequestMapping(value = "/{action}",method = RequestMethod.GET)
     public JSONObject userActionNotLogin(@PathVariable String action,HttpServletRequest request) {
         logger.info("userActionNotLogin controller");
         return userService.getActionHub(action,request);
     }
-    @RequestMapping(value = "/user/join",method = RequestMethod.POST)
+    @RequestMapping(value = "/join",method = RequestMethod.POST)
     public JSONObject tryJoin(@Valid @RequestBody tryInsertDto tryInsertDto ,HttpSession session) {
         logger.info("tryJoin");
         logger.info(tryInsertDto.toString());
         return userService.insert(tryInsertDto, session);
     }
-    @RequestMapping(value = "/user/change/pwd",method = RequestMethod.PUT)
+    @RequestMapping(value = "/change/pwd",method = RequestMethod.PUT)
     public JSONObject tryChangeUserInfor(@Valid @RequestBody tryUpdatePwdDato tryUpdatePwdDato) {
         logger.info("tryChangeUserInfor controller");
         return userService.changePwdForLost(tryUpdatePwdDato);
