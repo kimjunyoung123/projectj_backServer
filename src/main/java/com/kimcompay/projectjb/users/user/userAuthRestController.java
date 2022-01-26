@@ -20,7 +20,7 @@ public class userAuthRestController {
     @Autowired
     private userService userService;
 
-    @RequestMapping(value = "/{action}",method = RequestMethod.GET)
+    @RequestMapping(value = "/{action}",method = RequestMethod.GET)//매 페이지 이동 마다 로그인정보 조회
     public JSONObject userAction(@PathVariable String action,HttpServletRequest request) {
         logger.info("userAction controller");
         return userService.getAuthActionHub(action,request);

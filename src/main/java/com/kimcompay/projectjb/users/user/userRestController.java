@@ -25,18 +25,18 @@ public class userRestController {
     @Autowired
     private userService userService;
 
-    @RequestMapping(value = "/{action}",method = RequestMethod.GET)
+    @RequestMapping(value = "/{action}",method = RequestMethod.GET)//user/get요청오는거 다받음
     public JSONObject userActionNotLogin(@PathVariable String action,HttpServletRequest request) {
         logger.info("userActionNotLogin controller");
         return userService.getActionHub(action,request);
     }
-    @RequestMapping(value = "/join",method = RequestMethod.POST)
+    @RequestMapping(value = "/join",method = RequestMethod.POST)//회원가입 
     public JSONObject tryJoin(@Valid @RequestBody tryInsertDto tryInsertDto ,HttpSession session) {
         logger.info("tryJoin");
         logger.info(tryInsertDto.toString());
         return userService.insert(tryInsertDto, session);
     }
-    @RequestMapping(value = "/change/pwd",method = RequestMethod.PUT)
+    @RequestMapping(value = "/change/pwd",method = RequestMethod.PUT)//비밀번호 찾기 후 변경
     public JSONObject tryChangeUserInfor(@Valid @RequestBody tryUpdatePwdDato tryUpdatePwdDato) {
         logger.info("tryChangeUserInfor controller");
         return userService.changePwdForLost(tryUpdatePwdDato);

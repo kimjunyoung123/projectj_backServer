@@ -37,12 +37,12 @@ public class compayAuthRestController {
         logger.info("storeInsert controller");
         return storeService.insert(tryInsertStoreDto);
     }
-    @RequestMapping(value = "/gets/{page}/{keyword}",method = RequestMethod.GET)
+    @RequestMapping(value = "/gets/{page}/{keyword}",method = RequestMethod.GET)//보유매장조회
     public JSONObject getStores(@PathVariable String page,@PathVariable String keyword) {
         logger.info("getStores controller");
         return storeService.getStoresByEmail(page,keyword);
     }
-    @RequestMapping(value = "/get/{id}",method = RequestMethod.GET)
+    @RequestMapping(value = "/get/{id}",method = RequestMethod.GET)//매장정보상세조회
     public JSONObject getStore(@PathVariable int id) {
         logger.info("getStore controller");
         return storeService.getStore(id);
