@@ -16,6 +16,7 @@ import com.kimcompay.projectjb.users.principalDetails;
 import com.kimcompay.projectjb.users.company.model.storeDao;
 import com.kimcompay.projectjb.users.company.model.storeVo;
 import com.kimcompay.projectjb.users.company.model.tryInsertStoreDto;
+import com.kimcompay.projectjb.users.company.model.tryUpdateStoreDto;
 
 import org.json.simple.JSONObject;
 import org.slf4j.Logger;
@@ -43,10 +44,114 @@ public class storeService {
     @Autowired
     private RedisTemplate<String,String>redisTemplate;
     
-    public JSONObject tryUpdate(tryInsertStoreDto  tryInsertStoreDto) {
+    @Transactional(rollbackFor =  Exception.class)
+    public JSONObject tryUpdate(tryUpdateStoreDto  tryUpdateStoreDto) {
         logger.info("tryUpdate");
-        
-        return null;
+        //수정요청 가게 정보 가져오기
+        storeVo storeVo=storeDao.findById(tryUpdateStoreDto.getId()).orElseThrow(()->utillService.makeRuntimeEX("존재하지 않는 상품입니다", "tryUpdate"));
+        //주인이 맞는지 검사
+        if(utillService.getLoginId()!=storeVo.getCid()){
+            throw utillService.makeRuntimeEX("매장 주인이 아닙니다", "tryUpdate");
+        }
+        //시간이 변경되었나 검사
+        String openTime=tryUpdateStoreDto.getOpenTime();
+        String closeTime=tryUpdateStoreDto.getCloseTime();
+        if(!openTime.equals(storeVo.getOpenTime())||!closeTime.equals(storeVo.getCloseTime())){
+            logger.info("시간병경 요청");
+            checkOpenAndCloseTime(openTime, closeTime);
+            updateTime(storeVo, openTime, closeTime);
+        }
+        //
+        int radius=tryUpdateStoreDto.getDeliverRadius();
+        if(storeVo.getDeliverRadius()!=radius){
+            logger.info("배달반경범위가 변경되었습니다");
+            updateDeliverRadius(storeVo, radius);
+        }
+        //
+        int minPrice=tryUpdateStoreDto.getMinPrice();
+        if(storeVo.getMinPrice()!=minPrice){
+            logger.info("배달 최소금액 변경");
+            updateMinPrice(storeVo, minPrice);
+        }
+        //
+        String text=tryUpdateStoreDto.getText();
+        if(text!=storeVo.getText()){
+            logger.info("가게설명이 변경되었습니다");
+            updateStoreText(storeVo, text);
+        }
+        //
+        String thumbNail=tryUpdateStoreDto.getThumbNail();
+        if(!thumbNail.equals(storeVo.getSimg())){
+            logger.info("썸네일이 변경되었습니다");
+            updateThumbNail(storeVo, thumbNail);
+        }
+        //
+        String postCode=tryUpdateStoreDto.getPostcode();
+        String address=tryUpdateStoreDto.getAddress();
+        String detailAddress=tryUpdateStoreDto.getDetailAddress();
+        if(!postCode.equals(storeVo.getSpostcode())||!address.equals(storeVo.getSaddress())||!detailAddress.equals(storeVo.getSaddress())){
+            logger.info("주소가 변경되었습니다");
+            updateAddress(storeVo, address, postCode, detailAddress);
+        }
+        //
+        String phone=tryUpdateStoreDto.getPhone();
+        String tel=tryUpdateStoreDto.getTel();
+        if(!tel.equals(storeVo.getStel())){
+            logger.info("tel 변경되었습니다");
+            updateTel(storeVo, tel);
+        }
+        if(!phone.equals(storeVo.getSphone())){
+            logger.info("휴대폰번호가 변경되었습니다");
+            //인증검증로직필요함
+            updatePhone(storeVo, phone);
+        }
+        String companyNum=tryUpdateStoreDto.getNum();
+        if(!companyNum.equals(storeVo.getSnum())){
+            logger.info("사업자 번호가 변경되었습니다");
+            //사업자번호 검증로직필요
+            updateCompanyNum(storeVo, companyNum);
+        }
+        return utillService.getJson(false, "변경이 완료되었습니다");
+    }
+    private void updateCompanyNum(storeVo storeVo,String companyNum) {
+        logger.info("updateCompanyNum");
+        storeVo.setSnum(companyNum);
+    }
+    private void updatePhone(storeVo storeVo,String phone) {
+        logger.info("updatePhone");
+        storeVo.setSphone(phone);
+    }
+    private void updateTel(storeVo storeVo,String tel) {
+        logger.info("updateTel");
+        storeVo.setStel(tel);
+    }
+    private void updateAddress(storeVo storeVo,String address,String postCode,String detailAddress) {
+        logger.info("updateAddress");
+        storeVo.setSpostcode(postCode);
+        storeVo.setSaddress(address);
+        storeVo.setSdetail_address(detailAddress);
+    }
+    private void updateThumbNail(storeVo storeVo,String thumbNail) {
+        logger.info("updateThumbNail");
+        storeVo.setSimg(thumbNail);
+    }
+    private void updateStoreText(storeVo storeVo,String text) {
+        logger.info("updateStoreText");
+        storeVo.setText(text);
+    }
+    private void updateMinPrice(storeVo storeVo,int minPrice) {
+        logger.info("updateMinPrice");
+        storeVo.setMinPrice(minPrice);
+    }
+    private void updateDeliverRadius(storeVo storeVo,int radius) {
+        logger.info("updateDeliverRadius");
+        storeVo.setDeliverRadius(radius);
+    }
+    private void updateTime(storeVo storeVo,String openTime,String closeTime) {
+        logger.info("updateTime");
+        storeVo.setOpenTime(openTime);
+        storeVo.setCloseTime(closeTime);
+        logger.info("시간 변경완료");    
     }
     public String findDeliver(String loginId) {
         logger.info("findDeliver");
@@ -157,9 +262,9 @@ public class storeService {
         //사업자등록번호검사
         checkCompayNum(tryInsertStoreDto.getNum());
         //매장오픈/마감시간검사
-        checkOpenAndCloseTime(tryInsertStoreDto);
+        checkOpenAndCloseTime(tryInsertStoreDto.getOpenTime(),tryInsertStoreDto.getCloseTime());
         //같은매장이있는지 검사
-        checkSameStore(tryInsertStoreDto);
+        checkSameStore(tryInsertStoreDto.getStoreName(),tryInsertStoreDto.getNum(),tryInsertStoreDto.getAddress());
         //일반/휴대전화검사
         checkPhoneAndTel(tryInsertStoreDto.getPhone(),tryInsertStoreDto.getTel());
         //주소검사
@@ -173,9 +278,9 @@ public class storeService {
         }
         logger.info("휴대/일반전화 유효성검사 통과");
     }
-    private void checkSameStore(tryInsertStoreDto tryInsertStoreDto) {
+    private void checkSameStore(String storeName,String companyNum,String address) {
         logger.info("checkSameStore");
-        if(storeDao.countBySnameAndAddress(tryInsertStoreDto.getStoreName(),tryInsertStoreDto.getNum(), tryInsertStoreDto.getAddress())!=0){
+        if(storeDao.countBySnameAndAddress(storeName,companyNum, address)!=0){
             logger.info("같은위치에서 같은사업자번호로 이미 등록된 매장발견");
             throw utillService.makeRuntimeEX("같은위치에서 같은사업자번호로 이미 등록된 매장발견", "checkSameStore");
         }
@@ -198,11 +303,8 @@ public class storeService {
         //사업자 번호 검사는 일단 회사로 회원가입 후에 하는 시스템이므로 여기서 안해줘도 된다
         logger.info("사업자 번호 유효성 검사 통과");
     }
-    private void checkOpenAndCloseTime(tryInsertStoreDto tryInsertStoreDto) {
+    private void checkOpenAndCloseTime(String openTime,String closeTime) {
         logger.info("checkOpenAndCloseTime");
-        //요청시간 꺼내기
-        String openTime=tryInsertStoreDto.getOpenTime();
-        String closeTime=tryInsertStoreDto.getCloseTime();
         logger.info("시작시간: "+openTime);
         logger.info("종료시간: "+closeTime);
         //시간분리
