@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@RequestMapping(value = "/auth/store")
 public class compayRestController {
     private Logger logger=LoggerFactory.getLogger(compayRestController.class);
 
@@ -31,19 +32,19 @@ public class compayRestController {
     
 
     //매장등록
-    @RequestMapping(value = "/auth/store/join",method = RequestMethod.POST)
+    @RequestMapping(value = "/join",method = RequestMethod.POST)
     public JSONObject storeInsert(@Valid @RequestBody tryInsertStoreDto tryInsertStoreDto) {
-        logger.info("storeInsert");
+        logger.info("storeInsert controller");
         return storeService.insert(tryInsertStoreDto);
     }
-    @RequestMapping(value = "/auth/store/gets/{page}/{keyword}",method = RequestMethod.GET)
+    @RequestMapping(value = "/gets/{page}/{keyword}",method = RequestMethod.GET)
     public JSONObject getStores(@PathVariable String page,@PathVariable String keyword) {
-        logger.info("getStores");
+        logger.info("getStores controller");
         return storeService.getStoresByEmail(page,keyword);
     }
-    @RequestMapping(value = "/auth/store/get/{id}",method = RequestMethod.GET)
+    @RequestMapping(value = "/get/{id}",method = RequestMethod.GET)
     public JSONObject getStore(@PathVariable int id) {
-        logger.info("getStore");
+        logger.info("getStore controller");
         return storeService.getStore(id);
     }
     @RequestMapping(value = "/testimg",method = RequestMethod.POST)
