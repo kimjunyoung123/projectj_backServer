@@ -20,7 +20,7 @@ public class userAuthRestController {
     @Autowired
     private userService userService;
 
-    @RequestMapping(value = "/auth/user/{action}",method = RequestMethod.GET)
+    @RequestMapping(value = "/{action}",method = RequestMethod.GET)
     public JSONObject userAction(@PathVariable String action,HttpServletRequest request) {
         logger.info("userAction controller");
         return userService.getAuthActionHub(action,request);
