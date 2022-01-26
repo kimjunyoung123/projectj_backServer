@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
+import com.google.gson.JsonObject;
 import com.kimcompay.projectjb.utillService;
 import com.kimcompay.projectjb.apis.google.ocrService;
 import com.kimcompay.projectjb.users.company.model.tryInsertStoreDto;
@@ -46,6 +47,11 @@ public class compayAuthRestController {
     public JSONObject getStore(@PathVariable int id) {
         logger.info("getStore controller");
         return storeService.getStore(id);
+    }
+    @RequestMapping(value = "/infor/change",method = RequestMethod.PUT)//매장 정보수정
+    public JSONObject storeUpdate(@Valid @RequestBody tryInsertStoreDto tryInsertStoreDto) {
+        logger.info("storeUpdate controller");
+        return storeService.tryUpdate(tryInsertStoreDto);
     }
     @RequestMapping(value = "/testimg",method = RequestMethod.POST)
     public JSONObject testimg() {

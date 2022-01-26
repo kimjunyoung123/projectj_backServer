@@ -43,6 +43,11 @@ public class storeService {
     @Autowired
     private RedisTemplate<String,String>redisTemplate;
     
+    public JSONObject tryUpdate(tryInsertStoreDto  tryInsertStoreDto) {
+        logger.info("tryUpdate");
+        
+        return null;
+    }
     public String findDeliver(String loginId) {
         logger.info("findDeliver");
         logger.info("배달목록 찾는 상점:  "+loginId);
@@ -126,8 +131,7 @@ public class storeService {
                     .sname(tryInsertStoreDto.getStoreName()).snum(tryInsertStoreDto.getNum()).sphone(tryInsertStoreDto.getPhone()).spostcode(tryInsertStoreDto.getPostcode())
                     .minPrice(Integer.parseInt(tryInsertStoreDto.getMinPrice())).deliverRadius(Integer.parseInt(tryInsertStoreDto.getDeliverRadius()))
                     .cid(utillService.getLoginId()).semail(utillService.getLoginInfor().get("email").toString()).ssleep(0).stel(tryInsertStoreDto.getTel()).text(tryInsertStoreDto.getText()).build();
-                    storeDao.save(vo);
-                    
+                    storeDao.save(vo);            
     }
     @Async
     public void doneInsert(tryInsertStoreDto tryInsertStoreDto) {
