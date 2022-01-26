@@ -24,8 +24,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping(value = "/auth/store")
-public class compayRestController {
-    private Logger logger=LoggerFactory.getLogger(compayRestController.class);
+public class compayAuthRestController {
+    private Logger logger=LoggerFactory.getLogger(compayAuthRestController.class);
 
     @Autowired
     private storeService storeService;
