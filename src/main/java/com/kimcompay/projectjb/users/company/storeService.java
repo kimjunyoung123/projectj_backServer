@@ -103,12 +103,14 @@ public class storeService {
         if(!phone.equals(storeVo.getSphone())){
             logger.info("휴대폰번호가 변경되었습니다");
             //인증검증로직필요함
+            checkAuth(phone);
             updatePhone(storeVo, phone);
         }
         String companyNum=tryUpdateStoreDto.getNum();
         if(!companyNum.equals(storeVo.getSnum())){
             logger.info("사업자 번호가 변경되었습니다");
             //사업자번호 검증로직필요
+            checkCompayNum(companyNum);
             updateCompanyNum(storeVo, companyNum);
         }
         return utillService.getJson(false, "변경이 완료되었습니다");
