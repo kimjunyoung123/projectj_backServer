@@ -37,7 +37,7 @@ public class deliverPostionHandler extends TextWebSocketHandler {
 
 
     @Override//메세지가오는함수
-    protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
+    public void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
       logger.info("handleTextMessage");
       logger.info(message.toString());
       logger.info(session.toString());
