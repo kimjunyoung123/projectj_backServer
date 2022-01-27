@@ -73,23 +73,6 @@ public class deliverPostionHandler extends TextWebSocketHandler {
    @Override//연결이되면 자동으로 작동하는함수
    public void afterConnectionEstablished(WebSocketSession session) throws Exception {
       logger.info("afterConnectionEstablished");
-      checkUser(session);
-   }
-   private Map<Object,Object> getLoginInfor(WebSocketSession session) {
-      logger.info("getLoginInfor");
-      AbstractAuthenticationToken principal=(AbstractAuthenticationToken) session.getPrincipal();
-      principalDetails  principalDetails=(com.kimcompay.projectjb.users.principalDetails) principal.getPrincipal();
-      return principalDetails.getPrinci();
-   }
-   @Override //연결이끊기면 자동으로 작동하는함수
-   public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
-      logger.info("afterConnectionClosed");
-      //회사가 배달완료를 누르면 =배열전체삭제
-      //roomList.get(1).clear();//예제코드
-      //유저가 퇴장하면 현재 가지고있던 배열에서 자기 제거 내일 구현해보자
-   }
-   private void checkUser(WebSocketSession session) {
-      logger.info("checkUser");
       //로그인 상세정보 꺼내기
       Map<Object,Object>infor=getLoginInfor(session);
       String role=infor.get("role").toString();
@@ -107,7 +90,20 @@ public class deliverPostionHandler extends TextWebSocketHandler {
       }else if(role.equals(senums.user_role.get())){
          logger.info("일반이용자");
          actionAtUser(session, id);
-      }      
+      }   
+   }
+   private Map<Object,Object> getLoginInfor(WebSocketSession session) {
+      logger.info("getLoginInfor");
+      AbstractAuthenticationToken principal=(AbstractAuthenticationToken) session.getPrincipal();
+      principalDetails  principalDetails=(com.kimcompay.projectjb.users.principalDetails) principal.getPrincipal();
+      return principalDetails.getPrinci();
+   }
+   @Override //연결이끊기면 자동으로 작동하는함수
+   public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
+      logger.info("afterConnectionClosed");
+      //회사가 배달완료를 누르면 =배열전체삭제
+      //roomList.get(1).clear();//예제코드
+      //유저가 퇴장하면 현재 가지고있던 배열에서 자기 제거 내일 구현해보자
    }
    public void actionAtUser(WebSocketSession session,int id) {
       logger.info("actionAtUser");

@@ -31,7 +31,7 @@ public class storeVo {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int sid;
  
-    @Column(name = "scid",nullable = false)
+    @Column(name = "cid",nullable = false)
     private int cid;
 
     @Column(name = "saddress",nullable = false ,length = 50)
