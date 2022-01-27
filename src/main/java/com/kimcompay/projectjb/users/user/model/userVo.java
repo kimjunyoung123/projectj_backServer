@@ -31,39 +31,39 @@ public class userVo {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int uid;
 
-    @Column(name = "uemail",nullable = false,unique = true,length = 50)
+    @Column(name = "user_email",nullable = false,unique = true,length = 50)
     private String email;
 
-    @Column(name = "upwd",nullable = false ,length = 200)
+    @Column(name = "user_pwd",nullable = false ,length = 200)
     private String upwd;
 
-    @Column(name = "uaddress",nullable = false ,length = 50)
+    @Column(name = "user_address",nullable = false ,length = 50)
     private String uaddress;
 
-    @Column(name = "udetail_address",nullable = false ,length = 50)
+    @Column(name = "user_detail_address",nullable = false ,length = 50)
     private String udetail_address;
 
-    @Column(name = "upostcode",nullable = false ,length =20)
+    @Column(name = "user_postcode",nullable = false ,length =20)
     private String upostcode;
 
-    @Column(name = "uphone",nullable = false ,length = 11)
+    @Column(name = "user_phone",nullable = false ,length = 11)
     private String uphone;
 
-    @Column(name = "ulogin_date")
+    @Column(name = "user_login_date")
     @CreationTimestamp
     private Timestamp ulogin_date;
 
-    @Column(name = "ucreated")
+    @Column(name = "user_created")
     @CreationTimestamp
     private Timestamp ucreated;
 
-    @Column(name = "usleep",nullable = false ,columnDefinition = "TINYINT")
+    @Column(name = "user_sleep",nullable = false ,columnDefinition = "TINYINT")
     private int usleep;
 
-    @Column(name = "urole",nullable = false ,length = 20)
+    @Column(name = "user_role",nullable = false ,length = 20)
     private String urole;
 
-    @Column(name = "ubirth",nullable = false ,length = 30)
+    @Column(name = "user_birth",nullable = false ,length = 30)
     private String ubirth;
 
     @Column(name = "provider",nullable = false,length = 30)

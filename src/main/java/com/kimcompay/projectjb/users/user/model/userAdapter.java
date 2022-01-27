@@ -44,7 +44,7 @@ public class userAdapter {
             map.put("pwd", userVo.getUpwd());
             map.put("role", userVo.getUrole());
             map.put("sleep", userVo.getUsleep());
-            map.put("kind", senums.persnal.get());
+            //map.put("kind", senums.persnal.get());일반유저는 kind없음
             map.put("provier", userVo.getProvider());
         }else{
             logger.info("com to map");
