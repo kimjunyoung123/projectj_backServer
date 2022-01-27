@@ -8,6 +8,7 @@ import java.util.Map;
 
 import com.kimcompay.projectjb.utillService;
 import com.kimcompay.projectjb.delivery.deliveryService;
+import com.kimcompay.projectjb.delivery.model.deliverRoomDetailVo;
 import com.kimcompay.projectjb.enums.senums;
 import com.kimcompay.projectjb.users.principalDetails;
 import com.kimcompay.projectjb.users.company.storeService;
@@ -98,52 +99,53 @@ public class deliverPostionHandler extends TextWebSocketHandler {
          }
       }else if(role.equals(senums.user_role.get())){
          logger.info("일반이용자");
-         int roomId=0;//상점에서준 방번호 꺼내기 로직 추가해야함
-         //테스트를 위한 로직
-         if(id==11){
-            roomId=1;
-         }else{
-            roomId=2;
-         }
-         logger.info("룸번호: "+roomId);
-         //방에 입장/재입장하기 db수정
-         deliveryService.enterRoom(roomId,session.getId(),id);
-         Map<String,Object>roomDetail=new HashMap<>();
-         List<Map<String,Object>>room=new ArrayList<>();
-         boolean findFlag=false;
-         //배달번호로 된 방이 있나검사
-         try {
-            room=roomList.get(roomId);
-            for(Map<String,Object>rd:room){
-               if(rd.get("userId").equals(id)){
-                  //방이 있고 기존유저 소켓정보 수정
-                  logger.info("소켓 세션 변경");
-                  rd.put("sessionId", session.getId());
-                  rd.put("session", session);
-                  findFlag=true;
-                  break;
-               }
-            }
-            //방이 이미 있고 새유저가 왔을때
-            if(!findFlag){
-               logger.info("roomId번방에 새유저 추가");
-               roomDetail.put("roomNumber", roomId);
-               roomDetail.put("userId",id);
-               roomDetail.put("sessionId", session.getId());
-               roomDetail.put("session", session);
-               room.add(roomDetail);
-            }
-         } catch (NullPointerException e) {
-            //배달번호 관계없이 방이 하나도 없을경우만듬
-            logger.info("첫룸생성");
-            roomDetail.put("roomNumber", roomId);
-            roomDetail.put("userId",id);
-            roomDetail.put("sessionId", session.getId());
-            roomDetail.put("session", session);
-            room=new ArrayList<>();
-            room.add(roomDetail);
-            roomList.put(roomId, room);
-         }
+         actionAtUser(session, id);
       }      
+   }
+   public void actionAtUser(WebSocketSession session,int id) {
+      logger.info("actionAtUser");
+      //int roomId=0;//상점에서준 방번호 꺼내기 로직 추가해야함
+         List<Integer>roomIds=deliveryService.selectRoomIdByUserIdAndFlag(id,Integer.parseInt(senums.notFlag.get()));
+         if(utillService.checkEmthy(roomIds)){
+            throw utillService.makeRuntimeEX("배달이 존재하지 않습니다", "checkUser");
+         }
+         for(int roomId:roomIds){
+            List<Map<String,Object>>room=new ArrayList<>();
+            boolean findFlag=false;
+            //배달번호로 된 방이 있나검사
+            try {
+               room=roomList.get(roomId);
+               for(Map<String,Object>rd:room){
+                  if(rd.get("userId").equals(id)){
+                     //방이 있고 기존유저 소켓정보 수정
+                     logger.info("소켓 세션 변경");
+                     rd.put("sessionId", session.getId());
+                     rd.put("session", session);
+                     findFlag=true;
+                     break;
+                  }
+               }
+               //방이 이미 있고 새유저가 왔을때
+               if(!findFlag){
+                  logger.info("roomId번방에 새유저 추가");
+                  room.add(makeRoomDetail(session, roomId, id));
+               }
+            } catch (NullPointerException e) {
+               //배달번호 관계없이 방이 하나도 없을경우만듬
+               logger.info("첫룸생성");
+               room=new ArrayList<>();
+               room.add(makeRoomDetail(session, roomId, id));
+               roomList.put(roomId, room);
+            }
+         } 
+   }
+   public Map<String,Object> makeRoomDetail(WebSocketSession session,int roomId,int userId) {
+      logger.info("makeRoomDetail");
+      Map<String,Object>roomDetail=new HashMap<>();
+      roomDetail.put("roomNumber", roomId);
+      roomDetail.put("userId",userId);
+      roomDetail.put("sessionId", session.getId());
+      roomDetail.put("session", session);
+      return roomDetail;
    }
 }

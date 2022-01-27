@@ -1,5 +1,6 @@
 package com.kimcompay.projectjb.delivery;
 
+import java.util.List;
 import java.util.Optional;
 
 import com.kimcompay.projectjb.delivery.model.deliverRoomDetailDao;
@@ -23,6 +24,10 @@ public class deliveryService {
     @Autowired
     private deliverRoomDetailDao deliverRoomDetailDao;
 
+    public List<Integer> selectRoomIdByUserIdAndFlag(int userId,int flag) {
+        logger.info("selectRoomIdByUserIdAndFlag");
+        return deliverRoomDetailDao.findAllByRoomIdAndDoneFlag(userId, flag);
+    }
     public void makeDeliverRoom(int compayId) {
         logger.info("makeDeliverRoom");
         deliveryRoomVo vo=new deliveryRoomVo();
