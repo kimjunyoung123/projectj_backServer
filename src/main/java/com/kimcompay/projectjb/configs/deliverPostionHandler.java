@@ -81,6 +81,7 @@ public class deliverPostionHandler extends TextWebSocketHandler {
       //권한 체크
       String role=infor.get("role").toString();
       int id=Integer.parseInt(infor.get("id").toString());
+      logger.info("deliverPostionHandler 웹소켓요청 사용자아이디: "+id);
       //권한에 따라 방생성 or 입장 
       if(role.equals(senums.company_role.get())){
          logger.info("회사이용자");
@@ -110,6 +111,7 @@ public class deliverPostionHandler extends TextWebSocketHandler {
             throw utillService.makeRuntimeEX("배달이 존재하지 않습니다", "checkUser");
          }
          for(int roomId:roomIds){
+            logger.info("조회배달방번호: "+roomId);
             List<Map<String,Object>>room=new ArrayList<>();
             boolean findFlag=false;
             //배달번호로 된 방이 있나검사
