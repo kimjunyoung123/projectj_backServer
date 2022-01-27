@@ -31,47 +31,47 @@ public class comVo {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int cid;
 
-    @Column(name = "cemail",nullable = false,unique = true,length = 50)
+    @Column(name = "company_email",nullable = false,unique = true,length = 50)
     private String cemail;
 
-    @Column(name = "cpwd",nullable = false ,length = 200)
+    @Column(name = "company_pwd",nullable = false ,length = 200)
     private String cpwd;
 
-    @Column(name = "caddress",nullable = false ,length = 50)
+    @Column(name = "company_address",nullable = false ,length = 50)
     private String caddress;
 
-    @Column(name = "cdetail_address",nullable = false ,length = 50)
+    @Column(name = "company_detail_address",nullable = false ,length = 50)
     private String cdetail_address;
 
-    @Column(name = "cpostcode",nullable = false,length = 20 )
+    @Column(name = "company_postcode",nullable = false,length = 20 )
     private String cpostcode;
 
-    @Column(name = "cphone",nullable = false ,unique = true,length = 11)
+    @Column(name = "company_phone",nullable = false ,unique = true,length = 11)
     private String cphone;
 
-    @Column(name = "ctel",nullable = false ,unique = true,length = 11)
+    @Column(name = "company_tel",nullable = false ,unique = true,length = 11)
     private String ctel;
 
-    @Column(name = "crole",nullable = false ,length = 20)
+    @Column(name = "company_role",nullable = false ,length = 20)
     private String crole;
 
-    @Column(name = "store_name",nullable = false ,length = 100)
+    @Column(name = "company_name",nullable = false ,length = 100)
     private String store_name;
 
-    @Column(name = "clogin_date")
+    @Column(name = "company_login_date")
     @CreationTimestamp
     private Timestamp clogin_date;
 
-    @Column(name = "ccreated")
+    @Column(name = "company_created")
     @CreationTimestamp
     private Timestamp ccreated;
 
-    @Column(name = "csleep",nullable = false ,columnDefinition = "TINYINT")
+    @Column(name = "company_sleep",nullable = false ,columnDefinition = "TINYINT")
     private int csleep;
 
-    @Column(name = "cnum",nullable = false,unique = true)
+    @Column(name = "company_num",nullable = false,unique = true)
     private String cnum;
 
-    @Column(name = "ckind",nullable = false,columnDefinition = "TINYINT")
+    @Column(name = "company_kind",nullable = false,columnDefinition = "TINYINT")
     private int ckind;
 }
