@@ -11,6 +11,7 @@ import com.kimcompay.projectjb.utillService;
 import com.kimcompay.projectjb.apis.aws.services.fileService;
 import com.kimcompay.projectjb.apis.aws.services.sqsService;
 import com.kimcompay.projectjb.apis.kakao.kakaoMapService;
+import com.kimcompay.projectjb.enums.intenums;
 import com.kimcompay.projectjb.enums.senums;
 import com.kimcompay.projectjb.users.principalDetails;
 import com.kimcompay.projectjb.users.company.model.storeDao;
@@ -228,9 +229,8 @@ public class storeService {
     }
     public JSONObject getStoresByEmail(String page,String keyword) {
         logger.info("getStoresByEmail");
-        String email=utillService.getLoginInfor().get("email").toString();
         int requestPage=Integer.parseInt(page);
-        List<Map<String,Object>>storeSelectInfor=getStoresInfor(email, keyword, requestPage);
+        List<Map<String,Object>>storeSelectInfor=getStoresInfor(utillService.getLoginId(), keyword, requestPage);
         if(utillService.checkEmthy(storeSelectInfor)){
             if(utillService.checkBlank(keyword)){
                 throw utillService.makeRuntimeEX("가게 목록이 없습니다 등록해주세요", "getStoresByEmail");
@@ -250,13 +250,13 @@ public class storeService {
         reponse.put("totalPage", totalPage);
         return utillService.getJson(true, reponse);
     }
-    private List<Map<String,Object>> getStoresInfor(String email,String keyword,int requestPage) {
+    private List<Map<String,Object>> getStoresInfor(int cid,String keyword,int requestPage) {
         logger.info("getStoresInfor");
         logger.info("검색키워드: "+keyword);
         if(utillService.checkBlank(keyword)){
-            return storeDao.findByStoreNameNokeyword(email,email,utillService.getStart(requestPage, pageSize)-1,pageSize);
+            return storeDao.findByStoreNameNokeyword(cid,cid,utillService.getStart(requestPage, pageSize)-1,pageSize);
         }
-        return storeDao.findByStoreInKeyword(email,keyword,email,keyword,utillService.getStart(requestPage, pageSize)-1,pageSize);
+        return storeDao.findByStoreInKeyword(cid,keyword,cid,keyword,utillService.getStart(requestPage, pageSize)-1,pageSize);
     }
     @Transactional(rollbackFor = Exception.class)
     public JSONObject insert(tryInsertStoreDto tryInsertStoreDto){
@@ -291,7 +291,7 @@ public class storeService {
                     .saddress(tryInsertStoreDto.getAddress()).sdetail_address(tryInsertStoreDto.getDetailAddress()).simg(tryInsertStoreDto.getThumbNail())
                     .sname(tryInsertStoreDto.getStoreName()).snum(tryInsertStoreDto.getNum()).sphone(tryInsertStoreDto.getPhone()).spostcode(tryInsertStoreDto.getPostcode())
                     .minPrice(Integer.parseInt(tryInsertStoreDto.getMinPrice())).deliverRadius(Integer.parseInt(tryInsertStoreDto.getDeliverRadius()))
-                    .cid(utillService.getLoginId()).semail(utillService.getLoginInfor().get("email").toString()).ssleep(0).stel(tryInsertStoreDto.getTel()).text(tryInsertStoreDto.getText()).build();
+                    .cid(utillService.getLoginId()).ssleep(intenums.NOT_FLAG.get()).stel(tryInsertStoreDto.getTel()).text(tryInsertStoreDto.getText()).build();
                     storeDao.save(vo);            
     }
     @Async

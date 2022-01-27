@@ -34,28 +34,28 @@ public class storeVo {
     @Column(name = "cid",nullable = false)
     private int cid;
 
-    @Column(name = "saddress",nullable = false ,length = 50)
+    @Column(name = "store_address",nullable = false ,length = 50)
     private String saddress;
 
-    @Column(name = "sdetail_address",nullable = false ,length = 50)
+    @Column(name = "store_detail_address",nullable = false ,length = 50)
     private String sdetail_address;
 
-    @Column(name = "spostcode",nullable = false,length = 20 )
+    @Column(name = "store_postcode",nullable = false,length = 20 )
     private String spostcode;
 
-    @Column(name = "sphone",nullable = false ,length = 11)
+    @Column(name = "store_phone",nullable = false ,length = 11)
     private String sphone;
 
-    @Column(name = "stel",nullable = false ,length = 11)
+    @Column(name = "store_tel",nullable = false ,length = 11)
     private String stel;
 
-    @Column(name = "sname",nullable = false ,length = 50)
+    @Column(name = "store_name",nullable = false ,length = 50)
     private String sname;
     
-    @Column(name = "snum",nullable = false ,length = 50)
+    @Column(name = "store_num",nullable = false ,length = 50)
     private String snum;
 
-    @Column(name = "simg",nullable = false ,length = 255)
+    @Column(name = "thumb_nail",nullable = false ,length = 255)
     private String simg;
 
 
@@ -65,11 +65,11 @@ public class storeVo {
     @Column(name = "closeTime",nullable = false ,length = 20)
     private String closeTime;
 
-    @Column(name = "screated")
+    @Column(name = "store_created")
     @CreationTimestamp
     private Timestamp screated;
 
-    @Column(name = "ssleep",nullable = false ,columnDefinition = "TINYINT")
+    @Column(name = "store_sleep",nullable = false ,columnDefinition = "TINYINT")
     private int ssleep;
 
     @Column(name = "minPrice",nullable = false )
@@ -78,10 +78,9 @@ public class storeVo {
     @Column(name = "deliverRadius",nullable = false ,columnDefinition = "TINYINT")
     private int deliverRadius;
 
-    @Column(name = "text",nullable = false ,length = 255)
+    @Column(name = "store_text",nullable = false ,length = 255)
     private String text;
 
-    @Column(name = "semail",nullable = false ,length = 50)
-    private String semail;
+
 
 }
