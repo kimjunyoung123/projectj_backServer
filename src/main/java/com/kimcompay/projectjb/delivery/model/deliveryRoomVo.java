@@ -23,12 +23,19 @@ import lombok.ToString;
 @Entity
 public class deliveryRoomVo {
     @Id
-    @Column(name = "dr_id",nullable = false,unique = true)
+    @Column(name = "room_id",nullable = false,unique = true)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int drId;
+    private int roomId;
 
-    @Column(name = "deliver_room_master")
-    private int deliverRoomMaster;
+
+    @Column(name = "company_id")
+    private int companyId;
+
+    @Column(name = "start_flag",columnDefinition = "TINYINT")
+    private int startFlag;
+
+    @Column(name = "deliver_room_flag",columnDefinition = "TINYINT")
+    private int deliverRoomDoneFlag;
 
 
 

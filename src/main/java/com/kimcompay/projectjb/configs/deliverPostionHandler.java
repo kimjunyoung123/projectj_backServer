@@ -9,6 +9,7 @@ import java.util.Map;
 import com.kimcompay.projectjb.utillService;
 import com.kimcompay.projectjb.delivery.deliveryService;
 import com.kimcompay.projectjb.delivery.model.deliverRoomDetailVo;
+import com.kimcompay.projectjb.enums.intenums;
 import com.kimcompay.projectjb.enums.senums;
 import com.kimcompay.projectjb.users.principalDetails;
 import com.kimcompay.projectjb.users.company.storeService;
@@ -42,15 +43,18 @@ public class deliverPostionHandler extends TextWebSocketHandler {
       logger.info(session.toString());
       JSONObject xAndY=utillService.stringToJson(message.getPayload());
       System.out.println(xAndY);
-      int roomId=2;//만든방 번호 꺼내는 로직 추가해야함
+      //배달방번호 조회
+      List<Integer>roomIds=deliveryService.selectRoomIdByCompanyIdAndStartDoneFlag(Integer.parseInt(getLoginInfor(session).get("id").toString()),intenums.DONE_FLAG.get(),intenums.NOT_FLAG.get());
       try {
-         for(Map<String,Object>room:roomList.get(roomId)){
-            try {
-               //보내기만 하면됨 n번방 세션 들 다꺼내기
-               WebSocketSession wss = (WebSocketSession) room.get("session");
-               wss.sendMessage(new TextMessage(xAndY.toJSONString()));
-            } catch (Exception e) {
-                              
+         for(int roomId:roomIds){
+            for(Map<String,Object>room:roomList.get(roomId)){
+               try {
+                  //보내기만 하면됨 n번방 세션 들 다꺼내기
+                  WebSocketSession wss = (WebSocketSession) room.get("session");           
+                  wss.sendMessage(new TextMessage(xAndY.toJSONString()));
+               } catch (Exception e) {
+                                 
+               }
             }
          }
       } catch (NullPointerException e) {
@@ -61,11 +65,13 @@ public class deliverPostionHandler extends TextWebSocketHandler {
    @Override//연결이되면 자동으로 작동하는함수
    public void afterConnectionEstablished(WebSocketSession session) throws Exception {
       logger.info("afterConnectionEstablished");
-      //로그인정보 꺼내기
+      checkUser(session);
+   }
+   private Map<Object,Object> getLoginInfor(WebSocketSession session) {
+      logger.info("getLoginInfor");
       AbstractAuthenticationToken principal=(AbstractAuthenticationToken) session.getPrincipal();
       principalDetails  principalDetails=(com.kimcompay.projectjb.users.principalDetails) principal.getPrincipal();
-      checkUser(principalDetails,session);
-     
+      return principalDetails.getPrinci();
    }
    @Override //연결이끊기면 자동으로 작동하는함수
    public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
@@ -74,10 +80,10 @@ public class deliverPostionHandler extends TextWebSocketHandler {
       //roomList.get(1).clear();//예제코드
       //유저가 퇴장하면 현재 가지고있던 배열에서 자기 제거 내일 구현해보자
    }
-   private void checkUser(principalDetails principalDetails,WebSocketSession session) {
+   private void checkUser(WebSocketSession session) {
       logger.info("checkUser");
       //로그인 상세정보 꺼내기
-      Map<Object,Object>infor=principalDetails.getPrinci();
+      Map<Object,Object>infor=getLoginInfor(session);
       //권한 체크
       String role=infor.get("role").toString();
       int id=Integer.parseInt(infor.get("id").toString());
@@ -88,15 +94,11 @@ public class deliverPostionHandler extends TextWebSocketHandler {
          try {
             //배달 요청이 있는지 검사 로직 추가해야함
             //배달이 있다면 방 생성
-            if(deliveryService.checkAlreadyRoom(id)==0){
-               logger.info("새방 생성");
-               deliveryService.makeDeliverRoom(id);
-               //유저들에게 방번호 만들어졌다고 db로직추가해야함 아마 주문테이블에 추가할듯
-            }
+
             //방생성기록이 있다면 그냥 유지
          } catch (NullPointerException e) {
             //주문 요청이 한건도 없다면 예외발생
-            throw utillService.makeRuntimeEX("상점: "+principalDetails.getPrinci().get("id")+" 배달목록 존재하지 않음", "afterConnectionEstablished");
+            throw utillService.makeRuntimeEX("상점: "+id+" 배달목록 존재하지 않음", "afterConnectionEstablished");
          }
       }else if(role.equals(senums.user_role.get())){
          logger.info("일반이용자");
@@ -106,7 +108,7 @@ public class deliverPostionHandler extends TextWebSocketHandler {
    public void actionAtUser(WebSocketSession session,int id) {
       logger.info("actionAtUser");
       //int roomId=0;//상점에서준 방번호 꺼내기 로직 추가해야함
-         List<Integer>roomIds=deliveryService.selectRoomIdByUserIdAndFlag(id,Integer.parseInt(senums.notFlag.get()));
+         List<Integer>roomIds=deliveryService.selectRoomIdByUserIdAndFlag(id,intenums.NOT_FLAG.get());
          if(utillService.checkEmthy(roomIds)){
             throw utillService.makeRuntimeEX("배달이 존재하지 않습니다", "checkUser");
          }

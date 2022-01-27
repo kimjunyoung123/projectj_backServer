@@ -28,16 +28,16 @@ public class deliveryService {
         logger.info("selectRoomIdByUserIdAndFlag");
         return deliverRoomDetailDao.findAllByRoomIdAndDoneFlag(userId, flag);
     }
-    public void makeDeliverRoom(int compayId) {
+    public List<Integer> selectRoomIdByCompanyIdAndStartDoneFlag(int companyId,int startFlag,int doneFlag) {
+        logger.info("selectRoomIdByCompanyIdAndStartDoneFlag");
+        return deliveryRoomDao.findAllByMasterIdAndFlag(companyId, doneFlag, startFlag);
+    }
+   /* public void makeDeliverRoom(int compayId) {
         logger.info("makeDeliverRoom");
         deliveryRoomVo vo=new deliveryRoomVo();
         vo.setDeliverRoomMaster(compayId);
         deliveryRoomDao.save(vo);
-    }
-    public int checkAlreadyRoom(int companyId) {
-        logger.info("checkAlreadyRoom");
-        return deliveryRoomDao.findCountByRoomMaster(companyId);
-    }
+    }*/
     @Transactional(rollbackFor = Exception.class)
     public void enterRoom(int roomId,String userSocketId,int userId) {
         logger.info("enterRoom");
