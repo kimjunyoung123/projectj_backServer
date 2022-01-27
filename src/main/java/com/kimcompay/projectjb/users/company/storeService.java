@@ -86,9 +86,11 @@ public class storeService {
         }
         //가게설명
         String text=tryUpdateStoreDto.getText();
-        if(text!=storeVo.getText()){
+        if(!text.equals(storeVo.getText())){
             logger.info("가게설명이 변경되었습니다");
             updateFlag=true;
+            System.out.println(text);
+            System.out.println(storeVo.getText());
             updateStoreText(storeVo, text);
         }
         //썸네일
@@ -99,17 +101,12 @@ public class storeService {
             updateThumbNail(storeVo, thumbNail);
         }
         //주소
-        String postCode=tryUpdateStoreDto.getPostcode().trim();
-        String address=tryUpdateStoreDto.getAddress().trim();
+        String postCode=tryUpdateStoreDto.getPostcode();
+        String address=tryUpdateStoreDto.getAddress();
         String detailAddress=tryUpdateStoreDto.getDetailAddress();
-        if(!postCode.equals(storeVo.getSpostcode())||!address.equals(storeVo.getSaddress())||!detailAddress.equals(storeVo.getSaddress())){
+        if(!postCode.equals(storeVo.getSpostcode())||!address.equals(storeVo.getSaddress())||!detailAddress.equals(storeVo.getSdetail_address())){
             logger.info("주소가 변경되었습니다");
             updateFlag=true;
-            System.out.println("p: "+postCode.equals(storeVo.getSpostcode()));
-            System.out.println("a: "+address.equals(storeVo.getSaddress()));
-            System.out.println("d: "+detailAddress.equals(storeVo.getSaddress()));
-            System.out.println("p: "+postCode+" op: "+storeVo.getSpostcode());
-            System.out.println("a: "+address+" oa: "+storeVo.getSaddress());
             updateAddress(storeVo, address, postCode, detailAddress);
         }
         //휴대폰/일반전화
@@ -141,7 +138,7 @@ public class storeService {
            doneUpdate(tryUpdateStoreDto);
             return utillService.getJson(true, "변경이 완료되었습니다");
         }else{
-            return utillService.getJson(true, "변경사항이 없습니다");
+            return utillService.getJson(false, "변경사항이 없습니다");
         }
     }
     @Async
