@@ -49,6 +49,14 @@ public class deliverPostionHandler extends TextWebSocketHandler {
          for(int roomId:roomIds){
             for(Map<String,Object>room:roomList.get(roomId)){
                try {
+                  //테스트코드
+                  if(roomId==1){
+                     xAndY.put("message", "1번배달");
+                  }else if(roomId==2){
+                     xAndY.put("message", "2번배달");
+                  }else{
+                     xAndY.put("message", "3번배달");
+                  }
                   //보내기만 하면됨 n번방 세션 들 다꺼내기
                   WebSocketSession wss = (WebSocketSession) room.get("session");           
                   wss.sendMessage(new TextMessage(xAndY.toJSONString()));
@@ -84,18 +92,14 @@ public class deliverPostionHandler extends TextWebSocketHandler {
       logger.info("checkUser");
       //로그인 상세정보 꺼내기
       Map<Object,Object>infor=getLoginInfor(session);
-      //권한 체크
       String role=infor.get("role").toString();
       int id=Integer.parseInt(infor.get("id").toString());
       logger.info("deliverPostionHandler 웹소켓요청 사용자아이디: "+id);
-      //권한에 따라 방생성 or 입장 
+      //권한에 따라 
       if(role.equals(senums.company_role.get())){
          logger.info("회사이용자");
          try {
             //배달 요청이 있는지 검사 로직 추가해야함
-            //배달이 있다면 방 생성
-
-            //방생성기록이 있다면 그냥 유지
          } catch (NullPointerException e) {
             //주문 요청이 한건도 없다면 예외발생
             throw utillService.makeRuntimeEX("상점: "+id+" 배달목록 존재하지 않음", "afterConnectionEstablished");

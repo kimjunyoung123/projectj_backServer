@@ -32,12 +32,6 @@ public class deliveryService {
         logger.info("selectRoomIdByCompanyIdAndStartDoneFlag");
         return deliveryRoomDao.findAllByMasterIdAndFlag(companyId, doneFlag, startFlag);
     }
-   /* public void makeDeliverRoom(int compayId) {
-        logger.info("makeDeliverRoom");
-        deliveryRoomVo vo=new deliveryRoomVo();
-        vo.setDeliverRoomMaster(compayId);
-        deliveryRoomDao.save(vo);
-    }*/
     @Transactional(rollbackFor = Exception.class)
     public void enterRoom(int roomId,String userSocketId,int userId) {
         logger.info("enterRoom");
