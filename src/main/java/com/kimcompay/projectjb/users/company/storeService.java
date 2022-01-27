@@ -49,105 +49,161 @@ public class storeService {
         logger.info("tryUpdate");
         //수정요청 가게 정보 가져오기
         storeVo storeVo=storeDao.findById(tryUpdateStoreDto.getId()).orElseThrow(()->utillService.makeRuntimeEX("존재하지 않는 상품입니다", "tryUpdate"));
+        boolean updateFlag=false;
         //주인이 맞는지 검사
         if(utillService.getLoginId()!=storeVo.getCid()){
             throw utillService.makeRuntimeEX("매장 주인이 아닙니다", "tryUpdate");
+        }
+        //매장이름
+        String storeName=tryUpdateStoreDto.getStoreName();
+        if(!storeName.equals(tryUpdateStoreDto.getStoreName())){
+            logger.info("매장이름 변경");
+            updateFlag=true;
+            updateStoreName(storeVo, storeName);
         }
         //시간이 변경되었나 검사
         String openTime=tryUpdateStoreDto.getOpenTime();
         String closeTime=tryUpdateStoreDto.getCloseTime();
         if(!openTime.equals(storeVo.getOpenTime())||!closeTime.equals(storeVo.getCloseTime())){
             logger.info("시간병경 요청");
+            updateFlag=true;
             checkOpenAndCloseTime(openTime, closeTime);
             updateTime(storeVo, openTime, closeTime);
         }
-        //
+        //배달반경
         int radius=tryUpdateStoreDto.getDeliverRadius();
         if(storeVo.getDeliverRadius()!=radius){
             logger.info("배달반경범위가 변경되었습니다");
+            updateFlag=true;
             updateDeliverRadius(storeVo, radius);
         }
-        //
+        //최소배달금액
         int minPrice=tryUpdateStoreDto.getMinPrice();
         if(storeVo.getMinPrice()!=minPrice){
             logger.info("배달 최소금액 변경");
+            updateFlag=true;
             updateMinPrice(storeVo, minPrice);
         }
-        //
+        //가게설명
         String text=tryUpdateStoreDto.getText();
         if(text!=storeVo.getText()){
             logger.info("가게설명이 변경되었습니다");
+            updateFlag=true;
             updateStoreText(storeVo, text);
         }
-        //
+        //썸네일
         String thumbNail=tryUpdateStoreDto.getThumbNail();
         if(!thumbNail.equals(storeVo.getSimg())){
             logger.info("썸네일이 변경되었습니다");
+            updateFlag=true;
             updateThumbNail(storeVo, thumbNail);
         }
-        //
-        String postCode=tryUpdateStoreDto.getPostcode();
-        String address=tryUpdateStoreDto.getAddress();
+        //주소
+        String postCode=tryUpdateStoreDto.getPostcode().trim();
+        String address=tryUpdateStoreDto.getAddress().trim();
         String detailAddress=tryUpdateStoreDto.getDetailAddress();
         if(!postCode.equals(storeVo.getSpostcode())||!address.equals(storeVo.getSaddress())||!detailAddress.equals(storeVo.getSaddress())){
             logger.info("주소가 변경되었습니다");
+            updateFlag=true;
+            System.out.println("p: "+postCode.equals(storeVo.getSpostcode()));
+            System.out.println("a: "+address.equals(storeVo.getSaddress()));
+            System.out.println("d: "+detailAddress.equals(storeVo.getSaddress()));
+            System.out.println("p: "+postCode+" op: "+storeVo.getSpostcode());
+            System.out.println("a: "+address+" oa: "+storeVo.getSaddress());
             updateAddress(storeVo, address, postCode, detailAddress);
         }
-        //
+        //휴대폰/일반전화
         String phone=tryUpdateStoreDto.getPhone();
         String tel=tryUpdateStoreDto.getTel();
         if(!tel.equals(storeVo.getStel())){
             logger.info("tel 변경되었습니다");
+            updateFlag=true;
             updateTel(storeVo, tel);
         }
         if(!phone.equals(storeVo.getSphone())){
             logger.info("휴대폰번호가 변경되었습니다");
+            updateFlag=true;
             //인증검증로직필요함
             checkAuth(phone);
             updatePhone(storeVo, phone);
         }
+        //사업자번호
         String companyNum=tryUpdateStoreDto.getNum();
         if(!companyNum.equals(storeVo.getSnum())){
             logger.info("사업자 번호가 변경되었습니다");
+            updateFlag=true;
             //사업자번호 검증로직필요
             checkCompayNum(companyNum);
             updateCompanyNum(storeVo, companyNum);
         }
-        return utillService.getJson(false, "변경이 완료되었습니다");
+        //가게정보가 수정되면 알림메세지/이메일전송
+        if(updateFlag){
+           doneUpdate(tryUpdateStoreDto);
+            return utillService.getJson(true, "변경이 완료되었습니다");
+        }else{
+            return utillService.getJson(true, "변경사항이 없습니다");
+        }
+    }
+    @Async
+    public void doneUpdate(tryUpdateStoreDto tryUpdateStoreDto) {
+        logger.info("doneUpdate");
+        String updateMessage="가게정보가 수정되었습니다";
+        try {
+            tryInsertStoreDto dto=new tryInsertStoreDto();
+            dto.setPhone(tryUpdateStoreDto.getPhone());
+            dto.setText(tryUpdateStoreDto.getText());
+            dto.setThumbNail(tryUpdateStoreDto.getThumbNail());
+            doneInsert(dto, updateMessage);
+        } catch (Exception e) {
+            logger.info("doneUpdate 처리중 예외발생");
+        }
+    }
+    private void updateStoreName(storeVo storeVo,String storeName) {
+        logger.info("updateStoreName");
+        storeVo.setSname(storeName);
+        logger.info("매장이름 변경완료");
     }
     private void updateCompanyNum(storeVo storeVo,String companyNum) {
         logger.info("updateCompanyNum");
         storeVo.setSnum(companyNum);
+        logger.info("사업자번호 변경완료");
     }
     private void updatePhone(storeVo storeVo,String phone) {
         logger.info("updatePhone");
         storeVo.setSphone(phone);
+        logger.info("휴대폰 변경완료");
     }
     private void updateTel(storeVo storeVo,String tel) {
         logger.info("updateTel");
         storeVo.setStel(tel);
+        logger.info("일반전화 변경완료");
     }
     private void updateAddress(storeVo storeVo,String address,String postCode,String detailAddress) {
         logger.info("updateAddress");
         storeVo.setSpostcode(postCode);
         storeVo.setSaddress(address);
         storeVo.setSdetail_address(detailAddress);
+        logger.info("주소 변경완료");
     }
     private void updateThumbNail(storeVo storeVo,String thumbNail) {
         logger.info("updateThumbNail");
         storeVo.setSimg(thumbNail);
+        logger.info("썸네일 변경완료");
     }
     private void updateStoreText(storeVo storeVo,String text) {
         logger.info("updateStoreText");
         storeVo.setText(text);
+        logger.info("가게설명 변경완료");
     }
     private void updateMinPrice(storeVo storeVo,int minPrice) {
         logger.info("updateMinPrice");
         storeVo.setMinPrice(minPrice);
+        logger.info("배달최소금액 변경완료");
     }
     private void updateDeliverRadius(storeVo storeVo,int radius) {
         logger.info("updateDeliverRadius");
         storeVo.setDeliverRadius(radius);
+        logger.info("배달반경 변경완료");
     }
     private void updateTime(storeVo storeVo,String openTime,String closeTime) {
         logger.info("updateTime");
@@ -217,7 +273,8 @@ public class storeService {
         tryInsert(tryInsertStoreDto);
         //결과전송
         try {
-            doneInsert(tryInsertStoreDto);
+            String insertMessage="매장등록을 해주셔서 진심으로 감사합니다 \n 매장이름: "+tryInsertStoreDto.getStoreName()+"\n매장위치: "+tryInsertStoreDto.getAddress();
+            doneInsert(tryInsertStoreDto,insertMessage);
         } catch (Exception e) {
             logger.info("등록 되었으므로 예외무시");
         }
@@ -241,14 +298,13 @@ public class storeService {
                     storeDao.save(vo);            
     }
     @Async
-    public void doneInsert(tryInsertStoreDto tryInsertStoreDto) {
+    public void doneInsert(tryInsertStoreDto tryInsertStoreDto,String doneMessage) {
         logger.info("doneInsert");
-        String insertMessage="매장등록을 해주셔서 진심으로 감사합니다 \n 매장이름: "+tryInsertStoreDto.getStoreName()+"\n매장위치: "+tryInsertStoreDto.getAddress();
         principalDetails principalDetails=(principalDetails)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Map<Object,Object>map=principalDetails.getPrinci();
-        sqsService.sendEmailAsync(insertMessage,principalDetails.getUsername());
-        sqsService.sendPhoneAsync(insertMessage, map.get("phone").toString());
-        sqsService.sendPhoneAsync(insertMessage, tryInsertStoreDto.getPhone());
+        sqsService.sendEmailAsync(doneMessage,principalDetails.getUsername());//회사이메일
+        sqsService.sendPhoneAsync(doneMessage, map.get("phone").toString());//회사휴대폰
+        sqsService.sendPhoneAsync(doneMessage, tryInsertStoreDto.getPhone());//매장휴대폰
         //인증 세션 비우기
         HttpSession httpSession=utillService.getHttpServletRequest().getSession();
         httpSession.removeAttribute(senums.auth.get()+senums.phonet.get());
