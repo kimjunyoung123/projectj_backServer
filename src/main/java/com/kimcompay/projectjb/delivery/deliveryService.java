@@ -32,7 +32,7 @@ public class deliveryService {
         logger.info("selectRoomIdByCompanyIdAndStartDoneFlag");
         return deliveryRoomDao.findAllByMasterIdAndFlag(companyId, doneFlag, startFlag);
     }
-    @Transactional(rollbackFor = Exception.class)
+    /*@Transactional(rollbackFor = Exception.class)
     public void enterRoom(int roomId,String userSocketId,int userId) {
         logger.info("enterRoom");
         //배송요청조회 로직추가해야함 
@@ -44,7 +44,7 @@ public class deliveryService {
             logger.info("첫 배송조회 페이지 입장");
             vo.setDoneFlag(Integer.parseInt(senums.notFlag.get()));
             vo.setRoomId(roomId);
-            vo.setUserID(userId);
+            vo.setUserId(userId);
             vo.setUserSocketId(userSocketId);
             deliverRoomDetailDao.save(vo);
             return;
@@ -57,5 +57,5 @@ public class deliveryService {
             }
         }
         logger.info("첫입장도 아니고 웹세션도 그대로임");
-    }
+    }*/
 }
