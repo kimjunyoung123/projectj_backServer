@@ -38,7 +38,7 @@ public class deliveryRoomVo {
     private int storeId;
 
     @Column(name = "deliver_rooms_flag",columnDefinition = "TINYINT")
-    private int deliverRoomDoneFlag;
+    private int deliverRoomFlag;
 
     @Column(name = "deliver_room_created")
     @CreationTimestamp

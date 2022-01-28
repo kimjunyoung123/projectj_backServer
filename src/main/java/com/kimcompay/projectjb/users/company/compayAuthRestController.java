@@ -67,9 +67,10 @@ public class compayAuthRestController {
             return null;
         }
     }
-    @RequestMapping(value = "/deliver",method = RequestMethod.GET)
-    public JSONObject get() {
-        logger.info("get");
-        return deliveryService.getDelivers(1,"2022-01-28","2022-01-28", 45);
+    @RequestMapping(value = "/gets/deliver/{page}/{storeId}/{startDate}/{endDate}",method = RequestMethod.GET)
+    public JSONObject getDelivers(@PathVariable int page,@PathVariable int storeId,@PathVariable String startDate,@PathVariable String endDate) {
+        logger.info("getDelivers controller");
+        
+        return deliveryService.getDelivers(page,startDate,endDate, storeId);
     }
 }

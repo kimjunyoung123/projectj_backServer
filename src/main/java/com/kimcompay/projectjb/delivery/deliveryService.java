@@ -30,9 +30,22 @@ public class deliveryService {
 
     public JSONObject getDelivers(int page,String startDay,String endDay,int storeId) {
         logger.info("getDelivers");
-        return utillService.getJson(true, selectByPeriodAndStoreId(page, startDay, endDay, storeId));
+        List<deliveryRoomVo>deliveryRoomVos=selectByPeriodAndStoreId(page, startDay, endDay, storeId);
+        //본인 가게 배달방이 맞나 검사
+        int loginId=utillService.getLoginId();
+        for(deliveryRoomVo deliverRoom:deliveryRoomVos ){
+            if(deliverRoom.getCompanyId()!=loginId){
+                logger.info("다른 매장 배달 발견");
+                throw utillService.makeRuntimeEX("회사 소유 매장 배달이 아닙니다", "getDelivers");
+            }
+        }
+        //배달건수가 없을 수도있음 검사
+        if(utillService.checkEmthy(deliveryRoomVos)){
+            throw utillService.makeRuntimeEX("배달건수가 존재하지 않습니다", "getDelivers");
+        }
+        return utillService.getJson(true, deliveryRoomVos);
     }
-    public List<Map<String,Object>> selectByPeriodAndStoreId(int page,String startDay,String endDay,int storeId) {
+    public List<deliveryRoomVo> selectByPeriodAndStoreId(int page,String startDay,String endDay,int storeId) {
         logger.info("getDelivers");
         Timestamp daystart=Timestamp.valueOf(startDay+" 00:00:00");
         Timestamp dayEnd=Timestamp.valueOf(endDay+" 23:59:59");

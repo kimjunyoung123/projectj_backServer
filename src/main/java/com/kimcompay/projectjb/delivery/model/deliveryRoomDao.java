@@ -13,8 +13,8 @@ public interface deliveryRoomDao extends JpaRepository<deliveryRoomVo,Integer> {
    /* @Query(value = "select room_id from delivery_rooms where company_id=? and deliver_room_flag=? and delivery_rooms_flag",nativeQuery = true)
     List<Integer>findAllByMasterIdAndFlag(int companyId,int doneFlag,int startFlag);*/
 
-    @Query(value = "select room_id,deliver_rooms_flag from delivery_rooms where deliver_room_created between ? and ? and store_id=?",nativeQuery = true)
-    List<Map<String,Object>>findByDay(Timestamp daystart,Timestamp dayEnd,int store_id);
+    @Query(value = "select * from delivery_rooms where deliver_room_created between ? and ? and store_id=?",nativeQuery = true)
+    List<deliveryRoomVo>findByDay(Timestamp daystart,Timestamp dayEnd,int store_id);
 
 
 }
