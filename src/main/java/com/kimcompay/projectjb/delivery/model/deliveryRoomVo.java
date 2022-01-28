@@ -1,5 +1,7 @@
 package com.kimcompay.projectjb.delivery.model;
 
+import java.sql.Timestamp;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -8,6 +10,8 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 import com.google.auto.value.AutoValue.Builder;
+
+import org.hibernate.annotations.CreationTimestamp;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -27,15 +31,18 @@ public class deliveryRoomVo {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int roomId;
 
-
     @Column(name = "company_id")
     private int companyId;
 
-    @Column(name = "start_flag",columnDefinition = "TINYINT")
-    private int startFlag;
+    @Column(name = "store_id")
+    private int storeId;
 
-    @Column(name = "deliver_room_flag",columnDefinition = "TINYINT")
+    @Column(name = "deliver_rooms_flag",columnDefinition = "TINYINT")
     private int deliverRoomDoneFlag;
+
+    @Column(name = "deliver_room_created")
+    @CreationTimestamp
+    private Timestamp created;
 
 
 

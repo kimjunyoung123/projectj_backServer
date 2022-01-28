@@ -1,14 +1,18 @@
 package com.kimcompay.projectjb.delivery;
 
+import java.sql.Timestamp;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
+import com.kimcompay.projectjb.utillService;
 import com.kimcompay.projectjb.delivery.model.deliverRoomDetailDao;
 import com.kimcompay.projectjb.delivery.model.deliverRoomDetailVo;
 import com.kimcompay.projectjb.delivery.model.deliveryRoomDao;
 import com.kimcompay.projectjb.delivery.model.deliveryRoomVo;
 import com.kimcompay.projectjb.enums.senums;
 
+import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,14 +28,25 @@ public class deliveryService {
     @Autowired
     private deliverRoomDetailDao deliverRoomDetailDao;
 
+    public JSONObject getDelivers(int page,String startDay,String endDay,int storeId) {
+        logger.info("getDelivers");
+        return utillService.getJson(true, selectByPeriodAndStoreId(page, startDay, endDay, storeId));
+    }
+    public List<Map<String,Object>> selectByPeriodAndStoreId(int page,String startDay,String endDay,int storeId) {
+        logger.info("getDelivers");
+        Timestamp daystart=Timestamp.valueOf(startDay+" 00:00:00");
+        Timestamp dayEnd=Timestamp.valueOf(endDay+" 23:59:59");
+        
+        return deliveryRoomDao.findByDay(daystart, dayEnd,storeId);
+    }
     public List<Integer> selectRoomIdByUserIdAndFlag(int userId,int flag) {
         logger.info("selectRoomIdByUserIdAndFlag");
         return deliverRoomDetailDao.findAllByRoomIdAndDoneFlag(userId, flag);
     }
-    public List<Integer> selectRoomIdByCompanyIdAndStartDoneFlag(int companyId,int startFlag,int doneFlag) {
+   /* public List<Integer> selectRoomIdByCompanyIdAndStartDoneFlag(int companyId,int startFlag,int doneFlag) {
         logger.info("selectRoomIdByCompanyIdAndStartDoneFlag");
         return deliveryRoomDao.findAllByMasterIdAndFlag(companyId, doneFlag, startFlag);
-    }
+    }*/
     /*@Transactional(rollbackFor = Exception.class)
     public void enterRoom(int roomId,String userSocketId,int userId) {
         logger.info("enterRoom");

@@ -11,6 +11,7 @@ import javax.validation.Valid;
 import com.google.gson.JsonObject;
 import com.kimcompay.projectjb.utillService;
 import com.kimcompay.projectjb.apis.google.ocrService;
+import com.kimcompay.projectjb.delivery.deliveryService;
 import com.kimcompay.projectjb.users.company.model.tryInsertStoreDto;
 import com.kimcompay.projectjb.users.company.model.tryUpdateStoreDto;
 
@@ -31,7 +32,8 @@ public class compayAuthRestController {
 
     @Autowired
     private storeService storeService;
-    
+    @Autowired
+    private deliveryService deliveryService;
 
     //매장등록
     @RequestMapping(value = "/join",method = RequestMethod.POST)
@@ -64,7 +66,10 @@ public class compayAuthRestController {
             e.printStackTrace();
             return null;
         }
-       
-
+    }
+    @RequestMapping(value = "/deliver",method = RequestMethod.GET)
+    public JSONObject get() {
+        logger.info("get");
+        return deliveryService.getDelivers(1,"2022-01-28","2022-01-28", 45);
     }
 }
