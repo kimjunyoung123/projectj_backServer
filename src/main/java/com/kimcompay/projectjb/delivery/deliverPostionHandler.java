@@ -1,4 +1,4 @@
-package com.kimcompay.projectjb.configs;
+package com.kimcompay.projectjb.delivery;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -7,7 +7,6 @@ import java.util.Map;
 
 
 import com.kimcompay.projectjb.utillService;
-import com.kimcompay.projectjb.delivery.deliveryService;
 import com.kimcompay.projectjb.delivery.model.deliverRoomDetailVo;
 import com.kimcompay.projectjb.enums.intenums;
 import com.kimcompay.projectjb.enums.senums;
@@ -41,30 +40,21 @@ public class deliverPostionHandler extends TextWebSocketHandler {
       logger.info("handleTextMessage");
       logger.info(message.toString());
       logger.info(session.toString());
-      JSONObject xAndY=utillService.stringToJson(message.getPayload());
-      System.out.println(xAndY);
+      JSONObject xAndYAndRoom=utillService.stringToJson(message.getPayload());
+      int roomId=Integer.parseInt(xAndYAndRoom.get("roomId").toString());
+      System.out.println(xAndYAndRoom);
       //배달방번호 조회
-      List<Integer>roomIds=deliveryService.selectRoomIdByCompanyIdAndStartDoneFlag(Integer.parseInt(getLoginInfor(session).get("id").toString()),intenums.DONE_FLAG.get(),intenums.NOT_FLAG.get());
       try {
-         for(int roomId:roomIds){
             for(Map<String,Object>room:roomList.get(roomId)){
                try {
-                  //테스트코드
-                  if(roomId==1){
-                     xAndY.put("message", "1번배달");
-                  }else if(roomId==2){
-                     xAndY.put("message", "2번배달");
-                  }else{
-                     xAndY.put("message", "3번배달");
-                  }
                   //보내기만 하면됨 n번방 세션 들 다꺼내기
                   WebSocketSession wss = (WebSocketSession) room.get("session");           
-                  wss.sendMessage(new TextMessage(xAndY.toJSONString()));
+                  wss.sendMessage(new TextMessage(xAndYAndRoom.toJSONString()));
                } catch (Exception e) {
                                  
                }
             }
-         }
+         
       } catch (NullPointerException e) {
          logger.info("만들어진 방이 없습니다");
       }
