@@ -73,4 +73,10 @@ public class compayAuthRestController {
         
         return deliveryService.getDelivers(page,startDate,endDate, storeId);
     }
+    @RequestMapping(value = "/get/deliver/{roomId}",method = RequestMethod.GET)
+    public JSONObject getDeliverAddress(@PathVariable int roomId) {
+        logger.info("getDeliverAddress controller");
+        
+        return deliveryService.getDeliverAddress(roomId);
+    }
 }

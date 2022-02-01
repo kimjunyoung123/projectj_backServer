@@ -17,7 +17,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class deliveryService {
@@ -28,6 +27,10 @@ public class deliveryService {
     @Autowired
     private deliverRoomDetailDao deliverRoomDetailDao;
 
+    public JSONObject getDeliverAddress(int roomId) {
+        logger.info("getDeliverAddress");
+        return utillService.getJson(true, deliverRoomDetailDao.findAddressByRoomId(roomId));
+    }
     public JSONObject getDelivers(int page,String startDay,String endDay,int storeId) {
         logger.info("getDelivers");
         List<deliveryRoomVo>deliveryRoomVos=selectByPeriodAndStoreId(page, startDay, endDay, storeId);

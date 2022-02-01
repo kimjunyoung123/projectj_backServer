@@ -16,5 +16,4 @@ public interface deliveryRoomDao extends JpaRepository<deliveryRoomVo,Integer> {
     @Query(value = "select * from delivery_rooms where deliver_room_created between ? and ? and store_id=?",nativeQuery = true)
     List<deliveryRoomVo>findByDay(Timestamp daystart,Timestamp dayEnd,int store_id);
 
-
 }
