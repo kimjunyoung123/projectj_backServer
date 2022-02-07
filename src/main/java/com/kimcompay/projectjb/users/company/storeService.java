@@ -33,7 +33,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class storeService {
     private Logger logger=LoggerFactory.getLogger(storeService.class);
-    private int pageSize=2;
+    private final int  pageSize=2;
     @Autowired
     private storeDao storeDao;
     @Autowired

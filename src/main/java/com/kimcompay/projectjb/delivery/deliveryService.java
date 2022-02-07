@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class deliveryService {
     private Logger logger=LoggerFactory.getLogger(deliveryService.class);
+    private final int pageSize=2;
 
     @Autowired
     private deliveryRoomDao deliveryRoomDao;
@@ -50,10 +51,12 @@ public class deliveryService {
     }
     public List<deliveryRoomVo> selectByPeriodAndStoreId(int page,String startDay,String endDay,int storeId) {
         logger.info("getDelivers");
-        Timestamp daystart=Timestamp.valueOf(startDay+" 00:00:00");
-        Timestamp dayEnd=Timestamp.valueOf(endDay+" 23:59:59");
-        
-        return deliveryRoomDao.findByDay(daystart, dayEnd,storeId);
+        logger.info("조회날짜: "+startDay+", "+endDay);
+       /* if(utillService.checkBlank(startDay)&&utillService.checkBlank(endDay)){
+            Timestamp daystart=Timestamp.valueOf(startDay+" 00:00:00");
+            Timestamp dayEnd=Timestamp.valueOf(endDay+" 23:59:59");
+        }  */  
+        return deliveryRoomDao.findByAll(storeId,utillService.getStart(page, pageSize)-1,pageSize);
     }
     public List<Integer> selectRoomIdByUserIdAndFlag(int userId,int flag) {
         logger.info("selectRoomIdByUserIdAndFlag");
