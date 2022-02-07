@@ -3,15 +3,9 @@ package com.kimcompay.projectjb.delivery;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-
 import com.kimcompay.projectjb.utillService;
 import com.kimcompay.projectjb.delivery.model.deliverRoomDetailDao;
-import com.kimcompay.projectjb.delivery.model.deliverRoomDetailVo;
 import com.kimcompay.projectjb.delivery.model.deliveryRoomDao;
-import com.kimcompay.projectjb.delivery.model.deliveryRoomVo;
-import com.kimcompay.projectjb.enums.senums;
-
 import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,29 +28,43 @@ public class deliveryService {
     }
     public JSONObject getDelivers(int page,String startDay,String endDay,int storeId) {
         logger.info("getDelivers");
-        List<deliveryRoomVo>deliveryRoomVos=selectByPeriodAndStoreId(page, startDay, endDay, storeId);
+        List<Map<String,Object>>deliveryInfors=selectByPeriodAndStoreId(page, startDay, endDay, storeId);
+        //요청페이지,배달건수 검증
+        if(utillService.checkEmthy(deliveryInfors)){ 
+            throw utillService.makeRuntimeEX("배달건수가 존재하지 않습니다", "getDelivers");
+        } 
+        int totalPage=utillService.getTotalPage(Integer.parseInt(deliveryInfors.get(0).get("totalCount").toString()),pageSize);
         //본인 가게 배달방이 맞나 검사
         int loginId=utillService.getLoginId();
-        for(deliveryRoomVo deliverRoom:deliveryRoomVos ){
-            if(deliverRoom.getCompanyId()!=loginId){
+        for(Map<String,Object> deliveryInfor:deliveryInfors ){
+            if(Integer.parseInt(deliveryInfor.get("company_id").toString())!=loginId){
                 logger.info("다른 매장 배달 발견");
                 throw utillService.makeRuntimeEX("회사 소유 매장 배달이 아닙니다", "getDelivers");
             }
         }
-        //배달건수가 없을 수도있음 검사
-        if(utillService.checkEmthy(deliveryRoomVos)){
-            throw utillService.makeRuntimeEX("배달건수가 존재하지 않습니다", "getDelivers");
-        }
-        return utillService.getJson(true, deliveryRoomVos);
+        JSONObject response =new JSONObject();
+        response.put("flag", true);
+        response.put("totalPage",  totalPage);
+        response.put("message", deliveryInfors);
+        return response;
     }
-    public List<deliveryRoomVo> selectByPeriodAndStoreId(int page,String startDay,String endDay,int storeId) {
+    public List<Map<String,Object>> selectByPeriodAndStoreId(int page,String startDay,String endDay,int storeId) {
         logger.info("getDelivers");
         logger.info("조회날짜: "+startDay+", "+endDay);
-       /* if(utillService.checkBlank(startDay)&&utillService.checkBlank(endDay)){
+        Boolean startResult=utillService.checkBlank(startDay);
+        Boolean endResult=utillService.checkBlank(endDay);
+        if(!startResult&&!endResult){
             Timestamp daystart=Timestamp.valueOf(startDay+" 00:00:00");
             Timestamp dayEnd=Timestamp.valueOf(endDay+" 23:59:59");
-        }  */  
-        return deliveryRoomDao.findByAll(storeId,utillService.getStart(page, pageSize)-1,pageSize);
+            //시작,종료일 검사
+            if(daystart.toLocalDateTime().isAfter(dayEnd.toLocalDateTime())){
+                throw utillService.makeRuntimeEX("기간을 제대로 설정해주세요", "getDelivers");
+            }
+            return deliveryRoomDao.findByDay(daystart, dayEnd, storeId,daystart, dayEnd, storeId,utillService.getStart(page, pageSize)-1,pageSize);
+        }else if(!startResult&&endResult){
+            throw utillService.makeRuntimeEX("기간을 제대로 설정해주세요", "getDelivers");
+        } 
+        return deliveryRoomDao.findByAll(storeId,storeId,utillService.getStart(page, pageSize)-1,pageSize);
     }
     public List<Integer> selectRoomIdByUserIdAndFlag(int userId,int flag) {
         logger.info("selectRoomIdByUserIdAndFlag");
