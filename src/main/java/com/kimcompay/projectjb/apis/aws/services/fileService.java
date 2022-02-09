@@ -1,10 +1,13 @@
 package com.kimcompay.projectjb.apis.aws.services;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpSession;
 
+import com.kimcompay.projectjb.utillService;
 import com.kimcompay.projectjb.enums.senums;
 
 import org.json.simple.JSONObject;
@@ -27,7 +30,6 @@ public class fileService {
 
     @Autowired
     private s3Service s3Service;
-
     public JSONObject upload(MultipartHttpServletRequest request) {
         logger.info("upload");
         //파일꺼내기
@@ -82,5 +84,19 @@ public class fileService {
     public void deleteFile(String fileName) {
         logger.info("deleteFile");
         s3Service.deleteFile(bucketName, fileName);
+    }
+    public String uploadLocal(MultipartFile multipartFile) {
+        logger.info("uploadLocal");
+        File dest = new File("/Users/sesisoft/Desktop/persnal/projectj_backServer/src/main/resources/tempfilyers/" +multipartFile.getOriginalFilename());
+        try {
+            multipartFile.transferTo(dest);
+        } catch (IllegalStateException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return "/Users/sesisoft/Desktop/persnal/projectj_backServer/src/main/resources/tempfilyers/" +multipartFile.getOriginalFilename();
     }
 }

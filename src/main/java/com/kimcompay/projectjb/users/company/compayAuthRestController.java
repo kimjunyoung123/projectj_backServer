@@ -1,5 +1,6 @@
 package com.kimcompay.projectjb.users.company;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -25,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 @RestController
@@ -68,14 +70,17 @@ public class compayAuthRestController {
     @RequestMapping(value = "/uploadAndGet",method = RequestMethod.POST)
     public JSONObject uploadAndOcr(MultipartHttpServletRequest request) {
         logger.info("uploadAndOcr");
-        JSONObject result=fileService.upload(request);
+        JSONObject response=new JSONObject();
+        response=fileService.upload(request);
+        MultipartFile multipartFile=request.getFile("upload");
+        String imgPath=fileService.uploadLocal(request.getFile("upload"));
         try {
-            ocrService.detectText("https://s3.ap-northeast-2.amazonaws.com/jangbogo/2022-02-0942cb10b5-a79f-42b5-90e9-d47155e340eatest2.jpeg");
-        } catch (IOException e) {
+            ocrService.detectText(imgPath);
+        } catch (Exception e) {
             logger.info("ocr 글자 추출 실패");
             e.printStackTrace();
         }
-        return result;
+        return response;
     }
     @RequestMapping(value = "/testimg",method = RequestMethod.POST)
     public JSONObject testimg() {
