@@ -45,6 +45,17 @@ public class storeService {
     @Autowired
     private RedisTemplate<String,String>redisTemplate;
     
+    @Transactional(rollbackFor = Exception.class)
+    public JSONObject updateSleepOrOpen(int flag,int storeId) {
+        logger.info("storeSleepOrOpen");
+        int loginId=utillService.getLoginId();
+        storeVo storeVo=storeDao.findBySid(storeId).orElseThrow(()->utillService.makeRuntimeEX("존재하지 않는 매장입니다", "storeSleepOrOpen"));
+        if(storeVo.getCid()!=loginId){
+            throw utillService.makeRuntimeEX("회사소유의 매장이 아닙니다", "storeSleepOrOpen");
+        }
+        storeVo.setSsleep(flag);
+        return utillService.getJson(true, "엽업상태가 변경되었습니다"); 
+    }
     @Transactional(rollbackFor =  Exception.class)
     public JSONObject tryUpdate(tryUpdateStoreDto  tryUpdateStoreDto) {
         logger.info("tryUpdate");

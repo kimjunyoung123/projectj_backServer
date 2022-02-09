@@ -56,6 +56,10 @@ public class compayAuthRestController {
         logger.info("storeUpdate controller");
         return storeService.tryUpdate(tryUpdateStoreDto);
     }
+    @RequestMapping(value = "/infor/sleep/{flag}/{storeId}",method = RequestMethod.PUT)
+    public JSONObject storeSleepOrOpen(@PathVariable int flag,@PathVariable int storeId) {
+        return storeService.updateSleepOrOpen(flag, storeId);
+    }
     @RequestMapping(value = "/testimg",method = RequestMethod.POST)
     public JSONObject testimg() {
         logger.info("testimg");
