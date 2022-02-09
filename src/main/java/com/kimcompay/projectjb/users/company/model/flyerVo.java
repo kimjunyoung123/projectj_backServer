@@ -30,11 +30,11 @@ public class flyerVo {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int fid;
 
-    @Column(name = "fcompany_num",nullable = false)
-    private String companyNum;
+    @Column(name = "store_id",nullable = false)
+    private String storeId;
 
-    @Column(name = "fimg_path",nullable = false)
-    private String fImg_path;
+    @Column(name = "img_path",nullable = false)
+    private String img_path;
 
     @Column(name = "fcreated")
     @CreationTimestamp

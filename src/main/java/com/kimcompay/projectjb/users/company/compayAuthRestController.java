@@ -56,9 +56,14 @@ public class compayAuthRestController {
         logger.info("storeUpdate controller");
         return storeService.tryUpdate(tryUpdateStoreDto);
     }
-    @RequestMapping(value = "/infor/sleep/{flag}/{storeId}",method = RequestMethod.PUT)
+    @RequestMapping(value = "/infor/sleep/{flag}/{storeId}",method = RequestMethod.PUT)//매장 영업상태 수정
     public JSONObject storeSleepOrOpen(@PathVariable int flag,@PathVariable int storeId) {
+        logger.info("storeSleepOrOpen");
         return storeService.updateSleepOrOpen(flag, storeId);
+    }
+    @RequestMapping(value = "/uploadAndGet",method = RequestMethod.POST)
+    public void uploadAndOcr(@RequestBody JSONObject jsonObject) {
+        logger.info("uploadAndOcr");
     }
     @RequestMapping(value = "/testimg",method = RequestMethod.POST)
     public JSONObject testimg() {
@@ -71,13 +76,13 @@ public class compayAuthRestController {
             return null;
         }
     }
-    @RequestMapping(value = "/gets/deliver/{page}/{storeId}/{startDate}/{endDate}",method = RequestMethod.GET)
+    @RequestMapping(value = "/gets/deliver/{page}/{storeId}/{startDate}/{endDate}",method = RequestMethod.GET)//매장 배달 현황 조회
     public JSONObject getDelivers(@PathVariable int page,@PathVariable int storeId,@PathVariable String startDate,@PathVariable String endDate) {
         logger.info("getDelivers controller");
         
         return deliveryService.getDelivers(page,startDate,endDate, storeId);
     }
-    @RequestMapping(value = "/get/deliver/{roomId}",method = RequestMethod.GET)
+    @RequestMapping(value = "/get/deliver/{roomId}",method = RequestMethod.GET)//매장 배달 디테일 조회
     public JSONObject getDeliverAddress(@PathVariable int roomId) {
         logger.info("getDeliverAddress controller");
         
