@@ -33,7 +33,7 @@ public class deliverRoomDetailVo {
     private int userId;
     @Column(name = "done_flag",columnDefinition = "TINYINT")
     private int  doneFlag;
-    @Column(name = "deliver_room_details_address",nullable = false,length = 30)
+    @Column(name = "deliver_room_details_address",nullable = false,length = 50)
     private String  address;
 
 }
