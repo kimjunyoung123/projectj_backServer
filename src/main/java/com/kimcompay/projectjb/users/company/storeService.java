@@ -45,6 +45,7 @@ public class storeService {
     @Autowired
     private RedisTemplate<String,String>redisTemplate;
     
+
     @Transactional(rollbackFor = Exception.class)
     public JSONObject updateSleepOrOpen(int flag,int storeId) {
         logger.info("storeSleepOrOpen");

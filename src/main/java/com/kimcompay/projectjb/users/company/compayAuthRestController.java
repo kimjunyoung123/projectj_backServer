@@ -72,10 +72,9 @@ public class compayAuthRestController {
         logger.info("uploadAndOcr");
         JSONObject response=new JSONObject();
         response=fileService.upload(request);
-        MultipartFile multipartFile=request.getFile("upload");
         String imgPath=fileService.uploadLocal(request.getFile("upload"));
         try {
-            ocrService.detectText(imgPath);
+            response.put("ocr",ocrService.detectText(imgPath));
         } catch (Exception e) {
             logger.info("ocr 글자 추출 실패");
             e.printStackTrace();
