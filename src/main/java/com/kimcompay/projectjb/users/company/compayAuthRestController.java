@@ -10,6 +10,7 @@ import javax.validation.Valid;
 
 import com.google.gson.JsonObject;
 import com.kimcompay.projectjb.utillService;
+import com.kimcompay.projectjb.apis.aws.services.fileService;
 import com.kimcompay.projectjb.apis.google.ocrService;
 import com.kimcompay.projectjb.delivery.deliveryService;
 import com.kimcompay.projectjb.users.company.model.tryInsertStoreDto;
@@ -24,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 @RestController
 @RequestMapping(value = "/auth/store")
@@ -34,6 +36,8 @@ public class compayAuthRestController {
     private storeService storeService;
     @Autowired
     private deliveryService deliveryService;
+    @Autowired
+    private fileService fileService;
 
     //매장등록
     @RequestMapping(value = "/join",method = RequestMethod.POST)
@@ -62,8 +66,9 @@ public class compayAuthRestController {
         return storeService.updateSleepOrOpen(flag, storeId);
     }
     @RequestMapping(value = "/uploadAndGet",method = RequestMethod.POST)
-    public void uploadAndOcr(@RequestBody JSONObject jsonObject) {
+    public JSONObject uploadAndOcr(MultipartHttpServletRequest request) {
         logger.info("uploadAndOcr");
+        return fileService.upload(request);
     }
     @RequestMapping(value = "/testimg",method = RequestMethod.POST)
     public JSONObject testimg() {
