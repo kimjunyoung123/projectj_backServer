@@ -68,7 +68,14 @@ public class compayAuthRestController {
     @RequestMapping(value = "/uploadAndGet",method = RequestMethod.POST)
     public JSONObject uploadAndOcr(MultipartHttpServletRequest request) {
         logger.info("uploadAndOcr");
-        return fileService.upload(request);
+        JSONObject result=fileService.upload(request);
+        try {
+            ocrService.detectText("https://s3.ap-northeast-2.amazonaws.com/jangbogo/2022-02-0942cb10b5-a79f-42b5-90e9-d47155e340eatest2.jpeg");
+        } catch (IOException e) {
+            logger.info("ocr 글자 추출 실패");
+            e.printStackTrace();
+        }
+        return result;
     }
     @RequestMapping(value = "/testimg",method = RequestMethod.POST)
     public JSONObject testimg() {
