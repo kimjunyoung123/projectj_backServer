@@ -27,7 +27,7 @@ public class jwtService {
     public String get_access_token(String id) {
         logger.info("get_access_token");
         logger.info("토큰 발급 회원번호: "+id);
-        return JWT.create().withSubject(access_name).withClaim("id",id).withExpiresAt(new Date(System.currentTimeMillis()+1000*10000)).sign(Algorithm.HMAC512(jwt_sing));
+        return JWT.create().withSubject(access_name).withClaim("id",id).withExpiresAt(new Date(System.currentTimeMillis()+1000*5)).sign(Algorithm.HMAC512(jwt_sing));
     }
     public String get_refresh_token() {
         logger.info("get_refresh_token");

@@ -48,8 +48,8 @@ public class storeService {
     
     public JSONObject ocrAndUpload(MultipartHttpServletRequest request) {
         JSONObject response=new JSONObject();
-        response=fileService.upload(request);
         File file=fileService.convert(request.getFile("upload"));
+        response=fileService.upload(file);
         try {
             response.put("ocr",ocrService.detectText(file.toPath().toString()));
         } catch (Exception e) {
@@ -59,7 +59,7 @@ public class storeService {
         file.delete();
         return response;
     }
-    
+
     @Transactional(rollbackFor = Exception.class)
     public JSONObject updateSleepOrOpen(int flag,int storeId) {
         logger.info("storeSleepOrOpen");

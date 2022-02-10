@@ -5,9 +5,12 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import com.kimcompay.projectjb.utillService;
@@ -33,48 +36,61 @@ public class fileService {
 
     @Autowired
     private s3Service s3Service;
-    public void name() {
-        
-    }
     public JSONObject upload(MultipartHttpServletRequest request) {
         logger.info("upload");
-        //파일꺼내기
         List<MultipartFile>files=request.getFiles("upload");
-        //file로변환
-        File file=convert(files.get(0));
-        //s3업로드시도
-        JSONObject reseponse=s3Service.uploadImage(file, bucketName);
-        //성공했다면 페이지 이탈시 사진 삭제를 위해 세션에 담기+경로만들기
-        Boolean result=(Boolean)reseponse.get("flag");
-        String url=null;
-        if(result){
-            logger.info("사진 세션에 담기");
-            //주소만들기
-            String uploadName=reseponse.get("message").toString();
-            url=awsUrl+"/"+bucketName+"/"+uploadName;
-            logger.info("s3사진 경로: "+url);
-            //세션에담기
-            List<String>imgNames=new ArrayList<>();
-            HttpSession httpSession=request.getSession();
-            String imgSession=senums.imgSessionName.get();
-            try {
-                //이미지 배열 꺼내서 넣어주기 첫 요청이라면 예외 발생
-                httpSession=request.getSession();
-                imgNames=(List<String>)httpSession.getAttribute(imgSession);
-                imgNames.add(uploadName);
-            } catch (NullPointerException e) {
-                logger.info("첫 사진업로드 요청이므로 예외발생 만들어서 넣어주기");
-                imgNames=new ArrayList<>();
-                imgNames.add(uploadName);
-                httpSession.setAttribute(imgSession, imgNames);
+        if(files.size()>1){
+            //아직 미사용
+            for(MultipartFile multipartFile:files){
+                File file=convert(multipartFile);
+                uploadCore(file);
+                file.delete();
             }
-            file.delete();
+            return null;
         }else{
-            return reseponse;
+            //file로변환
+            File file=convert(files.get(0));
+            //aws업로드
+            Map<String,String>result=uploadCore(file);
+            //세션저장
+            saveSession(result.get("uploadName"));
+            //파일삭제
+            file.delete();
+            return utillService.getJson(true, result.get("url"));
         }
-        reseponse.put("uploaded", result);
-        reseponse.put("url", url);
-        return reseponse;
+    }
+    public JSONObject upload(File file) {
+        logger.info("upload");
+        Map<String,String>result=uploadCore(file);
+        saveSession(result.get("uploadName"));
+        return utillService.getJson(true, result.get("url"));
+    }
+    private void saveSession(String uploadName) {
+        logger.info("saveSession");
+        //세션에담기
+        List<String>imgNames=new ArrayList<>();
+        HttpSession httpSession=utillService.getHttpServletRequest().getSession();
+        String imgSession=senums.imgSessionName.get();
+        try {
+            //이미지 배열 꺼내서 넣어주기 첫 요청이라면 예외 발생
+            imgNames=(List<String>)httpSession.getAttribute(imgSession);
+            imgNames.add(uploadName);
+        } catch (NullPointerException e) {
+            logger.info("첫 사진업로드 요청이므로 예외발생 만들어서 넣어주기");
+            imgNames=new ArrayList<>();
+            imgNames.add(uploadName);
+            httpSession.setAttribute(imgSession, imgNames);
+        }
+    }
+    private Map<String,String> uploadCore(File file) {
+        logger.info("uploadCore");
+        //업로드
+        String uploadName=s3Service.uploadImage(file, bucketName);
+        //결과응답
+        Map<String,String>response=new HashMap<>();
+        response.put("url", awsUrl+"/"+bucketName+"/"+uploadName);
+        response.put("uploadName", uploadName);
+        return response;
     }
     public void deleteFile(HttpSession httpSession,List<String>usingImgs) {
         logger.info("deleteFile sesion");

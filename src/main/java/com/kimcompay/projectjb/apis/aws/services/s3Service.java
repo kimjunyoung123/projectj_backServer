@@ -21,16 +21,16 @@ public class s3Service {
     @Autowired
     private AmazonS3 amazonS3;
 
-    public JSONObject uploadImage(File file,String bucketName) {
+    public String uploadImage(File file,String bucketName) {
         logger.info("uploadImage");
         try {
-            String saveName=file.getName();
-            amazonS3.putObject(bucketName,saveName, file);
+            String imgName=file.getName();
+            amazonS3.putObject(bucketName,imgName, file);
             logger.info("파일업로드 완료");
-            return utillService.getJson(true, saveName);
+            return imgName;
         } catch (Exception e) {
             logger.info("파일 업로드에 실패 했습니다");
-            return utillService.getJson(false, "파일 업로드에 실패했습니다");
+            throw utillService.makeRuntimeEX("파일 업로드에 실패했습니다","uploadImage");
         }
 
     }
