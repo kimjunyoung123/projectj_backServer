@@ -56,6 +56,7 @@ public class ocrService {
           System.out.format("Text: %s%n", annotation.getDescription());
           System.out.format("Position : %s%n", annotation.getBoundingPoly());
           strings.add(annotation.getDescription());
+          strings.add(annotation.getBoundingPoly().toString());
         }
         
       }return utillService.getJson(true, strings);
