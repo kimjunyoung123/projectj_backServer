@@ -21,10 +21,9 @@ public class s3Service {
     @Autowired
     private AmazonS3 amazonS3;
 
-    public JSONObject uploadImage(MultipartFile multipartFile,String bucketName) {
+    public JSONObject uploadImage(File file,String bucketName) {
         logger.info("uploadImage");
         try {
-            File file=convert(multipartFile);
             String saveName=file.getName();
             amazonS3.putObject(bucketName,saveName, file);
             file.delete();
@@ -39,17 +38,5 @@ public class s3Service {
     public void deleteFile(String bucktetName,String fileName) {
         logger.info("deleteFile");
         amazonS3.deleteObject(bucktetName, fileName);
-    }
-    private File convert(MultipartFile multipartFile) {
-        logger.info("convert");
-        File file=new File(LocalDate.now().toString()+UUID.randomUUID()+multipartFile.getOriginalFilename());
-        try(FileOutputStream fileOutputStream=new FileOutputStream(file)){
-            fileOutputStream.write(multipartFile.getBytes()); 
-        } catch (Exception e) {
-            e.printStackTrace();
-            logger.info(e.getMessage());
-            throw utillService.makeRuntimeEX("파일형식변환에 실패했습니다","convert");
-        }
-        return file;
     }
 }

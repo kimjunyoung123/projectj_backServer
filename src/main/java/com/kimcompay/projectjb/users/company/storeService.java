@@ -1,15 +1,16 @@
 package com.kimcompay.projectjb.users.company;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import com.kimcompay.projectjb.utillService;
 import com.kimcompay.projectjb.apis.aws.services.fileService;
 import com.kimcompay.projectjb.apis.aws.services.sqsService;
+import com.kimcompay.projectjb.apis.google.ocrService;
 import com.kimcompay.projectjb.apis.kakao.kakaoMapService;
 import com.kimcompay.projectjb.enums.intenums;
 import com.kimcompay.projectjb.enums.senums;
@@ -24,11 +25,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 @Service
 public class storeService {
@@ -45,6 +46,19 @@ public class storeService {
     @Autowired
     private RedisTemplate<String,String>redisTemplate;
     
+    public JSONObject ocrAndUpload(MultipartHttpServletRequest request) {
+        JSONObject response=new JSONObject();
+        response=fileService.upload(request);
+        File file=fileService.convert(request.getFile("upload"));
+        try {
+            response.put("ocr",ocrService.detectText(file.toPath().toString()));
+        } catch (Exception e) {
+            logger.info("ocr 글자 추출 실패");
+            e.printStackTrace();
+        }
+        file.delete();
+        return response;
+    }
 
     @Transactional(rollbackFor = Exception.class)
     public JSONObject updateSleepOrOpen(int flag,int storeId) {

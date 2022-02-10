@@ -1,17 +1,13 @@
 package com.kimcompay.projectjb.users.company;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
-import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
+import java.io.IOException;
+
+
+
 import javax.validation.Valid;
 
-import com.google.gson.JsonObject;
-import com.kimcompay.projectjb.utillService;
-import com.kimcompay.projectjb.apis.aws.services.fileService;
+
 import com.kimcompay.projectjb.apis.google.ocrService;
 import com.kimcompay.projectjb.delivery.deliveryService;
 import com.kimcompay.projectjb.users.company.model.tryInsertStoreDto;
@@ -26,7 +22,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 @RestController
@@ -38,8 +33,7 @@ public class compayAuthRestController {
     private storeService storeService;
     @Autowired
     private deliveryService deliveryService;
-    @Autowired
-    private fileService fileService;
+
 
     //매장등록
     @RequestMapping(value = "/join",method = RequestMethod.POST)
@@ -70,16 +64,7 @@ public class compayAuthRestController {
     @RequestMapping(value = "/uploadAndGet",method = RequestMethod.POST)
     public JSONObject uploadAndOcr(MultipartHttpServletRequest request) {
         logger.info("uploadAndOcr");
-        JSONObject response=new JSONObject();
-        response=fileService.upload(request);
-        String imgPath=fileService.uploadLocal(request.getFile("upload"));
-        try {
-            response.put("ocr",ocrService.detectText(imgPath));
-        } catch (Exception e) {
-            logger.info("ocr 글자 추출 실패");
-            e.printStackTrace();
-        }
-        return response;
+        return storeService.ocrAndUpload(request);
     }
     @RequestMapping(value = "/testimg",method = RequestMethod.POST)
     public JSONObject testimg() {

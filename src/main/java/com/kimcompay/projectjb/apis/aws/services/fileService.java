@@ -1,9 +1,12 @@
 package com.kimcompay.projectjb.apis.aws.services;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import javax.servlet.http.HttpSession;
 
@@ -35,7 +38,7 @@ public class fileService {
         //파일꺼내기
         List<MultipartFile>files=request.getFiles("upload");
         //s3업로드시도
-        JSONObject reseponse=s3Service.uploadImage(files.get(0), bucketName);
+        JSONObject reseponse=s3Service.uploadImage(convert(files.get(0)), bucketName);
         //성공했다면 페이지 이탈시 사진 삭제를 위해 세션에 담기+경로만들기
         Boolean result=(Boolean)reseponse.get("flag");
         String url=null;
@@ -85,18 +88,16 @@ public class fileService {
         logger.info("deleteFile");
         s3Service.deleteFile(bucketName, fileName);
     }
-    public String uploadLocal(MultipartFile multipartFile) {
-        logger.info("uploadLocal");
-        File dest = new File("/Users/sesisoft/Desktop/persnal/projectj_backServer/src/main/resources/tempfilyers/" +multipartFile.getOriginalFilename());
-        try {
-            multipartFile.transferTo(dest);
-        } catch (IllegalStateException e) {
-            // TODO Auto-generated catch block
+    public File convert(MultipartFile multipartFile) {
+        logger.info("convert");
+        File file=new File(LocalDate.now().toString()+UUID.randomUUID()+multipartFile.getOriginalFilename());
+        try(FileOutputStream fileOutputStream=new FileOutputStream(file)){
+            fileOutputStream.write(multipartFile.getBytes()); 
+        } catch (Exception e) {
             e.printStackTrace();
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.info(e.getMessage());
+            throw utillService.makeRuntimeEX("파일형식변환에 실패했습니다","convert");
         }
-        return "/Users/sesisoft/Desktop/persnal/projectj_backServer/src/main/resources/tempfilyers/" +multipartFile.getOriginalFilename();
+        return file;
     }
 }
