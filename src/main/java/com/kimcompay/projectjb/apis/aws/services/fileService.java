@@ -33,6 +33,9 @@ public class fileService {
 
     @Autowired
     private s3Service s3Service;
+    public void name() {
+        
+    }
     public JSONObject upload(MultipartHttpServletRequest request) {
         logger.info("upload");
         //파일꺼내기

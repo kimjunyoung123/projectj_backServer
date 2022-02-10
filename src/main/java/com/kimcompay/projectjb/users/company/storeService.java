@@ -59,7 +59,7 @@ public class storeService {
         file.delete();
         return response;
     }
-
+    
     @Transactional(rollbackFor = Exception.class)
     public JSONObject updateSleepOrOpen(int flag,int storeId) {
         logger.info("storeSleepOrOpen");
