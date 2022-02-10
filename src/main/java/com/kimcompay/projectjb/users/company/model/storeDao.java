@@ -9,7 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 
 public interface storeDao extends JpaRepository<storeVo,Integer> {
     
-    @Query(value = "select count(*) from companys where cnum=?",nativeQuery = true)
+    @Query(value = "select count(*) from companys where company_num=?",nativeQuery = true)
     int countBySnum(Long snum);
 
     @Query(value = "select count(*) from stores where store_name=? and store_num=? and store_address=?",nativeQuery = true)

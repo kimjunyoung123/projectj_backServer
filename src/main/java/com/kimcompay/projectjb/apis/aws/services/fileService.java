@@ -37,8 +37,10 @@ public class fileService {
         logger.info("upload");
         //파일꺼내기
         List<MultipartFile>files=request.getFiles("upload");
+        //file로변환
+        File file=convert(files.get(0));
         //s3업로드시도
-        JSONObject reseponse=s3Service.uploadImage(convert(files.get(0)), bucketName);
+        JSONObject reseponse=s3Service.uploadImage(file, bucketName);
         //성공했다면 페이지 이탈시 사진 삭제를 위해 세션에 담기+경로만들기
         Boolean result=(Boolean)reseponse.get("flag");
         String url=null;
@@ -63,6 +65,9 @@ public class fileService {
                 imgNames.add(uploadName);
                 httpSession.setAttribute(imgSession, imgNames);
             }
+            file.delete();
+        }else{
+            return reseponse;
         }
         reseponse.put("uploaded", result);
         reseponse.put("url", url);

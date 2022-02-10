@@ -26,7 +26,6 @@ public class s3Service {
         try {
             String saveName=file.getName();
             amazonS3.putObject(bucketName,saveName, file);
-            file.delete();
             logger.info("파일업로드 완료");
             return utillService.getJson(true, saveName);
         } catch (Exception e) {
