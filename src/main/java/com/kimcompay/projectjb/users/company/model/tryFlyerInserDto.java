@@ -18,7 +18,6 @@ public class tryFlyerInserDto {
     private String price;
     @NotBlank(message = "상품이름을 입력해주세요")
     private String productName;
-    @NotBlank(message = "이벤트 여부가 누락되었습니다 관리자에게 문의해주세요")
     private boolean eventFlag;
     //따로 유효성 검사
     private List<Map<String,Object>>eventInfors;
