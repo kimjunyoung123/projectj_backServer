@@ -10,6 +10,7 @@ import javax.validation.Valid;
 
 import com.kimcompay.projectjb.apis.google.ocrService;
 import com.kimcompay.projectjb.delivery.deliveryService;
+import com.kimcompay.projectjb.users.company.model.tryFlyerInserDto;
 import com.kimcompay.projectjb.users.company.model.tryInsertStoreDto;
 import com.kimcompay.projectjb.users.company.model.tryUpdateStoreDto;
 
@@ -66,16 +67,11 @@ public class compayAuthRestController {
         logger.info("uploadAndOcr");
         return storeService.ocrAndUpload(request);
     }
-    @RequestMapping(value = "/testimg",method = RequestMethod.POST)
-    public JSONObject testimg() {
-        logger.info("testimg");
-        try {
-           return ocrService.detectText();
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-            return null;
-        }
+    @RequestMapping(value = "/flyer/insert",method = RequestMethod.POST)
+    public JSONObject insertFlyerAndProducts(@Valid @RequestBody tryFlyerInserDto tryFlyerInserDto) {
+        logger.info("insertFlyerAndProducts controller");
+        logger.info(tryFlyerInserDto.toString());
+        return null;
     }
     @RequestMapping(value = "/gets/deliver/{page}/{storeId}/{startDate}/{endDate}/{state}",method = RequestMethod.GET)//매장 배달 현황 조회
     public JSONObject getDelivers(@PathVariable int page,@PathVariable int storeId,@PathVariable String startDate,@PathVariable String endDate,@PathVariable int state) {
