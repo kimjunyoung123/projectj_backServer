@@ -26,9 +26,9 @@ public class deliveryService {
         logger.info("getDeliverAddress");
         return utillService.getJson(true, deliverRoomDetailDao.findAddressByRoomId(roomId));
     }
-    public JSONObject getDelivers(int page,String startDay,String endDay,int storeId) {
+    public JSONObject getDelivers(int page,String startDay,String endDay,int storeId,int state) {
         logger.info("getDelivers");
-        List<Map<String,Object>>deliveryInfors=selectByPeriodAndStoreId(page, startDay, endDay, storeId);
+        List<Map<String,Object>>deliveryInfors=selectByPeriodAndStoreId(page, startDay, endDay, storeId,state);
         //요청페이지,배달건수 검증
         if(utillService.checkEmthy(deliveryInfors)){ 
             throw utillService.makeRuntimeEX("배달건수가 존재하지 않습니다", "getDelivers");
@@ -48,7 +48,7 @@ public class deliveryService {
         response.put("message", deliveryInfors);
         return response;
     }
-    public List<Map<String,Object>> selectByPeriodAndStoreId(int page,String startDay,String endDay,int storeId) {
+    public List<Map<String,Object>> selectByPeriodAndStoreId(int page,String startDay,String endDay,int storeId,int state) {
         logger.info("getDelivers");
         logger.info("조회날짜: "+startDay+", "+endDay);
         Boolean startResult=utillService.checkBlank(startDay);
@@ -60,11 +60,11 @@ public class deliveryService {
             if(daystart.toLocalDateTime().isAfter(dayEnd.toLocalDateTime())){
                 throw utillService.makeRuntimeEX("기간을 제대로 설정해주세요", "getDelivers");
             }
-            return deliveryRoomDao.findByDay(daystart, dayEnd, storeId,daystart, dayEnd, storeId,utillService.getStart(page, pageSize)-1,pageSize);
+            return deliveryRoomDao.findByDay(daystart, dayEnd, storeId,state,daystart, dayEnd, storeId,state,utillService.getStart(page, pageSize)-1,pageSize);
         }else if(!startResult&&endResult){
             throw utillService.makeRuntimeEX("기간을 제대로 설정해주세요", "getDelivers");
         } 
-        return deliveryRoomDao.findByAll(storeId,storeId,utillService.getStart(page, pageSize)-1,pageSize);
+        return deliveryRoomDao.findByAll(storeId,state,storeId,state,utillService.getStart(page, pageSize)-1,pageSize);
     }
     public List<Integer> selectRoomIdByUserIdAndFlag(int userId,int flag) {
         logger.info("selectRoomIdByUserIdAndFlag");

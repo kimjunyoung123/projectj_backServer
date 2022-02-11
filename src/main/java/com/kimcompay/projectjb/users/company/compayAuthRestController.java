@@ -77,11 +77,11 @@ public class compayAuthRestController {
             return null;
         }
     }
-    @RequestMapping(value = "/gets/deliver/{page}/{storeId}/{startDate}/{endDate}",method = RequestMethod.GET)//매장 배달 현황 조회
-    public JSONObject getDelivers(@PathVariable int page,@PathVariable int storeId,@PathVariable String startDate,@PathVariable String endDate) {
+    @RequestMapping(value = "/gets/deliver/{page}/{storeId}/{startDate}/{endDate}/{state}",method = RequestMethod.GET)//매장 배달 현황 조회
+    public JSONObject getDelivers(@PathVariable int page,@PathVariable int storeId,@PathVariable String startDate,@PathVariable String endDate,@PathVariable int state) {
         logger.info("getDelivers controller");
         
-        return deliveryService.getDelivers(page,startDate,endDate, storeId);
+        return deliveryService.getDelivers(page,startDate,endDate, storeId,state);
     }
     @RequestMapping(value = "/get/deliver/{roomId}",method = RequestMethod.GET)//매장 배달 디테일 조회
     public JSONObject getDeliverAddress(@PathVariable int roomId) {
