@@ -23,6 +23,10 @@ public class flyerService {
     @Autowired
     private fileService fileService;
     
+    public flyerVo getFlyer(int flyerId) {
+        logger.info("getFlyer");
+        return flyerDao.findById(flyerId).orElseThrow(()->utillService.makeRuntimeEX("존재하지 않는 전단입니다", "getFlyer"));
+    }
     private int insert(String imgPath,int storeId) {
         flyerVo vo=flyerVo.builder().img_path(imgPath).defaultSelect(0).storeId(storeId).companyId(utillService.getLoginId()).build();
         flyerDao.save(vo);

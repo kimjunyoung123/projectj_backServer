@@ -1,5 +1,7 @@
 package com.kimcompay.projectjb.users.company.model;
 
+import java.sql.Timestamp;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -7,7 +9,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-import com.google.auto.value.AutoValue.Builder;
+import org.hibernate.annotations.CreationTimestamp;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -17,14 +19,14 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-@Builder
+@lombok.Builder
 @ToString
 @Table(name = "products")
 @Entity
 public class productVo {  
     
     @Id 
-    @Column(name = "pid",nullable = false,unique = true)
+    @Column(name = "product_id",nullable = false,unique = true)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int pid;
 
@@ -32,7 +34,7 @@ public class productVo {
     private int storeId;
 
     @Column(name = "flyer_id",nullable = false)
-    private int flyer_id;
+    private int flyerId;
 
     @Column(name = "event_state",columnDefinition = "TINYINT")
     private int eventFlag;
@@ -54,4 +56,8 @@ public class productVo {
 
     @Column(name = "category",nullable =  false)
     private String category;
+
+    @Column(name = "product_created")
+    @CreationTimestamp
+    private Timestamp created;
 }

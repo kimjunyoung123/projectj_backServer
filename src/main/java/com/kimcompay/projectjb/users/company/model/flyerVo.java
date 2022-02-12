@@ -28,7 +28,7 @@ import lombok.ToString;
 public class flyerVo {
 
     @Id 
-    @Column(name = "fid",nullable = false,unique = true)
+    @Column(name = "flyer_id",nullable = false,unique = true)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int fid;
 
