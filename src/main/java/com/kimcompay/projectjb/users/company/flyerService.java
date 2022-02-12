@@ -24,7 +24,7 @@ public class flyerService {
     private fileService fileService;
     
     public void checkExists(int flyerId) {
-        if(flyerDao.existsById(flyerId)){
+        if(!flyerDao.existsById(flyerId)){
             throw utillService.makeRuntimeEX("존재하지 않는 전단입니다", "checkExists");
         }
     }
