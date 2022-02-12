@@ -2,6 +2,7 @@ package com.kimcompay.projectjb.users.company;
 
 import java.io.File;
 
+import com.kimcompay.projectjb.utillService;
 import com.kimcompay.projectjb.apis.aws.services.fileService;
 import com.kimcompay.projectjb.apis.google.ocrService;
 import com.kimcompay.projectjb.users.company.model.flyerDao;
@@ -23,7 +24,7 @@ public class flyerService {
     private fileService fileService;
     
     private int insert(String imgPath,int storeId) {
-        flyerVo vo=flyerVo.builder().img_path(imgPath).defaultSelect(0).storeId(storeId).build();
+        flyerVo vo=flyerVo.builder().img_path(imgPath).defaultSelect(0).storeId(storeId).companyId(utillService.getLoginId()).build();
         flyerDao.save(vo);
         return vo.getFid();
     }

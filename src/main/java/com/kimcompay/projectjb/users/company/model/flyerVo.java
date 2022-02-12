@@ -35,6 +35,9 @@ public class flyerVo {
     @Column(name = "store_id",nullable = false)
     private int storeId;
 
+    @Column(name = "company_id",nullable = false)
+    private int companyId;
+
     @Column(name = "flyer_img_path",nullable = false)
     private String img_path;
 
