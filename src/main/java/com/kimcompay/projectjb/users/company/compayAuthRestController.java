@@ -64,10 +64,10 @@ public class compayAuthRestController {
         logger.info("storeSleepOrOpen");
         return storeService.updateSleepOrOpen(flag, storeId);
     }
-    @RequestMapping(value = "/uploadAndGet",method = RequestMethod.POST)
-    public JSONObject uploadAndOcr(MultipartHttpServletRequest request) {
+    @RequestMapping(value = "/uploadAndGet/{storeId}",method = RequestMethod.POST)
+    public JSONObject uploadAndOcr(MultipartHttpServletRequest request,@PathVariable int storeId) {
         logger.info("uploadAndOcr");
-        return flyerService.ocrAndUpload(request);
+        return flyerService.ocrAndUpload(request,storeId);
     }
     @RequestMapping(value = "/flyer/insert",method = RequestMethod.POST)
     public JSONObject insertFlyerAndProducts(@Valid @RequestBody tryProductInsertDto tryProductInsertDto) {

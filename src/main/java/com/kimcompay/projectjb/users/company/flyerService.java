@@ -27,14 +27,14 @@ public class flyerService {
         flyerDao.save(vo);
         return vo.getFid();
     }
-    public JSONObject ocrAndUpload(MultipartHttpServletRequest request) {
+    public JSONObject ocrAndUpload(MultipartHttpServletRequest request,int storeId) {
         JSONObject response=new JSONObject();
         File file=fileService.convert(request.getFile("upload"));
         //aws upload
         response=fileService.upload(file);
         //글자추출
         try {
-            //response.put("ocr",ocrService.detectText(file.toPath().toString()));
+            response.put("ocr",ocrService.detectText(file.toPath().toString()));
         } catch (Exception e) {
             logger.info("ocr 글자 추출 실패");
             e.printStackTrace();
@@ -42,8 +42,7 @@ public class flyerService {
         //로컬 파일 삭제
         file.delete();
         //전단지 insert 
-        System.out.println("rr"+request.getParameter("storeId"));
-        response.put("id",insert(response.get("url").toString(),Integer.parseInt(request.getParameter("storeId"))));
+        response.put("id",insert(response.get("message").toString(),storeId));
         return response;
     }
 }
