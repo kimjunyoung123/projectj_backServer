@@ -12,7 +12,7 @@ import lombok.ToString;
 @NoArgsConstructor
 @ToString
 @Data
-public class tryFlyerInserDto {
+public class tryProductInsertDto {
     private int storeId;
     @NotBlank(message = "가격을 입력해주세요")
     private String price;

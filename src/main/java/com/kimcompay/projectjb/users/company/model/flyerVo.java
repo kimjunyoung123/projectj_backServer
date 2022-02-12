@@ -9,18 +9,20 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-import com.google.auto.value.AutoValue.Builder;
 
 import org.hibernate.annotations.CreationTimestamp;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
 @Builder
+@ToString
 @Table(name = "flyers")
 @Entity
 public class flyerVo {
@@ -31,9 +33,9 @@ public class flyerVo {
     private int fid;
 
     @Column(name = "store_id",nullable = false)
-    private String storeId;
+    private int storeId;
 
-    @Column(name = "img_path",nullable = false)
+    @Column(name = "flyer_img_path",nullable = false)
     private String img_path;
 
     @Column(name = "fcreated")

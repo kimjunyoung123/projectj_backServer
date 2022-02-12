@@ -15,6 +15,8 @@ import com.kimcompay.projectjb.apis.kakao.kakaoMapService;
 import com.kimcompay.projectjb.enums.intenums;
 import com.kimcompay.projectjb.enums.senums;
 import com.kimcompay.projectjb.users.principalDetails;
+import com.kimcompay.projectjb.users.company.model.flyerDao;
+import com.kimcompay.projectjb.users.company.model.flyerVo;
 import com.kimcompay.projectjb.users.company.model.storeDao;
 import com.kimcompay.projectjb.users.company.model.storeVo;
 import com.kimcompay.projectjb.users.company.model.tryInsertStoreDto;
@@ -46,19 +48,7 @@ public class storeService {
     @Autowired
     private RedisTemplate<String,String>redisTemplate;
     
-    public JSONObject ocrAndUpload(MultipartHttpServletRequest request) {
-        JSONObject response=new JSONObject();
-        File file=fileService.convert(request.getFile("upload"));
-        response=fileService.upload(file);
-        try {
-            response.put("ocr",ocrService.detectText(file.toPath().toString()));
-        } catch (Exception e) {
-            logger.info("ocr 글자 추출 실패");
-            e.printStackTrace();
-        }
-        file.delete();
-        return response;
-    }
+    
 
     @Transactional(rollbackFor = Exception.class)
     public JSONObject updateSleepOrOpen(int flag,int storeId) {

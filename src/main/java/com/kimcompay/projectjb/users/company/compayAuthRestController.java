@@ -10,7 +10,7 @@ import javax.validation.Valid;
 
 import com.kimcompay.projectjb.apis.google.ocrService;
 import com.kimcompay.projectjb.delivery.deliveryService;
-import com.kimcompay.projectjb.users.company.model.tryFlyerInserDto;
+import com.kimcompay.projectjb.users.company.model.tryProductInsertDto;
 import com.kimcompay.projectjb.users.company.model.tryInsertStoreDto;
 import com.kimcompay.projectjb.users.company.model.tryUpdateStoreDto;
 
@@ -34,6 +34,8 @@ public class compayAuthRestController {
     private storeService storeService;
     @Autowired
     private deliveryService deliveryService;
+    @Autowired
+    private flyerService flyerService;
 
 
     //매장등록
@@ -65,12 +67,12 @@ public class compayAuthRestController {
     @RequestMapping(value = "/uploadAndGet",method = RequestMethod.POST)
     public JSONObject uploadAndOcr(MultipartHttpServletRequest request) {
         logger.info("uploadAndOcr");
-        return storeService.ocrAndUpload(request);
+        return flyerService.ocrAndUpload(request);
     }
     @RequestMapping(value = "/flyer/insert",method = RequestMethod.POST)
-    public JSONObject insertFlyerAndProducts(@Valid @RequestBody tryFlyerInserDto tryFlyerInserDto) {
+    public JSONObject insertFlyerAndProducts(@Valid @RequestBody tryProductInsertDto tryProductInsertDto) {
         logger.info("insertFlyerAndProducts controller");
-        logger.info(tryFlyerInserDto.toString());
+        logger.info(tryProductInsertDto.toString());
         return null;
     }
     @RequestMapping(value = "/gets/deliver/{page}/{storeId}/{startDate}/{endDate}/{state}",method = RequestMethod.GET)//매장 배달 현황 조회
