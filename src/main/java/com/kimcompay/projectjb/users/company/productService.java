@@ -27,26 +27,30 @@ public class productService {
     private productDao productDao;
     @Autowired
     private productEventDao productEventDao;
+    @Autowired
+    private flyerService flyerService;
 
     @Transactional(rollbackFor = Exception.class)
     public JSONObject insert(tryProductInsertDto tryProductInsertDto) {
         logger.info("insert");
-        //옳바른 전단이지 검
-        productVo vo=productVo.builder().category(tryProductInsertDto.getCategory()).text(tryProductInsertDto.getText()).flyerId(tryProductInsertDto.getFlyerId()).origin(tryProductInsertDto.getOrigin()).price(tryProductInsertDto.getPrice()).productImgPath(tryProductInsertDto.getProductImgPath()).productName(tryProductInsertDto.getProductName()).eventFlag(tryProductInsertDto.getEventFlag()).build();
+        int flyerId=tryProductInsertDto.getFlyerId();
+        //유요한 전단인지 검사
+        flyerService.checkExists(flyerId);
+        //상품 insert
+        productVo vo=productVo.builder().category(tryProductInsertDto.getCategory()).text(tryProductInsertDto.getText()).flyerId(flyerId).origin(tryProductInsertDto.getOrigin()).price(tryProductInsertDto.getPrice()).productImgPath(tryProductInsertDto.getProductImgPath()).productName(tryProductInsertDto.getProductName()).eventFlag(tryProductInsertDto.getEventFlag()).build();
+        productDao.save(vo);
+        //이벤트 여부 검사
         if(tryProductInsertDto.getEventFlag()==1){
             logger.info("이벤트 테이블 insert시도");
-            checkEvent(tryProductInsertDto.getEventInfors());
-
-        }
-        productDao.save(vo);
-        List<Map<String,Object>>eventInfors=(List<Map<String,Object>>)tryProductInsertDto.getEventInfors();
-        for(Map<String,Object>eventInfor:eventInfors){
-            productEventVo vo2=productEventVo.builder().date(eventInfor.get("date").toString()).productId(vo.getPid()).eventPrice(Integer.parseInt(eventInfor.get("price").toString())).build();
-            productEventDao.save(vo2);
-        }
+            List<Map<String,Object>>eventInfors=(List<Map<String,Object>>)tryProductInsertDto.getEventInfors();
+            checkEvent(eventInfors);
+            for(Map<String,Object>eventInfor:eventInfors){
+                productEventVo vo2=productEventVo.builder().date(eventInfor.get("date").toString()).productId(vo.getPid()).eventPrice(Integer.parseInt(eventInfor.get("price").toString())).build();
+                productEventDao.save(vo2);
+            }
+        } 
         return utillService.getJson(true, "상품등록에 성공 하였습니다");
     }
-   
     private boolean checkPrice(int price) {
         logger.info("checkPrice");
         if(price<=0){

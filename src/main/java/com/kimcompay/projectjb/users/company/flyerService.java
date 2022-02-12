@@ -23,6 +23,11 @@ public class flyerService {
     @Autowired
     private fileService fileService;
     
+    public void checkExists(int flyerId) {
+        if(flyerDao.existsById(flyerId)){
+            throw utillService.makeRuntimeEX("존재하지 않는 전단입니다", "checkExists");
+        }
+    }
     public flyerVo getFlyer(int flyerId) {
         logger.info("getFlyer");
         return flyerDao.findById(flyerId).orElseThrow(()->utillService.makeRuntimeEX("존재하지 않는 전단입니다", "getFlyer"));
