@@ -36,6 +36,8 @@ public class compayAuthRestController {
     private deliveryService deliveryService;
     @Autowired
     private flyerService flyerService;
+    @Autowired
+    private productService productService;
 
 
     //매장등록
@@ -64,16 +66,17 @@ public class compayAuthRestController {
         logger.info("storeSleepOrOpen");
         return storeService.updateSleepOrOpen(flag, storeId);
     }
+    //전단등록
     @RequestMapping(value = "/uploadAndGet/{storeId}",method = RequestMethod.POST)
     public JSONObject uploadAndOcr(MultipartHttpServletRequest request,@PathVariable int storeId) {
         logger.info("uploadAndOcr");
         return flyerService.ocrAndUpload(request,storeId);
     }
+    //상품등록
     @RequestMapping(value = "/flyer/insert",method = RequestMethod.POST)
     public JSONObject insertFlyerAndProducts(@Valid @RequestBody tryProductInsertDto tryProductInsertDto) {
         logger.info("insertFlyerAndProducts controller");
-        logger.info(tryProductInsertDto.toString());
-        return null;
+        return productService.insert(tryProductInsertDto);
     }
     @RequestMapping(value = "/gets/deliver/{page}/{storeId}/{startDate}/{endDate}/{state}",method = RequestMethod.GET)//매장 배달 현황 조회
     public JSONObject getDelivers(@PathVariable int page,@PathVariable int storeId,@PathVariable String startDate,@PathVariable String endDate,@PathVariable int state) {
