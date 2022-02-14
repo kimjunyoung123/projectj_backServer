@@ -51,19 +51,13 @@ public class deliveryService {
     public List<Map<String,Object>> selectByPeriodAndStoreId(int page,String startDay,String endDay,int storeId,int state) {
         logger.info("getDelivers");
         logger.info("조회날짜: "+startDay+", "+endDay);
-        Boolean startResult=utillService.checkBlank(startDay);
-        Boolean endResult=utillService.checkBlank(endDay);
-        if(!startResult&&!endResult){
-            Timestamp daystart=Timestamp.valueOf(startDay+" 00:00:00");
-            Timestamp dayEnd=Timestamp.valueOf(endDay+" 23:59:59");
-            //시작,종료일 검사
-            if(daystart.toLocalDateTime().isAfter(dayEnd.toLocalDateTime())){
-                throw utillService.makeRuntimeEX("기간을 제대로 설정해주세요", "getDelivers");
-            }
-            return deliveryRoomDao.findByDay(daystart, dayEnd, storeId,state,daystart, dayEnd, storeId,state,utillService.getStart(page, pageSize)-1,pageSize);
-        }else if(!startResult&&endResult){
-            throw utillService.makeRuntimeEX("기간을 제대로 설정해주세요", "getDelivers");
-        } 
+        Map<String,Object>result=utillService.checkRequestDate(startDay, endDay);
+        if((boolean)result.get("flag")){
+            Timestamp start=Timestamp.valueOf(result.get("start").toString());
+            Timestamp end=Timestamp.valueOf(result.get("end").toString());
+            return deliveryRoomDao.findByDay(start, end, storeId,state,start, end, storeId,state,utillService.getStart(page, pageSize)-1,pageSize);
+
+        }
         return deliveryRoomDao.findByAll(storeId,state,storeId,state,utillService.getStart(page, pageSize)-1,pageSize);
     }
     public List<Integer> selectRoomIdByUserIdAndFlag(int userId,int flag) {

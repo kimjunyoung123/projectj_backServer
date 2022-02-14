@@ -1,6 +1,9 @@
 package com.kimcompay.projectjb.users.company;
 
 import java.io.File;
+import java.sql.Timestamp;
+import java.util.List;
+import java.util.Map;
 
 import com.kimcompay.projectjb.utillService;
 import com.kimcompay.projectjb.apis.aws.services.fileService;
@@ -18,11 +21,27 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 @Service
 public class flyerService {
     private Logger logger=LoggerFactory.getLogger(flyerService.class);
+    private final int pageSize=2;
     @Autowired
     private flyerDao flyerDao;
     @Autowired
     private fileService fileService;
     
+    public List<flyerVo> getByStoreId(int storeId,int page,String startDate,String endDate) {
+        logger.info("getByStoreId");
+        return null;
+    }
+    private List<flyerVo> getFlyerArr(int storeId,String startDate,String endDate,int page) {
+        logger.info("getByStoreId");
+        Map<String,Object>result=utillService.checkRequestDate(startDate, endDate);
+        if((boolean)result.get("flag")){
+            Timestamp start=Timestamp.valueOf(result.get("start").toString());
+            Timestamp end=Timestamp.valueOf(result.get("end").toString());
+            return flyerDao.findByDay(start, end, storeId,start, end, storeId,utillService.getStart(page, pageSize)-1,pageSize);
+
+        }
+        return flyerDao.findByStoreId(storeId);
+    }
     public void checkExists(int flyerId) {
         if(!flyerDao.existsById(flyerId)){
             throw utillService.makeRuntimeEX("존재하지 않는 전단입니다", "checkExists");

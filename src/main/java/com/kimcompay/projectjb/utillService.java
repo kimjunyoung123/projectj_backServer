@@ -1,7 +1,9 @@
 package com.kimcompay.projectjb;
 
 import java.io.IOException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -303,6 +305,36 @@ public class utillService {
             logger.info("이미지가 존재하지 않습니다");
         }
         return imgNames;
+    }
+    public static  List<String> getDateInStrgin(String keyword) {
+        List<String>dates=Arrays.asList(keyword.split(","));
+        if(dates.isEmpty()){
+            dates.add(null);
+            dates.add(null);
+        }
+        return dates;
+    }
+    public static Map<String,Object> checkRequestDate(String startDay,String endDay) {
+        logger.info("");
+        Map<String,Object>result=new HashMap<>();
+        Boolean startResult=utillService.checkBlank(startDay);
+        Boolean endResult=utillService.checkBlank(endDay);
+        if(!startResult&&!endResult){
+            Timestamp daystart=Timestamp.valueOf(startDay+" 00:00:00");
+            Timestamp dayEnd=Timestamp.valueOf(endDay+" 23:59:59");
+            //시작,종료일 검사
+            if(daystart.toLocalDateTime().isAfter(dayEnd.toLocalDateTime())){
+                throw utillService.makeRuntimeEX("기간을 제대로 설정해주세요", "getDelivers");
+            }
+            result.put("flag", true);
+            result.put("start", daystart);
+            result.put("end", dayEnd);
+            return result;
+        }else if(!startResult&&endResult){
+            throw utillService.makeRuntimeEX("기간을 제대로 설정해주세요", "getDelivers");
+        } 
+        result.put("flag", false);
+        return result;
     }
     
  

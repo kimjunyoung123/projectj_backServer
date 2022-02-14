@@ -53,19 +53,25 @@ public class storeService {
     private RedisTemplate<String,String>redisTemplate;
     @Autowired
     private deliveryService deliveryService;
+    @Autowired
+    private flyerService flyerService;
     
     public JSONObject authGetsActionHub(String kind,int page,String keyword) {
         logger.info("authGetsActionHub");
         if(kind.equals("stores")){
             return getStoresByEmail(page,keyword);
         }else if(kind.equals("deliver")){
-            List<String>dates=Arrays.asList(keyword.split(","));
+            List<String>dates=utillService.getDateInStrgin(keyword);
             HttpServletRequest request=utillService.getHttpServletRequest();
-            if(dates.isEmpty()){
-                dates.add(null);
-                dates.add(null);
-            }
             return deliveryService.getDelivers(page,dates.get(0),dates.get(1),Integer.parseInt(request.getParameter("storeId")), Integer.parseInt(request.getParameter("state")));
+        }else if(kind.equals("flyers")){
+            List<String>dates=utillService.getDateInStrgin(keyword);
+            HttpServletRequest request=utillService.getHttpServletRequest();
+            List<flyerVo>flyerVos=flyerService.getByStoreId(Integer.parseInt(request.getParameter("storeId")),page,dates.get(0),dates.get(1));
+            if(utillService.checkEmthy(flyerVos)){
+                throw utillService.makeRuntimeEX("등록한 전단(상품)이 없습니다", "authGetsActionHub");
+            }
+            return utillService.getJson(true, flyerVos);
         }else {
             throw utillService.makeRuntimeEX("잘못된요청입니다", "authGetsActionHub");
         }
