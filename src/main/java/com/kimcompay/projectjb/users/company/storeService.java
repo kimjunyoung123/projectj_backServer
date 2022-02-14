@@ -25,6 +25,7 @@ import com.kimcompay.projectjb.users.company.model.storeVo;
 import com.kimcompay.projectjb.users.company.model.tryInsertStoreDto;
 import com.kimcompay.projectjb.users.company.model.tryUpdateStoreDto;
 
+import org.checkerframework.checker.units.qual.K;
 import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,7 +70,16 @@ public class storeService {
             throw utillService.makeRuntimeEX("잘못된요청입니다", "authGetsActionHub");
         }
     }
-
+    public JSONObject authGetActionHub(String kind,int id) {
+        logger.info("authGetActionHub");
+        if(kind.equals("store")){
+            return getStore(id);
+        }else if(kind.equals("deliver")){
+            return deliveryService.getDeliverAddress(id);
+        }else{
+            throw utillService.makeRuntimeEX("잘못된요청입니다", "authGetsActionHub");
+        }
+    }
     @Transactional(rollbackFor = Exception.class)
     public JSONObject updateSleepOrOpen(int flag,int storeId) {
         logger.info("storeSleepOrOpen");
@@ -248,7 +258,7 @@ public class storeService {
         logger.info("배달목록 찾는 상점:  "+loginId);
         return redisTemplate.opsForValue().get(loginId+"delivery");
     }
-    public JSONObject getStore(int id) {
+    private JSONObject getStore(int id) {
         logger.info("getStore");
         logger.info("조회 매장 고유번호: "+id);
         storeVo storeVo=storeDao.findBySid(id).orElseThrow(()->utillService.makeRuntimeEX("존재하지 않는 매장입니다", "getStore"));

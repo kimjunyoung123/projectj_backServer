@@ -1,14 +1,12 @@
 package com.kimcompay.projectjb.users.company;
 
 
-import java.io.IOException;
 
 
 
 import javax.validation.Valid;
 
 
-import com.kimcompay.projectjb.apis.google.ocrService;
 import com.kimcompay.projectjb.delivery.deliveryService;
 import com.kimcompay.projectjb.users.company.model.tryProductInsertDto;
 import com.kimcompay.projectjb.users.company.model.tryInsertStoreDto;
@@ -46,15 +44,17 @@ public class compayAuthRestController {
         logger.info("storeInsert controller");
         return storeService.insert(tryInsertStoreDto);
     }
-    @RequestMapping(value = "/gets/{kind}/{page}/{keyword}",method = RequestMethod.GET)//보유매장조회
+    //매장,배달리스트 조화
+    @RequestMapping(value = "/gets/{kind}/{page}/{keyword}",method = RequestMethod.GET)
     public JSONObject getStores(@PathVariable int page,@PathVariable String keyword,@PathVariable String kind) {
         logger.info("getStores controller");
         return storeService.authGetsActionHub(kind,page,keyword);
     }
-    @RequestMapping(value = "/get/{id}",method = RequestMethod.GET)//매장정보상세조회
-    public JSONObject getStore(@PathVariable int id) {
+    //매장,배달 디테일 정보조회
+    @RequestMapping(value = "/get/{kind}/{id}",method = RequestMethod.GET)
+    public JSONObject getStore(@PathVariable int id,@PathVariable String kind) {
         logger.info("getStore controller");
-        return storeService.getStore(id);
+        return storeService.authGetActionHub(kind,id);
     }
     @RequestMapping(value = "/infor/change",method = RequestMethod.PUT)//매장 정보수정
     public JSONObject storeUpdate(@Valid @RequestBody tryUpdateStoreDto tryUpdateStoreDto) {
@@ -77,17 +77,5 @@ public class compayAuthRestController {
     public JSONObject insertFlyerAndProducts(@Valid @RequestBody tryProductInsertDto tryProductInsertDto) {
         logger.info("insertFlyerAndProducts controller");
         return productService.insert(tryProductInsertDto);
-    }
-    /*@RequestMapping(value = "/gets/deliver/{page}/{storeId}/{startDate}/{endDate}/{state}",method = RequestMethod.GET)//매장 배달 현황 조회
-    public JSONObject getDelivers(@PathVariable int page,@PathVariable int storeId,@PathVariable String startDate,@PathVariable String endDate,@PathVariable int state) {
-        logger.info("getDelivers controller");
-        
-        return deliveryService.getDelivers(page,startDate,endDate, storeId,state);
-    }*/
-    @RequestMapping(value = "/get/deliver/{roomId}",method = RequestMethod.GET)//매장 배달 디테일 조회
-    public JSONObject getDeliverAddress(@PathVariable int roomId) {
-        logger.info("getDeliverAddress controller");
-        
-        return deliveryService.getDeliverAddress(roomId);
     }
 }
