@@ -2,9 +2,11 @@ package com.kimcompay.projectjb.users.company;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import com.kimcompay.projectjb.utillService;
@@ -12,6 +14,7 @@ import com.kimcompay.projectjb.apis.aws.services.fileService;
 import com.kimcompay.projectjb.apis.aws.services.sqsService;
 import com.kimcompay.projectjb.apis.google.ocrService;
 import com.kimcompay.projectjb.apis.kakao.kakaoMapService;
+import com.kimcompay.projectjb.delivery.deliveryService;
 import com.kimcompay.projectjb.enums.intenums;
 import com.kimcompay.projectjb.enums.senums;
 import com.kimcompay.projectjb.users.principalDetails;
@@ -47,8 +50,25 @@ public class storeService {
     private fileService fileService;
     @Autowired
     private RedisTemplate<String,String>redisTemplate;
+    @Autowired
+    private deliveryService deliveryService;
     
-    
+    public JSONObject authGetsActionHub(String kind,int page,String keyword) {
+        logger.info("authGetsActionHub");
+        if(kind.equals("stores")){
+            return getStoresByEmail(page,keyword);
+        }else if(kind.equals("deliver")){
+            List<String>dates=Arrays.asList(keyword.split(","));
+            HttpServletRequest request=utillService.getHttpServletRequest();
+            if(dates.isEmpty()){
+                dates.add(null);
+                dates.add(null);
+            }
+            return deliveryService.getDelivers(page,dates.get(0),dates.get(1),Integer.parseInt(request.getParameter("storeId")), Integer.parseInt(request.getParameter("state")));
+        }else {
+            throw utillService.makeRuntimeEX("잘못된요청입니다", "authGetsActionHub");
+        }
+    }
 
     @Transactional(rollbackFor = Exception.class)
     public JSONObject updateSleepOrOpen(int flag,int storeId) {
@@ -246,9 +266,9 @@ public class storeService {
             throw utillService.makeRuntimeEX("매장 소유자의 계정이 아닙니다", "getStore");
         }
     }
-    public JSONObject getStoresByEmail(String page,String keyword) {
+    private JSONObject getStoresByEmail(int page,String keyword) {
         logger.info("getStoresByEmail");
-        int requestPage=Integer.parseInt(page);
+        int requestPage=page;
         List<Map<String,Object>>storeSelectInfor=getStoresInfor(utillService.getLoginId(), keyword, requestPage);
         if(utillService.checkEmthy(storeSelectInfor)){
             if(utillService.checkBlank(keyword)){

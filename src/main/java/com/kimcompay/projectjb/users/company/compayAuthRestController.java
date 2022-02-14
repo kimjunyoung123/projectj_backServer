@@ -46,10 +46,10 @@ public class compayAuthRestController {
         logger.info("storeInsert controller");
         return storeService.insert(tryInsertStoreDto);
     }
-    @RequestMapping(value = "/gets/{page}/{keyword}",method = RequestMethod.GET)//보유매장조회
-    public JSONObject getStores(@PathVariable String page,@PathVariable String keyword) {
+    @RequestMapping(value = "/gets/{kind}/{page}/{keyword}",method = RequestMethod.GET)//보유매장조회
+    public JSONObject getStores(@PathVariable int page,@PathVariable String keyword,@PathVariable String kind) {
         logger.info("getStores controller");
-        return storeService.getStoresByEmail(page,keyword);
+        return storeService.authGetsActionHub(kind,page,keyword);
     }
     @RequestMapping(value = "/get/{id}",method = RequestMethod.GET)//매장정보상세조회
     public JSONObject getStore(@PathVariable int id) {
@@ -78,12 +78,12 @@ public class compayAuthRestController {
         logger.info("insertFlyerAndProducts controller");
         return productService.insert(tryProductInsertDto);
     }
-    @RequestMapping(value = "/gets/deliver/{page}/{storeId}/{startDate}/{endDate}/{state}",method = RequestMethod.GET)//매장 배달 현황 조회
+    /*@RequestMapping(value = "/gets/deliver/{page}/{storeId}/{startDate}/{endDate}/{state}",method = RequestMethod.GET)//매장 배달 현황 조회
     public JSONObject getDelivers(@PathVariable int page,@PathVariable int storeId,@PathVariable String startDate,@PathVariable String endDate,@PathVariable int state) {
         logger.info("getDelivers controller");
         
         return deliveryService.getDelivers(page,startDate,endDate, storeId,state);
-    }
+    }*/
     @RequestMapping(value = "/get/deliver/{roomId}",method = RequestMethod.GET)//매장 배달 디테일 조회
     public JSONObject getDeliverAddress(@PathVariable int roomId) {
         logger.info("getDeliverAddress controller");
