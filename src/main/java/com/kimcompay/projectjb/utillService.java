@@ -176,6 +176,9 @@ public class utillService {
     }
     public static <T> boolean checkEmthy(List<T>arr) {
         logger.info("checkEmthy");
+        if(arr==null){
+            return true;
+        }
         if(arr.size()==0||arr.isEmpty()){
             return true;
         }

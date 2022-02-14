@@ -41,7 +41,7 @@ public class flyerVo {
     @Column(name = "flyer_img_path",nullable = false)
     private String img_path;
 
-    @Column(name = "fcreated")
+    @Column(name = "flyer_created")
     @CreationTimestamp
     private Timestamp fcreated;
 

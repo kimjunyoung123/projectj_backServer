@@ -29,7 +29,12 @@ public class flyerService {
     
     public List<flyerVo> getByStoreId(int storeId,int page,String startDate,String endDate) {
         logger.info("getByStoreId");
-        return null;
+        List<flyerVo>flyerVos=getFlyerArr(storeId, startDate, endDate, page);
+        if(utillService.checkEmthy(flyerVos)){
+            throw utillService.makeRuntimeEX("등록한 전단 및 상품이 없습니다", "getByStoreId");
+        }
+        
+        return flyerVos;
     }
     private List<flyerVo> getFlyerArr(int storeId,String startDate,String endDate,int page) {
         logger.info("getByStoreId");
@@ -40,7 +45,7 @@ public class flyerService {
             return flyerDao.findByDay(start, end, storeId,start, end, storeId,utillService.getStart(page, pageSize)-1,pageSize);
 
         }
-        return flyerDao.findByStoreId(storeId);
+        return flyerDao.findByStoreId(storeId,storeId,page,pageSize);
     }
     public void checkExists(int flyerId) {
         if(!flyerDao.existsById(flyerId)){
