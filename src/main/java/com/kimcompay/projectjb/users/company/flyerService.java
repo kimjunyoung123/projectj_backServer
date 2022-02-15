@@ -27,7 +27,18 @@ public class flyerService {
     @Autowired
     private fileService fileService;
     
-
+    public JSONObject getFlyerAndProducts(int flyerId) {
+        logger.info("getFlyerAndProducts");
+        Map<String,Object>infors=getFlyerJoinProductAndEvent(flyerId);
+        if(infors.isEmpty()){
+            throw utillService.makeRuntimeEX("등록된 상품,전단,이벤트가 없습니다", "getFlyerAndProducts");
+        }
+        return utillService.getJson(true, infors);
+    }
+    private Map<String,Object> getFlyerJoinProductAndEvent(int flyerId) {
+        logger.info("getFlyerJoinProductAndEvent");
+        return flyerDao.findByFlyerJoinProductAndEvent(flyerId);
+    }
     public List<Map<String,Object>> getFlyerArr(int storeId,String startDate,String endDate,int page) {
         logger.info("getByStoreId");
         Map<String,Object>result=utillService.checkRequestDate(startDate, endDate);

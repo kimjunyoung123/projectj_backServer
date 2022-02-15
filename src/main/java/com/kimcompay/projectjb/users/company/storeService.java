@@ -87,6 +87,8 @@ public class storeService {
             return getStore(id);
         }else if(kind.equals("deliver")){
             return deliveryService.getDeliverAddress(id);
+        }else if(kind.equals("flyer")){
+            return flyerService.getFlyerAndProducts(id);
         }else{
             throw utillService.makeRuntimeEX("잘못된요청입니다", "authGetsActionHub");
         }
