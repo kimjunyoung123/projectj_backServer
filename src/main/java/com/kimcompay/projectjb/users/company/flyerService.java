@@ -27,16 +27,8 @@ public class flyerService {
     @Autowired
     private fileService fileService;
     
-    public List<flyerVo> getByStoreId(int storeId,int page,String startDate,String endDate) {
-        logger.info("getByStoreId");
-        List<flyerVo>flyerVos=getFlyerArr(storeId, startDate, endDate, page);
-        if(utillService.checkEmthy(flyerVos)){
-            throw utillService.makeRuntimeEX("등록한 전단 및 상품이 없습니다", "getByStoreId");
-        }
-        
-        return flyerVos;
-    }
-    private List<flyerVo> getFlyerArr(int storeId,String startDate,String endDate,int page) {
+
+    public List<Map<String,Object>> getFlyerArr(int storeId,String startDate,String endDate,int page) {
         logger.info("getByStoreId");
         Map<String,Object>result=utillService.checkRequestDate(startDate, endDate);
         if((boolean)result.get("flag")){
