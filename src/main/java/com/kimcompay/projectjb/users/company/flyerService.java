@@ -29,13 +29,21 @@ public class flyerService {
     
     public JSONObject getFlyerAndProducts(int flyerId) {
         logger.info("getFlyerAndProducts");
-        Map<String,Object>infors=getFlyerJoinProductAndEvent(flyerId);
+        flyerVo flyerVo=flyerDao.findByFid(flyerId).orElseThrow(()->utillService.makeRuntimeEX("존재하지 않는 전단입니다", "getFlyerAndProducts"));
+        if(flyerVo.getCompanyId()!=utillService.getLoginId()){
+            throw utillService.makeRuntimeEX("회사소유의 전단이 아닙니다", "getFlyerAndProducts");
+        }
+        List<Map<String,Object>>infors=getFlyerJoinProductAndEvent(flyerId);
         if(infors.isEmpty()){
             throw utillService.makeRuntimeEX("등록된 상품,전단,이벤트가 없습니다", "getFlyerAndProducts");
         }
-        return utillService.getJson(true, infors);
+        JSONObject response =new JSONObject();
+        response.put("flag", true);
+        response.put("infors", infors);
+        response.put("flyer", flyerVo);
+        return response;
     }
-    private Map<String,Object> getFlyerJoinProductAndEvent(int flyerId) {
+    private List<Map<String,Object>> getFlyerJoinProductAndEvent(int flyerId) {
         logger.info("getFlyerJoinProductAndEvent");
         return flyerDao.findByFlyerJoinProductAndEvent(flyerId);
     }
