@@ -27,11 +27,11 @@ import lombok.ToString;
 public class storeVo {
     
     @Id 
-    @Column(name = "sid",nullable = false,unique = true)
+    @Column(name = "store_id",nullable = false,unique = true)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int sid;
  
-    @Column(name = "cid",nullable = false)
+    @Column(name = "company_id",nullable = false)
     private int cid;
 
     @Column(name = "store_address",nullable = false ,length = 50)

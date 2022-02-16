@@ -54,7 +54,7 @@ public class flyerService {
             Map<Integer,Object>events=new HashMap<>();
             for(productVo vo:products){
                 if(vo.getEventFlag()==1){
-                    events.put(vo.getProductId(),productService.getProductEvent(vo.getProductId()));
+                    events.put(vo.getId(),productService.getProductEvent(vo.getId()));
                 }
             }
             if(!events.isEmpty()){
@@ -85,7 +85,7 @@ public class flyerService {
     private int insert(String imgPath,int storeId) {
         flyerVo vo=flyerVo.builder().img_path(imgPath).defaultSelect(0).storeId(storeId).companyId(utillService.getLoginId()).build();
         flyerDao.save(vo);
-        return vo.getFid();
+        return vo.getId();
     }
     public JSONObject ocrAndUpload(MultipartHttpServletRequest request,int storeId) {
         JSONObject response=new JSONObject();

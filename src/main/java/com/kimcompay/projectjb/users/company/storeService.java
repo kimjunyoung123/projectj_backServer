@@ -97,7 +97,7 @@ public class storeService {
     public JSONObject updateSleepOrOpen(int flag,int storeId) {
         logger.info("storeSleepOrOpen");
         int loginId=utillService.getLoginId();
-        storeVo storeVo=storeDao.findBySid(storeId).orElseThrow(()->utillService.makeRuntimeEX("존재하지 않는 매장입니다", "storeSleepOrOpen"));
+        storeVo storeVo=storeDao.findById(storeId).orElseThrow(()->utillService.makeRuntimeEX("존재하지 않는 매장입니다", "storeSleepOrOpen"));
         if(storeVo.getCid()!=loginId){
             throw utillService.makeRuntimeEX("회사소유의 매장이 아닙니다", "storeSleepOrOpen");
         }
@@ -274,7 +274,7 @@ public class storeService {
     private JSONObject getStore(int id) {
         logger.info("getStore");
         logger.info("조회 매장 고유번호: "+id);
-        storeVo storeVo=storeDao.findBySid(id).orElseThrow(()->utillService.makeRuntimeEX("존재하지 않는 매장입니다", "getStore"));
+        storeVo storeVo=storeDao.findById(id).orElseThrow(()->utillService.makeRuntimeEX("존재하지 않는 매장입니다", "getStore"));
         logger.info("메징조회 정보: "+storeVo.toString());
         //매장 소유 회사 계정인지 검사
         utillService.checkOwner(storeVo.getCid(),"매장 소유자의 계정이 아닙니다");

@@ -51,7 +51,7 @@ public class productService {
             List<Map<String,Object>>eventInfors=(List<Map<String,Object>>)tryProductInsertDto.getEventInfors();
             checkEvent(eventInfors);
             for(Map<String,Object>eventInfor:eventInfors){
-                productEventVo vo2=productEventVo.builder().date(eventInfor.get("date").toString()).productId(vo.getProductId()).eventPrice(Integer.parseInt(eventInfor.get("price").toString())).build();
+                productEventVo vo2=productEventVo.builder().date(eventInfor.get("date").toString()).productId(vo.getId()).eventPrice(Integer.parseInt(eventInfor.get("price").toString())).build();
                 productEventDao.save(vo2);
             }
         } 

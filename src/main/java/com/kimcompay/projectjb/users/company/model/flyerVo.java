@@ -30,7 +30,7 @@ public class flyerVo {
     @Id 
     @Column(name = "flyer_id",nullable = false,unique = true)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int fid;
+    private int id;
 
     @Column(name = "store_id",nullable = false)
     private int storeId;
