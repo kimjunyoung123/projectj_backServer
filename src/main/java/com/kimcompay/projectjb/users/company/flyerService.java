@@ -2,6 +2,8 @@ package com.kimcompay.projectjb.users.company;
 
 import java.io.File;
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -10,6 +12,7 @@ import com.kimcompay.projectjb.apis.aws.services.fileService;
 import com.kimcompay.projectjb.apis.google.ocrService;
 import com.kimcompay.projectjb.users.company.model.flyerDao;
 import com.kimcompay.projectjb.users.company.model.flyerVo;
+import com.kimcompay.projectjb.users.company.model.productEventVo;
 import com.kimcompay.projectjb.users.company.model.productVo;
 
 import org.json.simple.JSONObject;
@@ -43,11 +46,23 @@ public class flyerService {
         List<productVo>products=productService.getByFlyerId(flyerId);
         if(products.isEmpty()){
             response.put("productFlag", false);
+            response.put("eventFlag", false);
         }else{
             response.put("productFlag", true);
             response.put("products ", products);
             //상품별 이벤트 조회
-            
+            Map<Integer,Object>events=new HashMap<>();
+            for(productVo vo:products){
+                if(vo.getEventFlag()==1){
+                    events.put(vo.getProductId(),productService.getProductEvent(vo.getProductId()));
+                }
+            }
+            if(!events.isEmpty()){
+                response.put("eventFlag", true);
+                response.put("events", events);
+            }else{
+                response.put("eventFlag", false);
+            }
         }
         return response;
     }

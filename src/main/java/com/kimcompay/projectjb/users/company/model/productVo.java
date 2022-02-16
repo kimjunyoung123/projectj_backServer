@@ -28,7 +28,7 @@ public class productVo {
     @Id 
     @Column(name = "product_id",nullable = false,unique = true)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int pid;
+    private int productId;
 
     @Column(name = "store_id",nullable = false)
     private int storeId;
