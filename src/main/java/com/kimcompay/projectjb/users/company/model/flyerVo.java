@@ -43,7 +43,7 @@ public class flyerVo {
 
     @Column(name = "flyer_created")
     @CreationTimestamp
-    private Timestamp fcreated;
+    private Timestamp created;
 
     @Column(name = "default_select",columnDefinition = "TINYINT")
     private int defaultSelect;

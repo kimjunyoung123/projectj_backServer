@@ -24,16 +24,16 @@ import lombok.ToString;
 public class deliverRoomDetailVo {
 
     @Id
-    @Column(name = "dd_id",nullable = false,unique = true)
+    @Column(name = "deliver_room_detail_id",nullable = false,unique = true)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int ddId;
+    private int id;
     @Column(name = "room_id")
     private int roomId;
     @Column(name = "user_id")
     private int userId;
     @Column(name = "done_flag",columnDefinition = "TINYINT")
     private int  doneFlag;
-    @Column(name = "deliver_room_details_address",nullable = false,length = 50)
+    @Column(name = "deliver_room_detail_address",nullable = false,length = 50)
     private String  address;
 
 }
