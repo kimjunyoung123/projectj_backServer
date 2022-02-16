@@ -34,14 +34,18 @@ public class flyerService {
             throw utillService.makeRuntimeEX("회사소유의 전단이 아닙니다", "getFlyerAndProducts");
         }
         List<Map<String,Object>>infors=getFlyerJoinProductAndEvent(flyerId);
-        if(infors.isEmpty()){
-            throw utillService.makeRuntimeEX("등록된 상품,전단,이벤트가 없습니다", "getFlyerAndProducts");
-        }
         JSONObject response =new JSONObject();
         response.put("flag", true);
-        response.put("infors", infors);
         response.put("flyer", flyerVo);
-        return response;
+        if(infors.isEmpty()){
+            response.put("productFlag", false);
+            return response;
+        }else{
+            response.put("productFlag", true);
+            response.put("infors", infors);
+            return response;
+
+        }
     }
     private List<Map<String,Object>> getFlyerJoinProductAndEvent(int flyerId) {
         logger.info("getFlyerJoinProductAndEvent");
@@ -56,7 +60,7 @@ public class flyerService {
             return flyerDao.findByDay(start, end, storeId,start, end, storeId,utillService.getStart(page, pageSize)-1,pageSize);
 
         }
-        return flyerDao.findByStoreId(storeId,storeId,page,pageSize);
+        return flyerDao.findByStoreId(storeId,storeId,utillService.getStart(page, pageSize)-1,pageSize);
     }
     public void checkExists(int flyerId) {
         if(!flyerDao.existsById(flyerId)){
