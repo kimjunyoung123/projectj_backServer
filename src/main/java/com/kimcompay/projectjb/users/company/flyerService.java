@@ -49,12 +49,12 @@ public class flyerService {
             response.put("eventFlag", false);
         }else{
             response.put("productFlag", true);
-            response.put("products ", products);
+            response.put("products", products);
             //상품별 이벤트 조회
-            Map<Integer,Object>events=new HashMap<>();
+           JSONObject events=new JSONObject();
             for(productVo vo:products){
                 if(vo.getEventFlag()==1){
-                    events.put(vo.getId(),productService.getProductEvent(vo.getId()));
+                    events.put("event"+vo.getId(),productService.getProductEvent(vo.getId()));
                 }
             }
             if(!events.isEmpty()){
