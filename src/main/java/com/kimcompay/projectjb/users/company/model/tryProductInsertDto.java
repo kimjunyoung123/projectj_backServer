@@ -30,8 +30,6 @@ public class tryProductInsertDto {
     @NotBlank(message = "카테고리가 누락되었습니다")
     private String category;
     private int flyerId;
-    @NotBlank(message = "전단이미지 경로가 누락되었습니다")
-    private String flyerPath;
     @NotBlank(message = "상품이미지가 누락되었습니다")
     private String productImgPath;
     @NotBlank(message = "원산지를 입력해주세요")
