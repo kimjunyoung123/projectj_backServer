@@ -44,25 +44,21 @@ public class flyerService {
         response.put("flyer", flyerVo);
         //전단에 있는 상품들 검색
         List<productVo>products=productService.getByFlyerId(flyerId);
+        List<Map<String,Object>>productAndEventArr=new ArrayList<>();
         if(products.isEmpty()){
             response.put("productFlag", false);
-            response.put("eventFlag", false);
         }else{
             response.put("productFlag", true);
-            response.put("products", products);
             //상품별 이벤트 조회
-           JSONObject events=new JSONObject();
             for(productVo vo:products){
+                Map<String,Object>productAndEvent=new HashMap<>();
+                productAndEvent.put("product", vo);
                 if(vo.getEventFlag()==1){
-                    events.put("event"+vo.getId(),productService.getProductEvent(vo.getId()));
+                    productAndEvent.put("event", productService.getProductEvent(vo.getId()));
                 }
+                productAndEventArr.add(productAndEvent);
             }
-            if(!events.isEmpty()){
-                response.put("eventFlag", true);
-                response.put("events", events);
-            }else{
-                response.put("eventFlag", false);
-            }
+            response.put("productAndEvents", productAndEventArr);
         }
         return response;
     }
