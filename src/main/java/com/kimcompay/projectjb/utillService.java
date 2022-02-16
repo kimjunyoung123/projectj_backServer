@@ -36,6 +36,12 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 public class utillService {
     private final static Logger logger=LoggerFactory.getLogger(utillService.class);
 
+    public  static void checkOwner(int ucId,String errorMessage) {
+        logger.info("checkOwner");
+        if(ucId!=utillService.getLoginId()){
+            throw utillService.makeRuntimeEX(errorMessage, "checkOwner");
+        }
+    }
     public static List<String> getImgSrc(String text) {
     	System.out.println("getImgSrc");
     	List<String>array=new ArrayList<>();

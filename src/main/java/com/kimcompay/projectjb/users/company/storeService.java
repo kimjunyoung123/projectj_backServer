@@ -111,7 +111,7 @@ public class storeService {
         storeVo storeVo=storeDao.findById(tryUpdateStoreDto.getId()).orElseThrow(()->utillService.makeRuntimeEX("존재하지 않는 상품입니다", "tryUpdate"));
         boolean updateFlag=false;
         //주인이 맞는지 검사
-        checkOwner(storeVo.getCid());
+        utillService.checkOwner(storeVo.getCid(),"매장 소유자의 계정이 아닙니다");
         //매장이름
         String storeName=tryUpdateStoreDto.getStoreName();
         if(!storeName.equals(tryUpdateStoreDto.getStoreName())){
@@ -277,17 +277,10 @@ public class storeService {
         storeVo storeVo=storeDao.findBySid(id).orElseThrow(()->utillService.makeRuntimeEX("존재하지 않는 매장입니다", "getStore"));
         logger.info("메징조회 정보: "+storeVo.toString());
         //매장 소유 회사 계정인지 검사
-        checkOwner(storeVo.getCid());
+        utillService.checkOwner(storeVo.getCid(),"매장 소유자의 계정이 아닙니다");
         //유저 고유번호 노출방지
         storeVo.setCid(0);
         return utillService.getJson(true, storeVo);
-    }
-    private void checkOwner(int storeId) {
-        logger.info("checkOwner");
-        //매장 소유 회사 계정인지 검사
-        if(storeId!=utillService.getLoginId()){
-            throw utillService.makeRuntimeEX("매장 소유자의 계정이 아닙니다", "getStore");
-        }
     }
     private JSONObject getStoresByEmail(int page,String keyword) {
         logger.info("getStoresByEmail");

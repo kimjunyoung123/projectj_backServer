@@ -10,6 +10,7 @@ import com.kimcompay.projectjb.apis.aws.services.fileService;
 import com.kimcompay.projectjb.apis.google.ocrService;
 import com.kimcompay.projectjb.users.company.model.flyerDao;
 import com.kimcompay.projectjb.users.company.model.flyerVo;
+import com.kimcompay.projectjb.users.company.model.productVo;
 
 import org.json.simple.JSONObject;
 import org.slf4j.Logger;
@@ -26,31 +27,31 @@ public class flyerService {
     private flyerDao flyerDao;
     @Autowired
     private fileService fileService;
+    @Autowired
+    private productService productService;
     
     public JSONObject getFlyerAndProducts(int flyerId) {
         logger.info("getFlyerAndProducts");
-        flyerVo flyerVo=flyerDao.findByFid(flyerId).orElseThrow(()->utillService.makeRuntimeEX("존재하지 않는 전단입니다", "getFlyerAndProducts"));
-        if(flyerVo.getCompanyId()!=utillService.getLoginId()){
-            throw utillService.makeRuntimeEX("회사소유의 전단이 아닙니다", "getFlyerAndProducts");
-        }
-        List<Map<String,Object>>infors=getFlyerJoinProductAndEvent(flyerId);
-        JSONObject response =new JSONObject();
-        response.put("flag", true);
+        JSONObject response=new JSONObject();
+        //조회전단 검색
+        flyerVo flyerVo=flyerDao.findById(flyerId).orElseThrow(()->utillService.makeRuntimeEX("존재하지 않는 전단입니다", "getFlyerAndProducts"));
+        //소유자 검사
+        utillService.checkOwner(flyerVo.getCompanyId(), "회사소유의 전단이 아닙니다");
+        response.put("flyerFlag", true);
         response.put("flyer", flyerVo);
-        if(infors.isEmpty()){
+        //전단에 있는 상품들 검색
+        List<productVo>products=productService.getByFlyerId(flyerId);
+        if(products.isEmpty()){
             response.put("productFlag", false);
-            return response;
         }else{
             response.put("productFlag", true);
-            response.put("infors", infors);
-            return response;
-
+            response.put("products ", products);
+            //상품별 이벤트 조회
+            
         }
+        return response;
     }
-    private List<Map<String,Object>> getFlyerJoinProductAndEvent(int flyerId) {
-        logger.info("getFlyerJoinProductAndEvent");
-        return flyerDao.findByFlyerJoinProductAndEvent(flyerId);
-    }
+
     public List<Map<String,Object>> getFlyerArr(int storeId,String startDate,String endDate,int page) {
         logger.info("getByStoreId");
         Map<String,Object>result=utillService.checkRequestDate(startDate, endDate);
@@ -61,11 +62,6 @@ public class flyerService {
 
         }
         return flyerDao.findByStoreId(storeId,storeId,utillService.getStart(page, pageSize)-1,pageSize);
-    }
-    public void checkExists(int flyerId) {
-        if(!flyerDao.existsById(flyerId)){
-            throw utillService.makeRuntimeEX("존재하지 않는 전단입니다", "checkExists");
-        }
     }
     public flyerVo getFlyer(int flyerId) {
         logger.info("getFlyer");

@@ -27,15 +27,18 @@ public class productService {
     private productDao productDao;
     @Autowired
     private productEventDao productEventDao;
-    @Autowired
-    private flyerService flyerService;
 
+
+    public List<productVo> getByFlyerId(int flyerId) {
+        logger.info("getByFlyerId");
+        List<productVo>products=productDao.findByFlyerId(flyerId);
+        return products;
+    }
     @Transactional(rollbackFor = Exception.class)
     public JSONObject insert(tryProductInsertDto tryProductInsertDto) {
         logger.info("insert");
         int flyerId=tryProductInsertDto.getFlyerId();
-        //유요한 전단인지 검사
-        flyerService.checkExists(flyerId);
+        checkExist(flyerId);
         //상품 insert
         productVo vo=productVo.builder().storeId(tryProductInsertDto.getStoreId()).category(tryProductInsertDto.getCategory()).text(tryProductInsertDto.getText()).flyerId(flyerId).origin(tryProductInsertDto.getOrigin()).price(tryProductInsertDto.getPrice()).productImgPath(tryProductInsertDto.getProductImgPath()).productName(tryProductInsertDto.getProductName()).eventFlag(tryProductInsertDto.getEventFlag()).build();
         productDao.save(vo);
@@ -50,6 +53,12 @@ public class productService {
             }
         } 
         return utillService.getJson(true, "상품등록에 성공 하였습니다");
+    }
+    private void checkExist(int flyerId) {
+        logger.info("checkExist");
+        if(productDao.countFlyerByFlyerId(flyerId)==0){
+            throw utillService.makeRuntimeEX("존재하지 않는 전단입니다", "checkExist");
+        }
     }
     private boolean checkPrice(int price) {
         logger.info("checkPrice");
