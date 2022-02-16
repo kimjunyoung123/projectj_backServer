@@ -44,6 +44,25 @@ public class flyerService {
         response.put("flyer", flyerVo);
         //전단에 있는 상품들 검색
         List<productVo>products=productService.getByFlyerId(flyerId);
+        if(products.isEmpty()){
+            response.put("productFlag", false);
+        }else{
+            response.put("productFlag", true);
+            response.put("products", products);
+        }
+        return response;
+    }
+
+    /*public JSONObject getProductAndEvent(int productId) {
+        logger.info("getFlyerAndProducts");
+        JSONObject response=new JSONObject();
+        //조회전단 검색
+        //소유자 검사
+        utillService.checkOwner(flyerVo.getCompanyId(), "회사소유의 전단이 아닙니다");
+        response.put("flyerFlag", true);
+        response.put("flyer", flyerVo);
+        //전단에 있는 상품들 검색
+        List<productVo>products=productService.getByFlyerId(flyerId);
         List<Map<String,Object>>productAndEventArr=new ArrayList<>();
         if(products.isEmpty()){
             response.put("productFlag", false);
@@ -61,7 +80,7 @@ public class flyerService {
             response.put("productAndEvents", productAndEventArr);
         }
         return response;
-    }
+    }*/
 
     public List<Map<String,Object>> getFlyerArr(int storeId,String startDate,String endDate,int page) {
         logger.info("getByStoreId");
