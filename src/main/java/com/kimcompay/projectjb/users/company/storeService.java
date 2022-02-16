@@ -278,8 +278,6 @@ public class storeService {
         logger.info("메징조회 정보: "+storeVo.toString());
         //매장 소유 회사 계정인지 검사
         utillService.checkOwner(storeVo.getCid(),"매장 소유자의 계정이 아닙니다");
-        //유저 고유번호 노출방지
-        storeVo.setCid(0);
         return utillService.getJson(true, storeVo);
     }
     private JSONObject getStoresByEmail(int page,String keyword) {
