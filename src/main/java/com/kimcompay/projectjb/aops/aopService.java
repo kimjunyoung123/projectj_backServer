@@ -35,7 +35,8 @@ public class aopService {
     private Logger logger=LoggerFactory.getLogger(aopService.class); 
     @Autowired
     private fileService fileService;
-
+    
+    @Async
     @Before("execution(* com.kimcompay.projectjb.users.company.*.*(..))"
     +"||execution(* com.kimcompay.projectjb.users.user.*.*(..))"
     +"||execution(* com.kimcompay.projectjb.apis.aws.services.*.*(..))"
