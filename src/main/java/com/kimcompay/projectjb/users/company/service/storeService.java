@@ -11,7 +11,7 @@ import com.kimcompay.projectjb.utillService;
 import com.kimcompay.projectjb.apis.aws.services.fileService;
 import com.kimcompay.projectjb.apis.aws.services.sqsService;
 import com.kimcompay.projectjb.apis.kakao.kakaoMapService;
-import com.kimcompay.projectjb.delivery.deliveryService;
+import com.kimcompay.projectjb.delivery.service.deliveryService;
 import com.kimcompay.projectjb.enums.intenums;
 import com.kimcompay.projectjb.enums.senums;
 import com.kimcompay.projectjb.users.principalDetails;            

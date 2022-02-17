@@ -6,9 +6,8 @@ package com.kimcompay.projectjb.users.company;
 
 import javax.validation.Valid;
 
-
-import com.kimcompay.projectjb.delivery.deliveryService;
 import com.kimcompay.projectjb.users.company.model.tryProductInsertDto;
+import com.kimcompay.projectjb.delivery.service.deliveryService;
 import com.kimcompay.projectjb.users.company.model.tryInsertStoreDto;
 import com.kimcompay.projectjb.users.company.model.tryUpdateStoreDto;
 import com.kimcompay.projectjb.users.company.service.flyerService;
@@ -16,8 +15,6 @@ import com.kimcompay.projectjb.users.company.service.productService;
 import com.kimcompay.projectjb.users.company.service.storeService;
 
 import org.json.simple.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;

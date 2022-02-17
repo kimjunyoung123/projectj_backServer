@@ -29,7 +29,6 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 @RestController
 public class restController {
-    private Logger logger=LoggerFactory.getLogger(restController.class);
     @Autowired
     private snsService snsService;
     @Autowired
@@ -39,45 +38,34 @@ public class restController {
     @Autowired
     private fileService fileService;
 
-    //auth가 앞에있으면 로그인후 이용가능한 api
-    @RequestMapping(value = "/auth/test",method = RequestMethod.GET)
-    public void name(HttpSession session) {
-        logger.info("test");
-    }
+    
     @RequestMapping(value = "/sns/**",method = RequestMethod.POST)
     public JSONObject sendSns(@RequestBody JSONObject jsonObject,HttpSession httpSession) {
-        logger.info("sendSns Controller");
         return snsService.send(jsonObject, httpSession);
     }
     @RequestMapping(value = "/confrim/{scope}/**",method = RequestMethod.POST)
     public JSONObject checkConfrim(@PathVariable String scope,@RequestBody JSONObject jsonObject,HttpSession httpSession) {
-        logger.info("checkConfrim");
         return snsService.confrim(jsonObject,httpSession);
     }
     @RequestMapping(value = "/checkPage/{scope}",method = RequestMethod.GET)
     public JSONObject checkPage(@PathVariable String scope,HttpServletRequest request) {
-        logger.info("checkPage controller");
         return checkPageService.checkPage(request, scope);
       
     }
     @RequestMapping(value = "/login",method = RequestMethod.POST)
     public JSONObject tryLogin(HttpServletRequest request,HttpServletResponse response) {
-        logger.info("tryLogin");
         return userService.checkLogin(request, response);
     }
     @RequestMapping(value = "/social/{kind}/{action}",method = RequestMethod.GET)
     public JSONObject soLogin(@PathVariable String kind,@PathVariable String action) {
-        logger.info("soLogin");
         return checkPageService.selectPage(kind,action);
     }
     @RequestMapping(value = "/callback/{kind}/{action}",method = RequestMethod.GET)
     public void socialCallback(@PathVariable String kind,@PathVariable String action,HttpServletRequest request) {
-        logger.info("socialCallback");
         checkPageService.selectCallback(kind,action,request);
     }
     @RequestMapping("/tokenExpire/{result}")
     public JSONObject tokenExpire(@PathVariable String result,HttpServletRequest request) {
-        logger.info("tokenExpire controller");
         if(result.equals(senums.newToken.get())){
             return utillService.getJson(true, "new");
         }else{
@@ -87,7 +75,6 @@ public class restController {
     }
     @RequestMapping(value = "/auth/file/{action}",method = RequestMethod.POST)
     public JSONObject imgController(@PathVariable String action,MultipartHttpServletRequest request) {
-        logger.info("imgController");
         return fileService.upload(request);
     }
 }

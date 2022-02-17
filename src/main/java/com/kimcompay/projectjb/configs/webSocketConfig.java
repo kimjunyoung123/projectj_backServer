@@ -1,6 +1,6 @@
 package com.kimcompay.projectjb.configs;
 
-import com.kimcompay.projectjb.delivery.deliverPostionHandler;
+import com.kimcompay.projectjb.delivery.service.deliverPostionHandler;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;

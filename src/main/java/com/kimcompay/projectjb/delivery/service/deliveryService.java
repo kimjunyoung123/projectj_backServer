@@ -1,4 +1,4 @@
-package com.kimcompay.projectjb.delivery;
+package com.kimcompay.projectjb.delivery.service;
 
 import java.sql.Timestamp;
 import java.util.List;
