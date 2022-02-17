@@ -1,19 +1,13 @@
 package com.kimcompay.projectjb.apis.aws.services;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.time.LocalDate;
-import java.util.UUID;
+
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.kimcompay.projectjb.utillService;
 
-import org.json.simple.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 @Service
 public class s3Service {

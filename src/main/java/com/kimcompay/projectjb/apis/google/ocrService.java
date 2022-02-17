@@ -8,7 +8,6 @@ import com.google.cloud.vision.v1.EntityAnnotation;
 import com.google.cloud.vision.v1.Feature;
 import com.google.cloud.vision.v1.Image;
 import com.google.cloud.vision.v1.ImageAnnotatorClient;
-import com.google.gson.JsonObject;
 import com.google.protobuf.ByteString;
 import com.kimcompay.projectjb.utillService;
 
