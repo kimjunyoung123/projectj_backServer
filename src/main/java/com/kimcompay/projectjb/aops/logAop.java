@@ -30,7 +30,6 @@ public class logAop {
         Object[] paramValues =joinPoint.getArgs();
         for(int i=0;i<len;i++){
             logger.info("요청변수: "+paramNames[i]+" 요청값: "+paramValues[i].toString());
-
         }
       
         return joinPoint.proceed();   
