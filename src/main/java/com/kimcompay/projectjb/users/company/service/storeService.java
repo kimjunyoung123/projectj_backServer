@@ -179,7 +179,7 @@ public class storeService {
         }
         //가게정보가 수정되면 알림메세지/이메일전송
         if(updateFlag){
-           doneUpdate(tryUpdateStoreDto);
+          // doneUpdate(tryUpdateStoreDto);
             return utillService.getJson(true, "변경이 완료되었습니다");
         }else{
             return utillService.getJson(false, "변경사항이 없습니다");
@@ -305,14 +305,14 @@ public class storeService {
         sqsService.sendPhoneAsync(doneMessage, map.get("phone").toString());//회사휴대폰
         sqsService.sendPhoneAsync(doneMessage, tryInsertStoreDto.getPhone());//매장휴대폰
         //인증 세션 비우기
-        HttpSession httpSession=utillService.getHttpServletRequest().getSession();
+       /* HttpSession httpSession=utillService.getHttpServletRequest().getSession();
         httpSession.removeAttribute(senums.auth.get()+senums.phonet.get());
         //사용하지 않는 사진 지우기
         //이미지가 있다면 path제거후 이름만 얻어내기
         List<String>usingImgs=utillService.getOnlyImgNames(tryInsertStoreDto.getText());
         usingImgs.add(tryInsertStoreDto.getThumbNail().split("/")[4]);
         fileService.deleteFile(httpSession,usingImgs);
-        httpSession.removeAttribute(senums.imgSessionName.get());
+        httpSession.removeAttribute(senums.imgSessionName.get());*/
     }
     private void checkValues(tryInsertStoreDto tryInsertStoreDto) {
         //사업자등록번호검사
