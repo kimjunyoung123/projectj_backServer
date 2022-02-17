@@ -4,8 +4,7 @@ package com.kimcompay.projectjb.users.user;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -15,7 +14,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kimcompay.projectjb.utillService;
 import com.kimcompay.projectjb.apis.aws.services.sqsService;
 import com.kimcompay.projectjb.apis.jungbu.jungbuService;
@@ -35,8 +33,7 @@ import com.kimcompay.projectjb.users.user.model.userdao;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -48,7 +45,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class userService {
-    private Logger logger=LoggerFactory.getLogger(userService.class);
     @Value("${refresh_token_cookie}")
     private String refreshTokenCookieName;
     @Value("${access_token_cookie}")
@@ -73,33 +69,26 @@ public class userService {
     private jwtService jwtService;
 
     public JSONObject getAuthActionHub(String action,HttpServletRequest request) {
-        logger.info("getAuthActionHub");
         if(action.equals(senums.checkt.get())){
-            logger.info("로그인 조회 요청");
             return checkLogin(request, request.getParameter("detail"));
         }else if(action.equals("logout")){
-            logger.info("로그아웃요청");
             return logOut(request);
         }
         throw utillService.makeRuntimeEX("잘못된 요청", "getActionHub");
     }
     public JSONObject getActionHub(String action,HttpServletRequest request) {
-        logger.info("getActionHub");
         if(action.equals("checkEmail")){
-            logger.info("이메일 중복검사");
             return utillService.getJson(checkSamEmail(request.getParameter("email")),"");
         }
         throw utillService.makeRuntimeEX("잘못된 요청", "getActionHub");
     }
     public void oauthLogin(String email,userVo userVo) {
-        logger.info("oauthLogin");
         //로그인처리
         String accessToken=jwtService.get_access_token(email);
         String refreshToken=jwtService.get_refresh_token();
         try {
             oauthLogin(userVo,refreshToken);
         } catch (RuntimeException e) {
-            logger.info("소셜로그인 에러 발생: "+e.getMessage());
             String message=e.getMessage();
             if(!message.startsWith("메")){
                 message=senums.defaultFailMessage.get();
@@ -110,7 +99,6 @@ public class userService {
         utillService.makeLoginCookie(accessToken,refreshToken,accessTokenCookieName,refreshTokenCookieName);
     }
     private void oauthLogin(userVo userVo,String refreshToken) {
-        logger.info("oauthLogin");
         String email=userVo.getEmail();
         String phone=userVo.getUphone();
         Map<String,Object>map=userdao.findByPhoneAndEmailJoinCompany(phone, phone, email, email);
@@ -122,17 +110,13 @@ public class userService {
         }else if(nowYear-year<18){//나이검사
             throw new RuntimeException("메세지: 18세 미만은 소셜로그인이 불가합니다");
         }else if(Integer.parseInt(map.get("ue").toString())!=0){
-            logger.info("이미 존재하는 이메일: "+email);
             userVo=userdao.findByEmail(email).orElseThrow(()->new IllegalAccessError("찾을 수없는 이메일"));//에러가터질확률이 없을거같다  그래서 no trycatch
         }else if(Integer.parseInt(map.get("up").toString())!=0){
-            logger.info("이미 존재하는 휴대폰번호: "+phone);
             userVo=userdao.findByUphone(phone);//에러가터질확률이 없을거같다  그래서 no trycatch
         }else{
-            logger.info("소셜로그인으로 첫로그인 요청 회원가입 진행");
             userVo.setUpwd(securityConfig.pwdEncoder().encode(userVo.getUpwd()));
             userdao.save(userVo);
         }
-        logger.info("소셜 로그인중 찾은 유저정보: "+userVo);
         //vo->map
         userVo.setUlogin_date(Timestamp.valueOf(LocalDateTime.now()));//로그인시간 넣어주기
         Map<Object,Object>result=voToMap(userVo);
@@ -146,15 +130,12 @@ public class userService {
         redisTemplate.opsForValue().set(refreshToken,email);//리프레시토큰 넣어주기
         //로그인시간갱신
         updateLoginDate(senums.persnal.get(),email);
-        logger.info("소셜 로그인 완료");
     }
     private Map<Object, Object> voToMap(userVo userVo) {
-        logger.info("voToMap");
         userAdapter.adapterUser(userVo);
         return userAdapter.getMap();
     }
     private boolean checkSamEmail(String email) {
-        logger.info("checkSamEmail");
         Map<String,Object>map=userdao.countByEmail(email,email);
         for(Entry<String,Object>m:map.entrySet()){
             if(Integer.parseInt(m.getValue().toString())!=0){
@@ -164,7 +145,6 @@ public class userService {
         return false;
     }
     private JSONObject logOut(HttpServletRequest request) {
-        logger.info("logOut");
         //쿠키제거
         List<String>cookieNames=new ArrayList<>();
         cookieNames.add(accessTokenCookieName);
@@ -175,16 +155,13 @@ public class userService {
         //redis제거
         cookieNames.clear();//배열하나로 돌려쓰기
         String id=Integer.toString(utillService.getLoginId());
-        logger.info("로그아웃 회원번호: "+id);
         cookieNames.add(id);
         String refreshTokenValue=utillService.getCookieValue(request, refreshTokenCookieName);
-        logger.info("레디스 삭제: "+refreshTokenValue);
         cookieNames.add(refreshTokenValue);
         redisTemplate.delete(cookieNames);
         return utillService.getJson(true, "로그아웃완료");
     }
     public JSONObject changePwdForLost(tryUpdatePwdDato tryUpdatePwdDato) {
-        logger.info("changePwdForLost");
         try {
             //요청 redis에서 꺼내기
             String token=tryUpdatePwdDato.getToken();
@@ -198,7 +175,6 @@ public class userService {
         }
     }
     private Map<Object,Object> checkRequest(String token) {
-        logger.info("checkRequest");
         Map<Object,Object>redis=redisTemplate.opsForHash().entries(token);
             //요청이 있었는지검사
             if(utillService.checkEmthy(redis)){
@@ -206,14 +182,12 @@ public class userService {
             }
             //요청기간검사
             Timestamp timestamp=Timestamp.valueOf(redis.get("expire").toString().replace("T", " "));
-            logger.info("비밀번호 변경유효 기간: "+timestamp);
             if(LocalDateTime.now().isAfter(timestamp.toLocalDateTime())){
                 throw utillService.makeRuntimeEX("유효기간이 지난 요청입니다", "changePwdForLost");
             }
         return redis;
     }
     private void updatePwd(String email,String pwd,String pwd2) {
-        logger.info("updatePwd");
         if(!pwd.equals(pwd2)){
             throw utillService.makeRuntimeEX("비밀번호가 일치하지 않습니다", "updatePwd");
         }
@@ -222,17 +196,14 @@ public class userService {
         for(Entry<String, Object> m:map.entrySet()){
             if(Integer.parseInt(m.getValue().toString())!=0){
                 table=m.getKey();
-                logger.info("비밀번호 변경 테이블: "+table);
                 break;
             }
         }
         String hashPwd=securityConfig.pwdEncoder().encode(pwd);
         try {
             if(table.equals("uc")){
-                logger.info("유저 비밀번호변경");
                 userdao.updateUserPwd(hashPwd, email);
             }else {
-                logger.info("회사 비밀번호 변경");
                 userdao.updateCompanyPwd(hashPwd, email);
             }
         } catch (Exception e) {
@@ -240,27 +211,20 @@ public class userService {
         }
     }
     public Map<String,Object> selectPhoneByEmail(String email) {
-        logger.info("selectPhoneByEmail");
         return userdao.findPhoneByEmail(email, email);
     }
     public Map<String,Object> selectEmailByPhone(String phone) {
-        logger.info("selectEmailByPhone");
         return userdao.findEmailByPhone(phone, phone);
     }
     private JSONObject checkLogin(HttpServletRequest request,String detail) {
-        logger.info("checkLogin");
-        logger.info("detail: "+detail);
         try {
              //시큐리티 세션 꺼내기
             principalDetails principalDetails=(principalDetails)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             //요청분류
             if(detail.equals("email")){
-                logger.info("이메일만 전달");
                 return utillService.getJson(true, principalDetails.getUsername()+","+principalDetails.getRole());
             }else if(detail.equals(senums.allt.get())){
-                logger.info("비밀번호 제외 후 전달");
                 Map<Object,Object>map=principalDetails.getPrinci();
-                logger.info(map.toString());
                 map.put(refreshTokenCookieName, null);//refresh token제거 비밀번호는 로그인시 애초에 redis에 저장하지 않음
                 JSONObject jsonObject=new JSONObject();
                 jsonObject.put("message", map);
@@ -278,7 +242,6 @@ public class userService {
     }
     @Transactional(rollbackFor = Exception.class)
     public JSONObject checkLogin(HttpServletRequest request,HttpServletResponse response) {
-        logger.info("checkLoginAuth");
         boolean flag=Boolean.parseBoolean(request.getParameter("flag"));
         System.out.println(flag);
         if(flag){
@@ -291,24 +254,16 @@ public class userService {
     }
     @Async
     public void updateLoginDate(String kind,String email) {
-        logger.info("updateLoginDate");
         //로그인날짜로 수정
         Timestamp date=Timestamp.valueOf(LocalDateTime.now());
         if(kind.equals(senums.persnal.get())){
             userdao.updateUserLoginDate(date, email);
         }else if(kind.equals(senums.company.get())){
             userdao.updateCompanyLoginDate(date, email);
-        }else{
-            logger.info("로그인 일자 갱신 실패");
         }
-        logger.info("로그인일자 갱신완료");
-    }
-    public void postActionHub() {
-        logger.info("postActionHub");
     }
     @Transactional(rollbackFor = Exception.class)
     public JSONObject insert(tryInsertDto tryInsertDto,HttpSession session) {
-        logger.info("insert");
         //휴대폰/이메일 인증했는지 검사
         checkAuth(tryInsertDto, session);
         //유효성검사
@@ -319,29 +274,25 @@ public class userService {
         try {
            doneInsert(session,tryInsertDto.getEmail());
         } catch (Exception e) {
-            logger.info("회원가입 후 알림메세지 전송실패");
+            utillService.writeLog("회원가입 후 알림메세지 전송실패",userService.class);
         }
         return utillService.getJson(true, "회원가입에 성공하였습니다");
     }
     @Async
     public void doneInsert(HttpSession session,String email) {
-        logger.info("doneInsert");
         session.removeAttribute(senums.auth.get()+senums.emailt.get());
         session.removeAttribute(senums.auth.get()+senums.phonet.get());
         sqsService.sendEmailAsync("장보고에 회원가입해주셔서 진심으로 감사합니다",email);
     }
     private void try_insert(tryInsertDto tryInsertDto) {
-        logger.info("try_insert");
-        String hash_pwd=securityConfig.pwdEncoder().encode(tryInsertDto.getPwd());
+       String hash_pwd=securityConfig.pwdEncoder().encode(tryInsertDto.getPwd());
         String post_code=tryInsertDto.getPost_code();
         if(tryInsertDto.getScope_num()==0){
-            logger.info("일반 회원 가입 ");
             userVo vo=userVo.builder().email(tryInsertDto.getEmail()).uaddress(tryInsertDto.getAddress()).udetail_address(tryInsertDto.getDetail_address())
                                         .uphone(tryInsertDto.getPhone()).upostcode(post_code).upwd(hash_pwd).urole(senums.user_role.get())
                                         .provider(senums.defaultProvider.get()).ubirth(tryInsertDto.getBirth()).usleep(0).build();
                                         userdao.save(vo);
         }else{
-            logger.info("기업 회원가입");
             //추가 검사 
             checkCompanyValues(tryInsertDto);
             checkComNum(jungbuService.getCompanyNum(tryInsertDto.getCompany_num(),tryInsertDto.getStart_dt().replace("-", ""),tryInsertDto.getName()));
@@ -352,21 +303,17 @@ public class userService {
         }
     }
     private void checkComNum(JSONObject response) {
-        logger.info("checkComNum");
         JSONArray jsons=(JSONArray)response.get("data");
         JSONObject jsonObject=(JSONObject)jsons.get(0);
         if(!jsonObject.get("valid").equals("01")){
             throw utillService.makeRuntimeEX("사업자 조회에 실패했습니다", "checkComNum");
         }
         JSONObject stauts=(JSONObject)jsonObject.get("status");
-        logger.info("사업자 상태: "+stauts);
         if(!stauts.get("b_stt_cd").equals("01")){
             throw utillService.makeRuntimeEX("휴업중이거나 폐업한 사업자번호입니다", "checkComNum");
         }
-        logger.info("사업자등록 유효성검사 통과");
     }
     private void checkCompanyValues(tryInsertDto tryInsertDto){
-        logger.info("checkCompanyValues");
         //사업자번호 검사
         checkCompnayNum(tryInsertDto.getCompany_num());
         //회사명 검사
@@ -377,27 +324,19 @@ public class userService {
         //개업일자 검사
         String start_dt=Optional.ofNullable(tryInsertDto.getStart_dt()).orElseThrow(()->utillService.makeRuntimeEX("개업일자를 입력해 주세요","checkCompanyValues"));
         checkOpenDate(start_dt);
-        logger.info("기업 유효성 통과");
     }
     private void checkOpenDate(String date) {
-        logger.info("checkOpenDate");
-        logger.info("개업일자: "+date);
         if(utillService.checkBlank(date)){
             throw utillService.makeRuntimeEX("개업일자가 비어있습니다","checkCompanyValues");
         }else if(LocalDateTime.now().isBefore(Timestamp.valueOf(date+" 23:59:59").toLocalDateTime())){
-            logger.info("개업일자가 현재보다 빠릅니다");
             throw utillService.makeRuntimeEX("개업일자가 현재보다 빠릅니다", "checkOpenDate");
         }
-        logger.info("개업일자 유효성 검사통과");
     }
     private void checkCompnayNum(String num) {
-        logger.info("checkCompnayNum");
         try {
             //null검사를 받을 때 안하므로 여기서 한다
             Long num2=Long.parseLong(Optional.ofNullable(num).orElseThrow(()-> new NullPointerException()));
-            logger.info("사업자 번호 유효성검사 통과");
             int count=userdao.countByCnumNative(num2);
-            logger.info("사업자번호 조회결과: "+count);
             if(count!=0){
                 throw utillService.makeRuntimeEX("이미등록된 사업자번호입니다 ", "try_insert");
             }     
@@ -411,7 +350,6 @@ public class userService {
         return userdao.findByPhoneAndEmailJoinCompany(val,val,val,val);
     }
     private void checkValues(tryInsertDto tryInsertDto ) {
-        logger.info("checkValues");
         //어떤 유형의 회원인지검사
         String scope_num=selectKind(tryInsertDto.getScope());
         //이메일,전화번호 중복검사 validation 어노테이션으로 null검사는 다하고 온다
@@ -424,21 +362,17 @@ public class userService {
         tryInsertDto.setScope_num(Integer.parseInt(scope_num));
         //일반회원일시 미성년자인지 검사
         if(scope_num.equals(senums.persnal.get())){
-            logger.info("일반 회원이므로 나이 검사");
             checkAge(tryInsertDto.getBirth());
         }
-        logger.info("공통 유효성 통과");
     }
     private void checkAge(String birch) {
-        logger.info("checkAge");
-        logger.info("생년월일: "+birch);
+
             String[] birth=birch.split("-");
             int nowYear=LocalDateTime.now().getYear();
             int year=Integer.parseInt(birth[0]);
             int month=Integer.parseInt(birth[1]);
             int day=Integer.parseInt(birth[2]);
             if(nowYear-year<18){
-                logger.info("18세미만 가입요청");
                 throw utillService.makeRuntimeEX("18이상 가입가능한 서비스입니다", "checkValues");
             }
             if(month>12||month<1){
@@ -446,39 +380,28 @@ public class userService {
             }else if(day<1||day>31){
                 throw utillService.makeRuntimeEX("일은 1이상 31이하입니다", "checkValues");
             }
-        logger.info("생년월일 유요성 통과");
     }
     private void checkSamePwd(String pwd,String pwd2) {
-        logger.info("checkSamePwd");
         if(!pwd.equals(pwd2)){
             throw utillService.makeRuntimeEX("비밀번호가 일치 하지 않습니다", "checkValues");
         }
-        logger.info("비밀번호 일치 유효성 통과");
     }
     private void checkExist(String phone,String email) {
-        logger.info("checkExist");
         Map<String,Object>emailPhoneCount=userdao.findByPhoneAndEmailJoinCompany(phone, phone,email,email);
         for(Entry<String, Object> entry:emailPhoneCount.entrySet()){
-            logger.info(entry.getValue().toString());
             if(Integer.parseInt(entry.getValue().toString())!=0){
                 throw utillService.makeRuntimeEX("이미 존재하는 "+ senums.valueOf(entry.getKey()).get()+"입니다", "checkValues");
             }
         }
-        logger.info("이메일/휴대폰 중복검사 통과");
     }
     private String selectKind(String scope) {
-        logger.info("selectKind");
         try {
-            logger.info("요청회원 유형: "+scope);
-            String scope2= senums.valueOf(scope).get(); 
-            logger.info("회원분류완료: "+scope2);
-            return scope2;            
+            return senums.valueOf(scope).get();            
         } catch (IllegalArgumentException e) {
             throw utillService.makeRuntimeEX("존재하는 회원 유형이 아닙니다", "checkValues");
         }
     }
     private void checkAuth(tryInsertDto tryInsertDto,HttpSession httpSession) {
-        logger.info("checkAuth");
         //휴대폰 번호 검사
         if(utillService.checkOnlyNum(tryInsertDto.getPhone())){
             throw utillService.makeRuntimeEX("휴대폰번호는 숫자만 입력가능합니다", "checkAuth");
@@ -491,14 +414,10 @@ public class userService {
         }else if(!tryInsertDto.getEmail().equals(email)){
             throw utillService.makeRuntimeEX("인증한 이메일과 번호가 다릅니다", "checkAuth");
         }
-        logger.info("인증 유효성검사 통과");
     }
     public JSONObject findChangePwdToken(String token) {
-        logger.info("findChangePwdToken");
-        logger.info("토큰: "+token);
         Map<Object, Object>map=redisTemplate.opsForHash().entries(token);
         Timestamp timestamp=Timestamp.valueOf(Optional.ofNullable(map.get("expire").toString().replace("T", " ")).orElseThrow(()->utillService.makeRuntimeEX("유효하지 않는 요청입니다","findChangePwdToken" )));
-        logger.info("토큰 유효 날짜: "+timestamp);
         if(LocalDateTime.now().isAfter(timestamp.toLocalDateTime())){
             throw utillService.makeRuntimeEX("유효기간이 만료된 요청입니다", "findChangePwdToken");
         }
