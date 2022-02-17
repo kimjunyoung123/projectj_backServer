@@ -26,8 +26,6 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class snsService {
-    
-    private Logger logger=LoggerFactory.getLogger(snsService.class);
     private final int limiteMin=3;
     private final int len=10;
 
@@ -43,8 +41,6 @@ public class snsService {
     private RedisTemplate<String,String>redisTemplate;
     
     public JSONObject send(JSONObject jsonObject,HttpSession httpSession) {
-        logger.info("send");
-        logger.info("전송요청 정보: "+jsonObject.toString());
         //입력값 검사
         String val= null;
         //사용용도 확인
@@ -65,28 +61,23 @@ public class snsService {
         } catch (IllegalArgumentException e) {
             throw utillService.makeRuntimeEX("지원하지 않는 인증방법 입니다","send");
         }
-        logger.info("조회할 정보: "+val);
         //db에 전화번호/이메일 찾기 (count 로 가져옴)
         Map<String,Object>dpe=userService.getCount(val);
         String upoe=dpe.get(keys[0]).toString();
         String cpoe=dpe.get(keys[1]).toString();
-        logger.info("일반회원: "+upoe+", 기업회원: "+cpoe);
-        logger.info(detail);
         //찾기라면 카운트가 1 이여야하고 가입이라면 0이여야함
         if(detail.equals(senums.auth.get())){
-            logger.info("가입이 안되어있어야하는요청");
+            //이미 가입되었으면 안되는요청
             if(!upoe.equals("0")||!cpoe.equals("0")){
-                logger.info("이미 가입 되어있는 정보");
                 utillService.throwRuntimeEX("이미 가입되어있는 "+type+"입니다");
             }
         }else if(detail.equals(senums.find.get())){
-            logger.info("가입이 되어있어야하는요청");
+            //가입이 되어있어야하는 요청
             if(upoe.equals("0")&&cpoe.equals("0")){
-                logger.info("회원 정보가 존재하지 않습니다");
                 utillService.throwRuntimeEX("가입된 회원정보가 존재하지 않습니다");
             }
         }else{
-            logger.info("비회원 요청");
+            utillService.writeLog("비회원요청", snsService.class);
         }
         //세션에 요청정보 담기
         String num=utillService.getRandomNum(len);
@@ -102,13 +93,13 @@ public class snsService {
         if(type.equals(senums.pwtt.get())){
             type=senums.emailt.get();
         }
+        //휴대폰전송시도
         if(type.equals(senums.phonet.get())){
-            logger.info("휴대폰 전송시도");
             if(utillService.checkOnlyNum(val)){
                 throw utillService.makeRuntimeEX("전화번호는 숫자만 있어야합니다", "send");
             }
         }else if(type.equals(senums.emailt.get())){
-            logger.info("이메일 전송시도");
+            //이메일전송시도 딱히 검사할것이없음
         }else{
             utillService.throwRuntimeEX("지원하지 않는 인증방식입니다");
         }
@@ -117,22 +108,16 @@ public class snsService {
         return utillService.getJson(true, "인증번호가 "+type+"로 전송되었습니다");
     }
     public JSONObject confrim(JSONObject jsonObject,HttpSession session) {
-        logger.info("confrim");
-        //요청정보 표시
-        logger.info(jsonObject.toString());
         //세션에서 요청 기록꺼내기
         Map<String,Object>map=new HashMap<>();
         String key=jsonObject.get("detail").toString()+jsonObject.get("type").toString();
-        logger.info("조회키: "+key);
         try {
-            logger.info(session.getAttribute(key).toString());
             map=(Map<String,Object>)session.getAttribute(key);
         } catch (NullPointerException e) {
             e.printStackTrace();
-            logger.info("인증 요청 내역없음");
+            utillService.writeLog("인증 요청 내역없음",snsService.class);
             utillService.throwRuntimeEX("요청 기록이 존재하지 않습니다 다시 요청 해주세요");
         }
-        logger.info(map.toString());
         //비교하기
         String rnum=null;
         try {
@@ -141,7 +126,6 @@ public class snsService {
                 throw new NullPointerException();
             }
         } catch (NullPointerException e) {
-           logger.info("인증번호 null");
            throw utillService.makeRuntimeEX("인증번호를 입력해 주세요", "confrim");
         }
         String num=map.get("num").toString().trim();
@@ -149,14 +133,11 @@ public class snsService {
             //용도에 맞춰서 처리
             String message="인증성공";
             if(key.startsWith(senums.find.get())){
-                logger.info("찾기 인증요청이였음");
                 message=doFindAction(map.get("val").toString(), map.get("type").toString());
                 session.removeAttribute(key);
             }else{
-                logger.info("일반 인증요청이였음");
                 map.put("res",true);
                 map.put(map.get("type").toString(), map.get("val"));
-                logger.info("인증후세션 내역: "+map.toString());
                 session.setAttribute(key, map);
             }
             return utillService.getJson(true, message);
@@ -165,7 +146,6 @@ public class snsService {
         
     }
     private String doFindAction(String val,String type) {
-        logger.info("doFindAction");
         String res="이메일: ";
         //비밀번호 찾기일경구
         if(type.equals(senums.pwtt.get())){
@@ -173,7 +153,6 @@ public class snsService {
             //요청알림을 위해 휴대폰 번호 조회
             Map<String,Object>phones=userService.selectPhoneByEmail(val);
             for(Entry<String, Object>m:phones.entrySet()){
-                logger.info(m.getKey());
                 if(m.getValue()==null){
                     continue;
                 }
@@ -185,7 +164,6 @@ public class snsService {
             //비밀번호요청 링크전송
             String changePwdToken=jwtService.get_refresh_token();
             String cPwdLink=changePwdLink+changePwdToken;
-            logger.info("비밀번호 변경링크: "+cPwdLink);
             //redis저장 
             Map<String,Object>map=new HashMap<>();
             map.put("email", val);
@@ -199,13 +177,11 @@ public class snsService {
             //이메일찾기일경우
             Map<String,Object>map=userService.selectEmailByPhone(val);
             for(Entry<String, Object>m:map.entrySet()){
-                logger.info(m.getKey());
                 if(m.getValue()==null){
                     continue;
                 }
                 res+=m.getValue().toString();
             }
-            logger.info("찾은 내용: "+res);
         }
         return res;
     }

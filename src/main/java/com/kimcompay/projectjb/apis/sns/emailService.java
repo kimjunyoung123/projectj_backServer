@@ -16,7 +16,7 @@ public class emailService {
     private  JavaMailSender javaMailSender;
 
     public  void sendEmail(String toAddress,String subject,String body) {
-        System.out.println(toAddress+"보낼주소");
+       utillService.writeLog(toAddress+"보낼주소",emailService.class);
         MimeMessage message = javaMailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message);
         try {
@@ -28,6 +28,6 @@ public class emailService {
           utillService.throwRuntimeEX("이메일 전송에 실패했습니다 잠시후 다시시도 바랍니다");
         }
         javaMailSender.send(message);
-        System.out.println(toAddress+"에게 메일전송");
+       utillService.writeLog(toAddress+"에게 메일전송",emailService.class);
     }
 }

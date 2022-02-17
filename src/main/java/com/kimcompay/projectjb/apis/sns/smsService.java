@@ -2,6 +2,8 @@ package com.kimcompay.projectjb.apis.sns;
 
 import java.util.HashMap;
 
+import com.kimcompay.projectjb.utillService;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -11,7 +13,6 @@ import net.nurigo.java_sdk.exceptions.CoolsmsException;
 
 @Service
 public class smsService {
-    private static Logger logger=LoggerFactory.getLogger(smsService.class);
 
     @Value("${coolsms.accesskey}")
     private  String apikey;
@@ -21,7 +22,6 @@ public class smsService {
     private  String company_phone;
 
     public  boolean sendMessege(String phoneNum,String messege) {
-        logger.info(phoneNum+" 문자전송번호");
         Message coolsms = new Message(apikey, apiSecret);
         HashMap<String, String> params = new HashMap<String, String>();
         params.put("to", phoneNum);
@@ -30,11 +30,10 @@ public class smsService {
         params.put("text", messege);
         try {
             coolsms.send(params);
-            System.out.println("문자 전송 완료");
             return true;
         } catch (CoolsmsException e) {
             e.printStackTrace();
-            System.out.println("sendMessege 전송 실패");
+           utillService.writeLog("sendMessege 전송 실패",smsService.class);
         }
        return false;
     }
