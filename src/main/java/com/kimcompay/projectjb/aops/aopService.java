@@ -1,22 +1,14 @@
 package com.kimcompay.projectjb.aops;
 
 import java.lang.reflect.Method;
-import java.security.Principal;
-import java.util.List;
-import java.util.Map;
 
-import javax.servlet.http.HttpSession;
+
 
 import com.kimcompay.projectjb.utillService;
 import com.kimcompay.projectjb.apis.aws.services.fileService;
-import com.kimcompay.projectjb.apis.aws.services.sqsService;
-import com.kimcompay.projectjb.enums.senums;
-import com.kimcompay.projectjb.users.principalDetails;
 
 import org.aspectj.lang.JoinPoint;
-import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
-import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.reflect.MethodSignature;
@@ -24,8 +16,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestWrapper;
 import org.springframework.stereotype.Service;
 
