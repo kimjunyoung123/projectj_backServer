@@ -59,7 +59,7 @@ public class aopService {
         //return joinPoint.getp();   
     }
     @AfterReturning(value = "execution(* com.kimcompay.projectjb.users.company.service.storeService.tryInsert(..))"
-    +"execution(* com.kimcompay.projectjb.users.company.service.storeService.tryUpdate(..))",returning="response")
+    +"||execution(* com.kimcompay.projectjb.users.company.service.storeService.tryUpdate(..))",returning="response")
     public void doneInserOrUpdate(JoinPoint joinPoint,Object response) {
         logger.info("doneInserOrUpdate");
         MethodSignature signature = (MethodSignature)joinPoint.getSignature();
