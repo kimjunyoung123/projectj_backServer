@@ -19,7 +19,6 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class naverService {
-    private Logger logger=LoggerFactory.getLogger(naverService.class);
     @Value("${naver.client.id}")
     private String naverClientId;
     @Value("${naver.client.pwd}")
@@ -34,11 +33,9 @@ public class naverService {
     private naverLoginService naverLoginService;
     
     public JSONObject callPage(String action) {
-        logger.info("callPage");
         String url=null;
         try {
             if(action.equals(nenum.loginPage.get())){
-                logger.info("로그인페이지요청");
                 try {
                     String state = URLEncoder.encode(loginCallback, "UTF-8");
                     return utillService.getJson(true, "https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id="+naverClientId+"&redirect_uri="+""+loginCallback+""+"&state="+state+"");
@@ -52,16 +49,13 @@ public class naverService {
         }
     }
     public void catchCallBack(String action,HttpServletRequest request) {
-        logger.info("catchCallBack");
         JSONObject result=new JSONObject();
         if(action.equals(kenum.loginPage.get())){
-            logger.info("네이버 로그인 콜백");
             result=naverLoginService.login(naverClientId,naverClientPwd,request.getParameter("code"),request.getParameter("state"));
         }else{
             result.put("flag", false);
             result.put("message", senums.defaultDetailAddress.get());
         }
-        logger.info("처리결과"+result);
         String url=frontDomain+resultLink+"?kind=naver&action="+action+"&result="+result.get("flag")+"&message="+result.get("message");
         utillService.doRedirect(utillService.getHttpSerResponse(), url);
     }
