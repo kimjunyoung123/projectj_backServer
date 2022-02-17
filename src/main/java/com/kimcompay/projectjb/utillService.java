@@ -345,6 +345,10 @@ public class utillService {
         result.put("flag", false);
         return result;
     }
+    public static <T> void writeLog(String message,Class<T> clazz) {
+         Logger logger=LoggerFactory.getLogger(clazz);
+         logger.info("message");
+    }
 
     
  

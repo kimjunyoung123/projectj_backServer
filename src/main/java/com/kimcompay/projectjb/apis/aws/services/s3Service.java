@@ -17,25 +17,22 @@ import org.springframework.web.multipart.MultipartFile;
 
 @Service
 public class s3Service {
-    private final static Logger logger=LoggerFactory.getLogger(s3Service.class);
     @Autowired
     private AmazonS3 amazonS3;
 
     public String uploadImage(File file,String bucketName) {
-        logger.info("uploadImage");
         try {
             String imgName=file.getName();
             amazonS3.putObject(bucketName,imgName, file);
-            logger.info("파일업로드 완료");
+            utillService.writeLog("파일업로드 완료",s3Service.class);
             return imgName;
         } catch (Exception e) {
-            logger.info("파일 업로드에 실패 했습니다");
+            utillService.writeLog("파일 업로드에 실패 했습니다",s3Service.class);
             throw utillService.makeRuntimeEX("파일 업로드에 실패했습니다","uploadImage");
         }
 
     }
     public void deleteFile(String bucktetName,String fileName) {
-        logger.info("deleteFile");
         amazonS3.deleteObject(bucktetName, fileName);
     }
 }

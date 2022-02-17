@@ -21,13 +21,11 @@ import okhttp3.Response;
 
 @Service
 public class jungbuService {
-    private Logger logger=LoggerFactory.getLogger(jungbuService.class);
 
     @Value("${tax.decoding.apikey}")
     private String apikey;
 
     public JSONObject getCompanyNum(String compay_num,String start_dt,String name) {
-        logger.info("getCompanyNum");
         //resttemplate통신이 안되서 okhttp3으로 통신
         OkHttpClient client = new OkHttpClient().newBuilder().build();
         MediaType mediaType = MediaType.parse("application/json");
@@ -62,7 +60,7 @@ public class jungbuService {
                         "       }\n  " +
                         "   ]\n" +
                         "}"); 옜날 방식*/
-        logger.info("전송 정보: "+jsonObject);
+        utillService.writeLog("전송 정보: "+jsonObject,jungbuService.class);
         //요청
         Request request = new Request.Builder()
                 .url("http://api.odcloud.kr/api/nts-businessman/v1/validate?serviceKey="+apikey)
@@ -75,7 +73,7 @@ public class jungbuService {
                 return utillService.stringToJson(response.body().string());
                
         } catch (Exception e) {
-                logger.info("사업자 등록 조회실패");
+                utillService.writeLog("사업자 등록 조회실패",jungbuService.class);
                 throw utillService.makeRuntimeEX("사업자 조회에 실패했습니다", "getCompanyNum");
         } 
     }

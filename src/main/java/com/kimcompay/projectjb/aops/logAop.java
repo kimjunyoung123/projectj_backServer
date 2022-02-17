@@ -16,14 +16,15 @@ import org.springframework.stereotype.Service;
 public class logAop {
     private Logger logger=LoggerFactory.getLogger(logAop.class); 
 
-    @Around("execution(* com.kimcompay.projectjb.users.company.flyerService.*(..))"
-    +"||execution(* com.kimcompay.projectjb.users.user.userService.*(..))"
-    +"||execution(* com.kimcompay.projectjb.users.company.storeService.*(..))"
-    +"||execution(* com.kimcompay.projectjb.users.company.productService.*(..))")
+    @Around("execution(* com.kimcompay.projectjb.users.company.*.*(..))"
+    +"||execution(* com.kimcompay.projectjb.users.user.*.*(..))"
+    +"||execution(* com.kimcompay.projectjb.apis.aws.services.*.*(..))"
+    +"||execution(* com.kimcompay.projectjb.apis.jungbu.*.*(..))")
     public Object writeLog(ProceedingJoinPoint joinPoint) throws Throwable {
         logger.info("writeLog");
         MethodSignature signature = (MethodSignature)joinPoint.getSignature();
         Method method=signature.getMethod();
+        logger.info("pakage: "+signature.getDeclaringTypeName());
         logger.info("mehtod: "+method.getName());
         int len=method.getParameterCount();
         String[] paramNames=signature.getParameterNames();

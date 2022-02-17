@@ -27,8 +27,6 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 @Service
 public class fileService {
-    private Logger logger=LoggerFactory.getLogger(fileService.class);
-
     @Value("${aws.s3.url}")
     private String awsUrl;
     @Value("${aws.bucket.name}")
@@ -37,7 +35,6 @@ public class fileService {
     @Autowired
     private s3Service s3Service;
     public JSONObject upload(MultipartHttpServletRequest request) {
-        logger.info("upload");
         List<MultipartFile>files=request.getFiles("upload");
         if(files.size()>1){
             //아직 미사용
@@ -60,13 +57,11 @@ public class fileService {
         }
     }
     public JSONObject upload(File file) {
-        logger.info("upload");
         Map<String,String>result=uploadCore(file);
         saveSession(result.get("uploadName"));
         return utillService.getJson(true, result.get("url"));
     }
     private void saveSession(String uploadName) {
-        logger.info("saveSession");
         //세션에담기
         List<String>imgNames=new ArrayList<>();
         HttpSession httpSession=utillService.getHttpServletRequest().getSession();
@@ -76,14 +71,13 @@ public class fileService {
             imgNames=(List<String>)httpSession.getAttribute(imgSession);
             imgNames.add(uploadName);
         } catch (NullPointerException e) {
-            logger.info("첫 사진업로드 요청이므로 예외발생 만들어서 넣어주기");
+            utillService.writeLog("첫 사진업로드 요청이므로 예외발생 만들어서 넣어주기",fileService.class);
             imgNames=new ArrayList<>();
             imgNames.add(uploadName);
             httpSession.setAttribute(imgSession, imgNames);
         }
     }
     private Map<String,String> uploadCore(File file) {
-        logger.info("uploadCore");
         //업로드
         String uploadName=s3Service.uploadImage(file, bucketName);
         //결과응답
@@ -93,33 +87,30 @@ public class fileService {
         return response;
     }
     public void deleteFile(HttpSession httpSession,List<String>usingImgs) {
-        logger.info("deleteFile sesion");
         try {
             List<String>imgNames=(List<String>)httpSession.getAttribute(senums.imgSessionName.get());
             for(String img:imgNames){
                 if(!usingImgs.contains(img)){
-                    logger.info("삭제할 이미지: "+img);
+                    utillService.writeLog("삭제할 이미지: "+img,fileService.class);
                     deleteFile(img);
                 }
             }
         } catch(NullPointerException e){
-            logger.info("삭제할 이미지가 없습니다");
+            utillService.writeLog("삭제할 이미지가 없습니다",fileService.class);
         }catch (Exception e) {
-           logger.info("이미지 삭제 실패");
+           utillService.writeLog("이미지 삭제 실패",fileService.class);
         }
     }
     public void deleteFile(String fileName) {
-        logger.info("deleteFile");
         s3Service.deleteFile(bucketName, fileName);
     }
     public File convert(MultipartFile multipartFile) {
-        logger.info("convert");
         File file=new File(LocalDate.now().toString()+UUID.randomUUID()+multipartFile.getOriginalFilename());
         try(FileOutputStream fileOutputStream=new FileOutputStream(file)){
             fileOutputStream.write(multipartFile.getBytes()); 
         } catch (Exception e) {
             e.printStackTrace();
-            logger.info(e.getMessage());
+            utillService.writeLog(e.getMessage(),fileService.class);
             throw utillService.makeRuntimeEX("파일형식변환에 실패했습니다","convert");
         }
         return file;
