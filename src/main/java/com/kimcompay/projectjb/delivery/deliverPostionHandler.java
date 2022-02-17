@@ -11,7 +11,7 @@ import com.kimcompay.projectjb.delivery.model.deliverRoomDetailVo;
 import com.kimcompay.projectjb.enums.intenums;
 import com.kimcompay.projectjb.enums.senums;
 import com.kimcompay.projectjb.users.principalDetails;
-import com.kimcompay.projectjb.users.company.storeService;
+import com.kimcompay.projectjb.users.company.service.storeService;
 
 import org.json.simple.JSONObject;
 import org.slf4j.Logger;

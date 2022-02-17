@@ -1,9 +1,8 @@
-package com.kimcompay.projectjb.users.company;
+package com.kimcompay.projectjb.users.company.service;
 
 import java.io.File;
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.HashMap;
+
 import java.util.List;
 import java.util.Map;
 
@@ -12,19 +11,16 @@ import com.kimcompay.projectjb.apis.aws.services.fileService;
 import com.kimcompay.projectjb.apis.google.ocrService;
 import com.kimcompay.projectjb.users.company.model.flyerDao;
 import com.kimcompay.projectjb.users.company.model.flyerVo;
-import com.kimcompay.projectjb.users.company.model.productEventVo;
 import com.kimcompay.projectjb.users.company.model.productVo;
 
 import org.json.simple.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 @Service
 public class flyerService {
-    private Logger logger=LoggerFactory.getLogger(flyerService.class);
     private final int pageSize=2;
     @Autowired
     private flyerDao flyerDao;
@@ -34,7 +30,6 @@ public class flyerService {
     private productService productService;
     
     public JSONObject getFlyerAndProducts(int flyerId) {
-        logger.info("getFlyerAndProducts");
         JSONObject response=new JSONObject();
         //조회전단 검색
         flyerVo flyerVo=flyerDao.findById(flyerId).orElseThrow(()->utillService.makeRuntimeEX("존재하지 않는 전단입니다", "getFlyerAndProducts"));
@@ -83,7 +78,6 @@ public class flyerService {
     }*/
 
     public List<Map<String,Object>> getFlyerArr(int storeId,String startDate,String endDate,int page) {
-        logger.info("getByStoreId");
         Map<String,Object>result=utillService.checkRequestDate(startDate, endDate);
         if((boolean)result.get("flag")){
             Timestamp start=Timestamp.valueOf(result.get("start").toString());
@@ -94,7 +88,6 @@ public class flyerService {
         return flyerDao.findByStoreId(storeId,storeId,utillService.getStart(page, pageSize)-1,pageSize);
     }
     public flyerVo getFlyer(int flyerId) {
-        logger.info("getFlyer");
         return flyerDao.findById(flyerId).orElseThrow(()->utillService.makeRuntimeEX("존재하지 않는 전단입니다", "getFlyer"));
     }
     private int insert(String imgPath,int storeId) {
@@ -111,7 +104,7 @@ public class flyerService {
         try {
             response.put("ocr",ocrService.detectText(file.toPath().toString()));
         } catch (Exception e) {
-            logger.info("ocr 글자 추출 실패");
+            utillService.writeLog("ocr 글자 추출 실패",flyerService.class);
             e.printStackTrace();
         }
         //로컬 파일 삭제

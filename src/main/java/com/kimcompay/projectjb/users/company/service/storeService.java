@@ -1,4 +1,4 @@
-package com.kimcompay.projectjb.users.company;
+package com.kimcompay.projectjb.users.company.service;
 
 import java.io.File;
 import java.util.ArrayList;
