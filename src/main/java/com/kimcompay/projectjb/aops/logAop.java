@@ -22,7 +22,8 @@ public class logAop {
     +"||execution(* com.kimcompay.projectjb.users.user.*.*(..))"
     +"||execution(* com.kimcompay.projectjb.apis.aws.services.*.*(..))"
     +"||execution(* com.kimcompay.projectjb.apis.jungbu.*.*(..))"
-    +"||execution(* com.kimcompay.projectjb.apis.kakao.*.*(..))") 
+    +"||execution(* com.kimcompay.projectjb.apis.kakao.*.*(..))"
+    +"||execution(* com.kimcompay.projectjb.apis.naver.*.*(..))") 
     public Object writeLog(ProceedingJoinPoint joinPoint) throws Throwable {
         logger.info("writeLog");
         MethodSignature signature = (MethodSignature)joinPoint.getSignature();

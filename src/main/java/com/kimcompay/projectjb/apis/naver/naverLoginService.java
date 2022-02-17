@@ -25,7 +25,6 @@ import org.springframework.web.client.HttpClientErrorException;
 
 @Service
 public class naverLoginService {
-    private Logger logger=LoggerFactory.getLogger(naverLoginService.class);
     
     @Value("${oauth.pwd}")
     private String oauthPwd;
@@ -38,32 +37,31 @@ public class naverLoginService {
 
 
     public JSONObject login(String clientId,String ClientPwd,String code,String state) {
-        logger.info("login");
         //토큰발급
         //토큰 꺼내기
         JSONObject result=new JSONObject();
         String accessToken=null;
         try {
             result=getToken(code, clientId,ClientPwd, state);
-            logger.info("네이버 통신결과: "+result);
+            utillService.writeLog("네이버 통신결과: "+result,naverLoginService.class);
             accessToken=result.get("access_token").toString();
-            logger.info("엑세스토큰: "+accessToken);
+            utillService.writeLog("엑세스토큰: "+accessToken,naverLoginService.class);
         } catch (NullPointerException |HttpClientErrorException e) {
-            logger.info("네이버 통신에러 발생: "+e.getMessage());
+            utillService.writeLog("네이버 통신에러 발생: "+e.getMessage(),naverLoginService.class);
             return utillService.getJson(false, "네이버 통신에 실패했습니다");
         }
         //사용자 정보 가져오기
         result=getUserProfile(accessToken);
-        logger.info("네이버 통신결과: "+result);
+        utillService.writeLog("네이버 통신결과: "+result,naverLoginService.class);
         //profile꺼내기
         LinkedHashMap<String,Object> profile=(LinkedHashMap<String,Object>)result.get("response");
         //네이버 주소 찾아오기
         JSONObject address=new JSONObject();
         try {
             address=getUserPayAddress(accessToken);
-            logger.info("네이버 통신결과: "+address);  
+            utillService.writeLog("네이버 통신결과: "+address,naverLoginService.class);  
         } catch (HttpClientErrorException |NullPointerException e) {
-            logger.info("네이버페이 주소정보 얻어오기 실패 디폴드값 밀어넣기");
+            utillService.writeLog("네이버페이 주소정보 얻어오기 실패 디폴드값 밀어넣기",naverLoginService.class);
             profile.put("postCode",senums.defaultPostcode.get());
             profile.put("address", senums.defaultAddress.get());
             profile.put("detailAddress", senums.defaultDetailAddress.get());
@@ -80,24 +78,20 @@ public class naverLoginService {
         return utillService.getJson(true, "네이버 로그인 완료");
     }
     private userVo jsonToVo(LinkedHashMap<String,Object> profile) {
-        logger.info("jsonToVo");
         userVo vo=userVo.builder().email(profile.get("email").toString()).uaddress(profile.get("address").toString()).ubirth(profile.get("birthyear")+"-"+profile.get("birthday"))
                         .udetail_address(profile.get("detailAddress").toString()).ulogin_date(Timestamp.valueOf(LocalDateTime.now())).uphone(profile.get("mobile").toString().replace("-", "")).upostcode(profile.get("postCode").toString())
                         .provider(senums.naver.get()).upwd(oauthPwd).urole(senums.user_role.get()).usleep(0).build();
                         return vo;
     }
     private JSONObject getToken(String code,String clientId,String clientPwd,String state) {
-        logger.info("getToken");
         return requestTo.requestGet(null,"https://nid.naver.com/oauth2.0/token?grant_type=authorization_code&client_id="+clientId+"&client_secret="+clientPwd+"&code="+code+"&state="+state+"", null);
     }
     private JSONObject getUserProfile(String accessToken) {
-        logger.info("getUserProfile");
         HttpHeaders headers=new HttpHeaders();
         headers.add("Authorization", "Bearer "+accessToken);
         return requestTo.requestGet(null, "https://openapi.naver.com/v1/nid/me", headers);
     }
     private JSONObject getUserPayAddress(String accessToken) {
-        logger.info("getUserPayAddress");
         HttpHeaders headers=new HttpHeaders();
         headers.add("Authorization", "Bearer "+accessToken);
         return requestTo.requestGet(null, "https://openapi.naver.com/v1/naverpay/address", headers);
