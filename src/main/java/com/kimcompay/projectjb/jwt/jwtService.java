@@ -23,7 +23,7 @@ public class jwtService {
 
 
     public String get_access_token(String id) {
-        return JWT.create().withSubject(access_name).withClaim("id",id).withExpiresAt(new Date(System.currentTimeMillis()+1000*5)).sign(Algorithm.HMAC512(jwt_sing));
+        return JWT.create().withSubject(access_name).withClaim("id",id).withExpiresAt(new Date(System.currentTimeMillis()+1000*10000)).sign(Algorithm.HMAC512(jwt_sing));
     }
     public String get_refresh_token() {
         return JWT.create().withSubject(refresh_name).withExpiresAt(new Date(System.currentTimeMillis()+1000*60*24*refresh_expire_day)).sign(Algorithm.HMAC512(jwt_sing));

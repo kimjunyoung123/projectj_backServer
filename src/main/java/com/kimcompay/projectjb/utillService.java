@@ -34,10 +34,8 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 public class utillService {
-    private final static Logger logger=LoggerFactory.getLogger(utillService.class);
 
     public  static void checkOwner(int ucId,String errorMessage) {
-        logger.info("checkOwner");
         if(ucId!=utillService.getLoginId()){
             throw utillService.makeRuntimeEX(errorMessage, "checkOwner");
         }
@@ -53,8 +51,6 @@ public class utillService {
 		return array;
     }
     public static void deleteCookie(String cookieName,HttpServletRequest request,HttpServletResponse response) {
-        logger.info("deleteCookie");
-        logger.info("제걸될 쿠키이름: "+cookieName);
         ResponseCookie cookie = ResponseCookie.from(cookieName, null) 
         .sameSite("None") 
         .secure(true) 
@@ -64,24 +60,18 @@ public class utillService {
         response.addHeader("Set-Cookie", cookie.toString()+";HttpOnly");
     }
     public static JSONObject getJson(boolean flag,Object message) {
-        logger.info("getjosn");
         JSONObject jsonObject=new JSONObject();
         jsonObject.put("flag", flag);
         jsonObject.put("message", message);
-        logger.info("리스폰 담기완료");
         return jsonObject;
     }
     public static RuntimeException makeRuntimeEX(String message,String methodName) {
-        logger.info("getRuntimeEX");
-        logger.info(methodName);
         return new RuntimeException("메세지: "+message);
     }
     public static RuntimeException throwRuntimeEX(String message) {
-        logger.info("throwRuntimeEX");
         throw new RuntimeException("메세지: "+message);
     }
     public static boolean checkBlank(String ob) {
-        logger.info("checkBlank");
         if(ob==null){
             return true;
         }else if(ob.equals("null")||ob.equals("undifined")){
@@ -101,12 +91,9 @@ public class utillService {
         return num;
     } 
     public static <T> T getValue(T ob,String error_message,String method_name) {
-        logger.info("getValue");
         return Optional.ofNullable(ob).orElseThrow(()->makeRuntimeEX(error_message,method_name));
     }
     public static void makeCookie(Map<String,Object>infor,HttpServletResponse response) {
-        logger.info("makeCookie");
-        logger.info("쿠키내용: "+infor.toString());
         for(Entry<String, Object> key:infor.entrySet()){
            /* ResponseCookie cookie = ResponseCookie.from(key.getKey(),key.getValue().toString()) 
             .sameSite("None") 
@@ -119,7 +106,6 @@ public class utillService {
         }
     }
     public static String getCookieValue(HttpServletRequest request,String cookieName) {
-        logger.info("getCookieValue");
         Cookie[] cookies=request.getCookies();
         for(Cookie c:cookies){
             if(c.getName().equals(cookieName)){
@@ -129,27 +115,23 @@ public class utillService {
         return null;
     }
     public static void doRedirect(HttpServletResponse response,String url) {
-        logger.info("doRedirect");
-        logger.info(url+"리다이렉트 요청 url");
         try {
             response.sendRedirect(url);
         } catch (IOException e) {
             e.printStackTrace();
-            logger.info("doRedirect error"+e.getMessage());
+            writeLog("doRedirect error"+e.getMessage(),utillService.class);
         }
     }
     public static void goFoward(String errorUrl,HttpServletRequest request,HttpServletResponse response) {
-       logger.info("goFoward");
         RequestDispatcher dp=request.getRequestDispatcher(errorUrl);
         try {
             dp.forward(request, response);
         } catch (ServletException | IOException e) {
-           logger.info("에러링크 존재 하지 않음");
+            writeLog("에러링크 존재 하지 않음",utillService.class);
             e.printStackTrace();
         } 
     }
     public static boolean checkOnlyNum(String snum) {
-        logger.info("checkOnlyNum");
         try {
             Long.parseLong(snum);
             return false;
@@ -158,30 +140,24 @@ public class utillService {
         }
     }
     public static JSONObject stringToJson(String jsonString) {
-        logger.info("stringToJson");
-        logger.info("json으로 파싱할 문자열: "+jsonString);
         JSONParser parser = new JSONParser();
         Object obj;
         try {
             obj = parser.parse(jsonString);
             JSONObject jsonObj = (JSONObject) obj;
-            logger.info("변환: "+jsonObj);
             return jsonObj;
         } catch (ParseException e) {
-            logger.info("string to json fail");
             e.printStackTrace();
             throw makeRuntimeEX(senums.defaultFailMessage.get(), "stringToJson");
         }
     }
     public static <T> Boolean checkEmthy(Map<T,T>map) {
-        logger.info("checkEmthy");
         if(map.isEmpty()||map.size()==0){
             return true;
         }
         return false;
     }
     public static <T> boolean checkEmthy(List<T>arr) {
-        logger.info("checkEmthy");
         if(arr==null){
             return true;
         }
@@ -191,21 +167,16 @@ public class utillService {
         return false;
     }
     public static HttpServletResponse getHttpSerResponse() {
-        logger.info("getHttpSerResponse");
         ServletRequestAttributes attr = (ServletRequestAttributes)RequestContextHolder.currentRequestAttributes();
         return attr.getResponse();
     }
     public static HttpServletRequest getHttpServletRequest() {
-        logger.info("getHttpSerResponse");
         ServletRequestAttributes attr = (ServletRequestAttributes)RequestContextHolder.currentRequestAttributes();
         return attr.getRequest();
     }
     public static void makeAllToString(Map<Object,Object>result) {
-        logger.info("makeAllToString");
         for(Entry<Object, Object> s:result.entrySet()){
-            logger.info(s.getKey().toString());
             if(Optional.ofNullable(s.getValue()).orElseGet(()->null)==null){
-                logger.info("null발견 무시");
                 continue;
             }else if(!s.getValue().getClass().getSimpleName().equals("String")){
                 result.put(s.getKey(), s.getValue().toString());
@@ -213,14 +184,12 @@ public class utillService {
         }
     }
     public static void makeLoginCookie(String accessToken,String refreshToken,String accessTokenCookieName,String refreshTokenCookieName) {
-        logger.info("makeLoginCookie");
         Map<String,Object>cookies=new HashMap<>();
         cookies.put(accessTokenCookieName, accessToken);
         cookies.put(refreshTokenCookieName, refreshToken);
         makeCookie(cookies,getHttpSerResponse());
     }
     public static String checkAuthPhone(String authText) {
-        logger.info("checkAuthPhone");
         Map<String,Object>authInfor=new HashMap<>();
         boolean checkFlag=false;
         String sphone=null;
@@ -228,11 +197,9 @@ public class utillService {
         try {
             HttpSession httpSession=getHttpServletRequest().getSession();
             authInfor=(Map<String,Object>)httpSession.getAttribute(authText+senums.phonet.get());
-            logger.info("휴대폰인증내역: "+authInfor);
             sphone=authInfor.get("val").toString();
             checkFlag=Boolean.parseBoolean(authInfor.get("res").toString());
         } catch (NullPointerException e) {
-            logger.info("휴대폰 인증 요청내역이없음");
             throw utillService.makeRuntimeEX("휴대폰 인증을 먼저 해주세요", "checkAuth");
         }
         if(!checkFlag){
@@ -241,14 +208,12 @@ public class utillService {
         return sphone;
     }
     public static String checkAuthEmail() {
-        logger.info("checkAuthEmail");
         Map<String,Object>authInfor=new HashMap<>();
         boolean checkFlag=false;
         String sEmail=null;
         try {
             HttpSession httpSession=getHttpServletRequest().getSession();
             authInfor=(Map<String,Object>)httpSession.getAttribute(senums.auth.get()+senums.emailt.get());
-            logger.info("이메일인증내역: "+authInfor);
             sEmail=authInfor.get("val").toString();
             checkFlag=Boolean.parseBoolean(authInfor.get("res").toString());
         } catch (Exception e) {
@@ -260,7 +225,6 @@ public class utillService {
         return sEmail;
     }  
     public static Map<Object,Object> getLoginInfor() {
-        logger.info("getLoginInfor");
         try {
             principalDetails principalDetails=(principalDetails)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             return principalDetails.getPrinci();
@@ -269,7 +233,6 @@ public class utillService {
         }
     }
     public static int getLoginId(){
-        logger.info("getLoginId");
         try {
             return Integer.parseInt(getLoginInfor().get("id").toString());
         } catch (Exception e) {
@@ -277,7 +240,6 @@ public class utillService {
         }
     }
     public static String getLoginEmail() {
-        logger.info("getLoginEmail");
         try {
             return getLoginInfor().get("email").toString();
         } catch (Exception e) {
@@ -285,7 +247,6 @@ public class utillService {
         }
     }
     public static int getTotalPage(int totalCount,int pageSize) {
-        logger.info("getTotalPage");
         int totalPage=totalCount/pageSize;
         int remainder=totalCount%pageSize;
         if(totalPage==0){
@@ -296,22 +257,18 @@ public class utillService {
         return totalPage;
     }
     public static int getStart(int page,int pageSize) {
-        logger.info("getStart");
-        logger.info("요청페이지 :"+page);
         return (page-1)*pageSize+1;//+1 이있는 이유는 1페이질때 대응하기 위해이다  
     }
     public static List<String> getOnlyImgNames(String text) {
-        logger.info("getOnlyImgNames");
         List<String>imgPaths=getImgSrc(text);
         List<String>imgNames=new ArrayList<>();
         if(!imgPaths.isEmpty()){
-            logger.info("가게 간단설명에 이미지 존재");
             for(String path:imgPaths){
                 imgNames.add(path.split("/")[4]);
             }
             return imgNames;
         }else{
-            logger.info("이미지가 존재하지 않습니다");
+            writeLog("이미지가 존재하지 않습니다",utillService.class);
         }
         return imgNames;
     }
@@ -324,7 +281,6 @@ public class utillService {
         return dates;
     }
     public static Map<String,Object> checkRequestDate(String startDay,String endDay) {
-        logger.info("");
         Map<String,Object>result=new HashMap<>();
         Boolean startResult=utillService.checkBlank(startDay);
         Boolean endResult=utillService.checkBlank(endDay);
