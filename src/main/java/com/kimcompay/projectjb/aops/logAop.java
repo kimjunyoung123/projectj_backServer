@@ -2,6 +2,8 @@ package com.kimcompay.projectjb.aops;
 
 import java.lang.reflect.Method;
 
+import com.kimcompay.projectjb.utillService;
+
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -26,13 +28,7 @@ public class logAop {
         Method method=signature.getMethod();
         logger.info("pakage: "+signature.getDeclaringTypeName());
         logger.info("mehtod: "+method.getName());
-        int len=method.getParameterCount();
-        String[] paramNames=signature.getParameterNames();
-        Object[] paramValues =joinPoint.getArgs();
-        for(int i=0;i<len;i++){
-            logger.info("요청변수: "+paramNames[i]+" 요청값: "+paramValues[i].toString());
-        }
-      
+        logger.info("요청변수: "+utillService.arrToLogString(signature.getParameterNames())+" 요청값: "+utillService.arrToLogString(joinPoint.getArgs()));
         return joinPoint.proceed();   
     }
 }

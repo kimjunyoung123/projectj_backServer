@@ -349,6 +349,9 @@ public class utillService {
          Logger logger=LoggerFactory.getLogger(clazz);
          logger.info("message");
     }
+    public static <T> String arrToLogString(T[] arr) {
+        return Arrays.toString(arr);
+    }
 
     
  
