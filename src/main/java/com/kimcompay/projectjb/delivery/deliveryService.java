@@ -7,14 +7,12 @@ import com.kimcompay.projectjb.utillService;
 import com.kimcompay.projectjb.delivery.model.deliverRoomDetailDao;
 import com.kimcompay.projectjb.delivery.model.deliveryRoomDao;
 import org.json.simple.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class deliveryService {
-    private Logger logger=LoggerFactory.getLogger(deliveryService.class);
     private final int pageSize=2;
 
     @Autowired
@@ -23,11 +21,9 @@ public class deliveryService {
     private deliverRoomDetailDao deliverRoomDetailDao;
 
     public JSONObject getDeliverAddress(int roomId) {
-        logger.info("getDeliverAddress");
         return utillService.getJson(true, deliverRoomDetailDao.findAddressByRoomId(roomId));
     }
     public JSONObject getDelivers(int page,String startDay,String endDay,int storeId,int state) {
-        logger.info("getDelivers");
         List<Map<String,Object>>deliveryInfors=selectByPeriodAndStoreId(page, startDay, endDay, storeId,state);
         //요청페이지,배달건수 검증
         if(utillService.checkEmthy(deliveryInfors)){ 
@@ -38,7 +34,6 @@ public class deliveryService {
         int loginId=utillService.getLoginId();
         for(Map<String,Object> deliveryInfor:deliveryInfors ){
             if(Integer.parseInt(deliveryInfor.get("company_id").toString())!=loginId){
-                logger.info("다른 매장 배달 발견");
                 throw utillService.makeRuntimeEX("회사 소유 매장 배달이 아닙니다", "getDelivers");
             }
         }
@@ -49,8 +44,6 @@ public class deliveryService {
         return response;
     }
     public List<Map<String,Object>> selectByPeriodAndStoreId(int page,String startDay,String endDay,int storeId,int state) {
-        logger.info("getDelivers");
-        logger.info("조회날짜: "+startDay+", "+endDay);
         Map<String,Object>result=utillService.checkRequestDate(startDay, endDay);
         if((boolean)result.get("flag")){
             Timestamp start=Timestamp.valueOf(result.get("start").toString());
@@ -61,7 +54,6 @@ public class deliveryService {
         return deliveryRoomDao.findByAll(storeId,state,storeId,state,utillService.getStart(page, pageSize)-1,pageSize);
     }
     public List<Integer> selectRoomIdByUserIdAndFlag(int userId,int flag) {
-        logger.info("selectRoomIdByUserIdAndFlag");
         return deliverRoomDetailDao.findAllByRoomIdAndDoneFlag(userId, flag);
     }
    /* public List<Integer> selectRoomIdByCompanyIdAndStartDoneFlag(int companyId,int startFlag,int doneFlag) {
