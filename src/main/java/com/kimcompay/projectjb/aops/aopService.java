@@ -56,8 +56,8 @@ public class aopService {
         logger.info("pakage: "+signature.getDeclaringTypeName());
         logger.info("mehtod: "+method.getName());
         logger.info("요청변수: "+utillService.arrToLogString(signature.getParameterNames())+" 요청값: "+utillService.arrToLogString(joinPoint.getArgs()));
-        //return joinPoint.getp();   
     }
+    @Async
     @AfterReturning(value = "execution(* com.kimcompay.projectjb.users.company.service.storeService.tryInsert(..))"
     +"||execution(* com.kimcompay.projectjb.users.company.service.storeService.tryUpdate(..))",returning="response")
     public void doneInserOrUpdate(JoinPoint joinPoint,Object response) {
