@@ -30,7 +30,6 @@ import org.springframework.web.client.HttpClientErrorException;
 
 @Service
 public class kakaoLoginService {
-    private Logger logger=LoggerFactory.getLogger(kakaoLoginService.class);
 
     @Value("${oauth.pwd}")
     private String oauthPwd;
@@ -42,20 +41,19 @@ public class kakaoLoginService {
     private sqsService sqsService;
 
     public JSONObject doLogin(String code,String restKey,String redirectUrl) {
-        logger.info("doLogin");
         //토큰얻어오기
         JSONObject response=new JSONObject();
         try {
             response=getToken(code,restKey,redirectUrl);
-            logger.info("카카오응답: "+response);
+            utillService.writeLog("카카오응답: "+response,kakaoLoginService.class);
         } catch (HttpClientErrorException e) {
-            logger.info("카카오 로그인 통신에러 발생");
-            logger.info("카카오 에러 메세지: "+e.getMessage());
+            utillService.writeLog("카카오 로그인 통신에러 발생",kakaoLoginService.class);
+            utillService.writeLog("카카오 에러 메세지: "+e.getMessage(),kakaoLoginService.class);
             //json으로 변환위해 문자열 재수정
             String message=e.getMessage().split(": ")[1];
             message=message.substring(1,message.length()-1);
             JSONObject error=utillService.stringToJson(message);
-            logger.info("에러내용: "+error);
+            utillService.writeLog("에러내용: "+error,kakaoLoginService.class);
             try {
                 //if대신 enum사용
                 return  utillService.getJson(false,kenum.valueOf(error.get("error_code").toString()).get());
@@ -65,9 +63,9 @@ public class kakaoLoginService {
         }
         //사용자정보 얻어오기
         response=getKuserInfor(response);
-        logger.info("카카오응답: "+response);
+        utillService.writeLog("카카오응답: "+response,kakaoLoginService.class);
         LinkedHashMap<String,Object>linkedHashMap=(LinkedHashMap<String,Object>)response.get("kakao_account");
-        logger.info("유저정보: "+linkedHashMap);
+        utillService.writeLog("유저정보: "+linkedHashMap,kakaoLoginService.class);
         //정보분리
         LinkedHashMap<String,Object>profile=(LinkedHashMap<String,Object>)linkedHashMap.get("profile");
         //테스트계정 주소/생일/휴대전화 받을 수 없음 임의로 만들자 
@@ -89,13 +87,11 @@ public class kakaoLoginService {
         return utillService.getJson(true, "카카오 로그인 완료");
     }
     private userVo mapToVo(LinkedHashMap<String,Object>profile,String email) {
-        logger.info("mapToVo");
         userVo vo=userVo.builder().email(email).uaddress(profile.get("address").toString()).ubirth(profile.get("birth").toString()).udetail_address(profile.get("detailAddress").toString()).ulogin_date(Timestamp.valueOf(LocalDateTime.now()))
                         .provider(senums.kakao.get()).uphone(profile.get("phone").toString()).upostcode(profile.get("postCode").toString()).upwd(oauthPwd).urole(senums.user_role.get()).usleep(0).build();
                         return vo;
     }
     private JSONObject getKuserInfor(JSONObject response) {
-        logger.info("getKuserInfor");
         HttpHeaders httpHeaders=new HttpHeaders();
         httpHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
         httpHeaders.add("Authorization", "Bearer "+response.get("access_token"));
@@ -104,8 +100,6 @@ public class kakaoLoginService {
 
     }
     private JSONObject getToken(String code,String restKey,String redirectUrl) {
-        logger.info("getToken");
-        logger.info("code: "+code);
         //body만들기
         MultiValueMap<String,Object> multiValueBody=new LinkedMultiValueMap<>();
         multiValueBody.add("grant_type", "authorization_code");//카카오에서  요청하는 고정값
