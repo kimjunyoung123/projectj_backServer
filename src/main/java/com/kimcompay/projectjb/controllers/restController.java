@@ -9,6 +9,7 @@ import javax.servlet.http.HttpSession;
 
 import com.kimcompay.projectjb.checkPageService;
 import com.kimcompay.projectjb.utillService;
+import com.kimcompay.projectjb.apis.requestTo;
 import com.kimcompay.projectjb.apis.aws.services.fileService;
 import com.kimcompay.projectjb.apis.sns.snsService;
 import com.kimcompay.projectjb.enums.senums;
@@ -20,6 +21,7 @@ import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -37,6 +39,8 @@ public class restController {
     private checkPageService checkPageService;
     @Autowired
     private fileService fileService;
+    @Autowired
+    private requestTo requestTo;
 
     
     @RequestMapping(value = "/sns/**",method = RequestMethod.POST)
@@ -76,5 +80,30 @@ public class restController {
     @RequestMapping(value = "/auth/file/{action}",method = RequestMethod.POST)
     public JSONObject imgController(@PathVariable String action,MultipartHttpServletRequest request) {
         return fileService.upload(request);
+    }
+    @RequestMapping(value = "/pitest")
+    public void pitest(HttpServletRequest request) {
+        System.out.println("pietest");
+        System.out.println(request.getParameter("token"));
+        HttpHeaders headers=new HttpHeaders();
+        headers.add("Authorization", "Bearer "+request.getParameter("token"));
+        //headers.add("Authorization", "key "+"jbvnnhhxtnrdwgionzlyvwsigxeu3dpogsmibz8252xoq0gkc80kad0hgqaqwh4q");
+        System.out.println(requestTo.requestGet(null, "https://api.minepi.com/v2/me", headers).toString());
+    }
+    @RequestMapping(value = "/pitest/{paymentid}")
+    public void pipayment(HttpServletRequest request,@PathVariable String paymentid) {
+        System.out.println("pietest");
+        HttpHeaders headers=new HttpHeaders();
+        headers.add("Authorization", "key "+"jbvnnhhxtnrdwgionzlyvwsigxeu3dpogsmibz8252xoq0gkc80kad0hgqaqwh4q");
+        System.out.println(requestTo.requestPost(null, "https://api.minepi.com/v2/payments/"+paymentid+"/approve", headers).toString());
+    }
+    @RequestMapping(value = "/pitest/{paymentid}/complete/{txid}")
+    public void pipaycomplete(HttpServletRequest request,@PathVariable String paymentid,@PathVariable String txid) {
+        System.out.println("pietest");
+        HttpHeaders headers=new HttpHeaders();
+        headers.add("Authorization", "key "+"jbvnnhhxtnrdwgionzlyvwsigxeu3dpogsmibz8252xoq0gkc80kad0hgqaqwh4q");
+        JSONObject body=new JSONObject();
+        body.put("txid", txid);
+        System.out.println(requestTo.requestPost(body, "https://api.minepi.com/v2/payments/"+paymentid+"/complete", headers).toString());
     }
 }
