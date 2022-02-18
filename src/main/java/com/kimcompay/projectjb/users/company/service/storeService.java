@@ -89,9 +89,9 @@ public class storeService {
         }
     }
     private void checkExist(int storeId) {
-        if(!storeDao.existsById(storeId)){
-            throw utillService.makeRuntimeEX("본인 소유의 매장이 아닙니다", "checkExist");
-        }
+        System.out.println(storeId);
+        storeVo storeVo=getStoreCore(storeId);
+        utillService.checkOwner(storeVo.getCid(), "본인 소유의 매장이 아닙니다");
     }
     @Transactional(rollbackFor = Exception.class)
     public JSONObject updateSleepOrOpen(int flag,int storeId) {
@@ -244,10 +244,13 @@ public class storeService {
         return redisTemplate.opsForValue().get(loginId+"delivery");
     }
     private JSONObject getStore(int id) {
-        storeVo storeVo=storeDao.findById(id).orElseThrow(()->utillService.makeRuntimeEX("존재하지 않는 매장입니다", "getStore"));
+        storeVo storeVo=getStoreCore(id);
         //매장 소유 회사 계정인지 검사
         utillService.checkOwner(storeVo.getCid(),"매장 소유자의 계정이 아닙니다");
         return utillService.getJson(true, storeVo);
+    }
+    private storeVo getStoreCore(int id) {
+        return storeDao.findById(id).orElseThrow(()->utillService.makeRuntimeEX("존재하지 않는 매장입니다", "getStore"));
     }
     private JSONObject getStoresByEmail(int page,String keyword) {
         int requestPage=page;
