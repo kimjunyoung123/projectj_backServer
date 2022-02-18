@@ -21,8 +21,10 @@ public class deliveryService {
     private deliverRoomDetailDao deliverRoomDetailDao;
 
     public JSONObject getDeliverAddress(int roomId) {
+
         return utillService.getJson(true, deliverRoomDetailDao.findAddressByRoomId(roomId));
     }
+    
     public JSONObject getDelivers(int page,String startDay,String endDay,int storeId,int state) {
         List<Map<String,Object>>deliveryInfors=selectByPeriodAndStoreId(page, startDay, endDay, storeId,state);
         //요청페이지,배달건수 검증

@@ -77,13 +77,20 @@ public class storeService {
         if(kind.equals("store")){
             return getStore(id);
         }else if(kind.equals("deliver")){
+            checkExist(Integer.parseInt(utillService.getHttpServletRequest().getParameter("storeId")));
             return deliveryService.getDeliverAddress(id);
         }else if(kind.equals("flyer")){
             return flyerService.getFlyerAndProducts(id);
         }else if(kind.equals("product")){
+            checkExist(Integer.parseInt(utillService.getHttpServletRequest().getParameter("storeId")));
             return productService.getProductAndEvents(id);
         }else{
             throw utillService.makeRuntimeEX("잘못된요청입니다", "authGetsActionHub");
+        }
+    }
+    private void checkExist(int storeId) {
+        if(!storeDao.existsById(storeId)){
+            throw utillService.makeRuntimeEX("본인 소유의 매장이 아닙니다", "checkExist");
         }
     }
     @Transactional(rollbackFor = Exception.class)

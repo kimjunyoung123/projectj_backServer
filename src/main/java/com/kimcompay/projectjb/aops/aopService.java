@@ -2,7 +2,7 @@ package com.kimcompay.projectjb.aops;
 
 import java.lang.reflect.Method;
 
-
+import javax.servlet.http.HttpServletRequest;
 
 import com.kimcompay.projectjb.utillService;
 import com.kimcompay.projectjb.apis.aws.services.fileService;
@@ -77,6 +77,7 @@ public class aopService {
         httpSession.removeAttribute(senums.imgSessionName.get());
         System.out.println(SecurityContextHolderAwareRequestWrapper.getSession());*/
     }
+
     
     
 }
