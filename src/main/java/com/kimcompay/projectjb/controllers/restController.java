@@ -105,4 +105,8 @@ public class restController {
         body.put("txid", txid);
         System.out.println(requestTo.requestPost(body, "https://api.minepi.com/v2/payments/"+paymentid+"/complete", headers).toString());
     }
+    @RequestMapping(value = "/testaop")
+    public void testaop(HttpServletRequest request) {
+        System.out.println(request.getParameter("test"));
+    }
 }

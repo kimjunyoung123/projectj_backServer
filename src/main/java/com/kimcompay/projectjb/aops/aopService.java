@@ -77,7 +77,27 @@ public class aopService {
         httpSession.removeAttribute(senums.imgSessionName.get());
         System.out.println(SecurityContextHolderAwareRequestWrapper.getSession());*/
     }
+    @Before("execution(* com.kimcompay.projectjb.controllers.restController.testaop(..))")
+    public void name(JoinPoint joinPoint) {
+        logger.info("name");
+        System.out.println(utillService.getLoginId());
+        logger.info(utillService.getHttpServletRequest().getParameter("test"));
+        for (Object obj : joinPoint.getArgs()) {
+            if (obj instanceof HttpServletRequest ) {
+                HttpServletRequest request = (HttpServletRequest) obj;
+                System.out.println(request.getParameter("test"));
+                // Doing...
 
+            }
+        } 
+    }
+    @Before("execution(* com.kimcompay.projectjb.users.company.service.productService.getProductAndEvents(..))")
+    public void checkOwner(JoinPoint joinPoint) {
+        logger.info("checkOwner");
+        logger.info(Integer.toString(utillService.getLoginId()));
+        logger.info(utillService.getHttpServletRequest().getParameter("storeId"));
+        
+    }
     
     
 }

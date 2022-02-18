@@ -26,6 +26,7 @@ public class productService {
     private productEventDao productEventDao;
 
     public JSONObject getProductAndEvents(int productId) {
+        System.out.println("ss;"+utillService.getHttpServletRequest().getParameter("storeId"));
         List<Map<String,Object>>productAndEvnets=getProductAndEventsCore(productId);
         utillService.checkDaoResult(productAndEvnets,"존재하지 않는 상품입니다", "getProductAndEvents");
         JSONObject response=new JSONObject();
