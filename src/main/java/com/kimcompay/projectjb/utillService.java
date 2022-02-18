@@ -308,6 +308,11 @@ public class utillService {
     public static <T> String arrToLogString(T[] arr) {
         return Arrays.toString(arr);
     }
+    public static <T> void checkDaoResult(List<T>arr,String errorMessage,String methodName) {
+        if(utillService.checkEmthy(arr)){
+            throw utillService.makeRuntimeEX(errorMessage, methodName);
+        }
+    }
 
     
  

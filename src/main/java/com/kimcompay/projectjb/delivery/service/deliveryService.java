@@ -31,11 +31,8 @@ public class deliveryService {
         } 
         int totalPage=utillService.getTotalPage(Integer.parseInt(deliveryInfors.get(0).get("totalCount").toString()),pageSize);
         //본인 가게 배달방이 맞나 검사
-        int loginId=utillService.getLoginId();
         for(Map<String,Object> deliveryInfor:deliveryInfors ){
-            if(Integer.parseInt(deliveryInfor.get("company_id").toString())!=loginId){
-                throw utillService.makeRuntimeEX("회사 소유 매장 배달이 아닙니다", "getDelivers");
-            }
+            utillService.checkOwner(Integer.parseInt(deliveryInfor.get("company_id").toString()),"회사 소유 매장 배달이 아닙니다");
         }
         JSONObject response =new JSONObject();
         response.put("flag", true);

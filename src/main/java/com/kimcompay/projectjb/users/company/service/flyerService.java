@@ -33,9 +33,8 @@ public class flyerService {
         JSONObject response=new JSONObject();
         //조회전단 검색
         List<Map<String,Object>>flyerAndProducts=flyerDao.findFlyerJoinProducts(flyerId);
-        if(utillService.checkEmthy(flyerAndProducts)){
-            throw utillService.makeRuntimeEX("존재하지 않는 전단입니다", "getFlyerAndProducts");
-        }
+        //빈값인지 검사
+        utillService.checkDaoResult(flyerAndProducts,"존재하지 않는 전단입니다", "getFlyerAndProducts");  
         //소유자 검사
         utillService.checkOwner(Integer.parseInt(flyerAndProducts.get(0).get("company_id").toString()), "회사소유의 전단이 아닙니다");
         //flyer정보 꺼내기
