@@ -2,16 +2,17 @@ package com.kimcompay.projectjb.users.company.service;
 
 import java.io.File;
 import java.sql.Timestamp;
-
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import com.kimcompay.projectjb.utillService;
 import com.kimcompay.projectjb.apis.aws.services.fileService;
 import com.kimcompay.projectjb.apis.google.ocrService;
 import com.kimcompay.projectjb.users.company.model.flyerDao;
 import com.kimcompay.projectjb.users.company.model.flyerVo;
-import com.kimcompay.projectjb.users.company.model.productVo;
 
 import org.json.simple.JSONObject;
 
@@ -26,25 +27,44 @@ public class flyerService {
     private flyerDao flyerDao;
     @Autowired
     private fileService fileService;
-    @Autowired
-    private productService productService;
+
     
     public JSONObject getFlyerAndProducts(int flyerId) {
         JSONObject response=new JSONObject();
         //조회전단 검색
-        flyerVo flyerVo=flyerDao.findById(flyerId).orElseThrow(()->utillService.makeRuntimeEX("존재하지 않는 전단입니다", "getFlyerAndProducts"));
+        List<Map<String,Object>>flyerAndProducts=flyerDao.findFlyerJoinProducts(flyerId);
+        if(utillService.checkEmthy(flyerAndProducts)){
+            throw utillService.makeRuntimeEX("존재하지 않는 전단입니다", "getFlyerAndProducts");
+        }
         //소유자 검사
-        utillService.checkOwner(flyerVo.getCompanyId(), "회사소유의 전단이 아닙니다");
+        utillService.checkOwner(Integer.parseInt(flyerAndProducts.get(0).get("company_id").toString()), "회사소유의 전단이 아닙니다");
+        //flyer정보 꺼내기
+        Map<String,Object>flyer=new HashMap<>();
+        flyer.put("flyer_id", flyerAndProducts.get(0).get("flyer_id"));
+        flyer.put("default", flyerAndProducts.get(0).get("default_select"));
+        flyer.put("flyer_img_path", flyerAndProducts.get(0).get("flyer_img_path"));
         response.put("flyerFlag", true);
-        response.put("flyer", flyerVo);
-        //전단에 있는 상품들 검색
-        List<productVo>products=productService.getByFlyerId(flyerId);
-        if(products.isEmpty()){
-            response.put("productFlag", false);
-        }else{
-            response.put("productFlag", true);
+        response.put("flyer", flyer);
+        //전단에 있는 상품들 추출
+        boolean productFlag=false;
+        List<Map<String,Object>>products=new ArrayList<>();
+        for(Map<String,Object>product:flyerAndProducts){
+            if(Optional.ofNullable(product.get("product_id")).orElseGet(()->null)!=null){
+                productFlag=true;
+                Map<String,Object>onlyProduct=new HashMap<>();
+                onlyProduct.put("product_id", product.get("product_id"));
+                onlyProduct.put("origin", product.get("origin"));
+                onlyProduct.put("price", product.get("price"));
+                onlyProduct.put("product_img_path", product.get("product_img_path"));
+                onlyProduct.put("event_state", product.get("event_state"));
+                products.add(onlyProduct);                
+            }
+        }
+        if(productFlag){
             response.put("products", products);
         }
+        response.put("productFlag", productFlag);
+
         return response;
     }
 
