@@ -1,5 +1,7 @@
 package com.kimcompay.projectjb.users.company.service;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -23,6 +25,39 @@ public class productService {
     @Autowired
     private productEventDao productEventDao;
 
+    public JSONObject getProductAndEvents(int productId) {
+        List<Map<String,Object>>productAndEvnets=getProductAndEventsCore(productId);
+        utillService.checkDaoResult(productAndEvnets,"존재하지 않는 상품입니다", "getProductAndEvents");
+        JSONObject response=new JSONObject();
+        //제품정보 꺼내기
+        Map<String,Object>product=new HashMap<>();
+        product.put("category", productAndEvnets.get(0).get("category"));
+        product.put("origin", productAndEvnets.get(0).get("origin"));
+        product.put("id", productAndEvnets.get(0).get("product_id"));
+        product.put("product_img_path", productAndEvnets.get(0).get("product_img_path"));
+        product.put("product_name", productAndEvnets.get(0).get("product_name"));
+        product.put("text", productAndEvnets.get(0).get("text"));
+        response.put("product", product);
+        //이벤트 조회
+        Boolean eventFlag=false;
+        if(Integer.parseInt(productAndEvnets.get(0).get("event_state").toString())==1){
+            eventFlag=true;
+            List<Map<String,Object>>events=new ArrayList<>();
+            for(Map<String,Object>productAndEvnet:productAndEvnets){
+                Map<String,Object>event=new HashMap<>();
+                event.put("event_date", productAndEvnet.get("product_event_date"));
+                event.put("id", productAndEvnet.get("product_event_id"));
+                event.put("event_price", productAndEvnet.get("product_event_price"));
+                events.add(event);
+            }
+            response.put("events", events);
+        }
+       response.put("event_flag", eventFlag);
+        return utillService.getJson(true, response);
+    }
+    private List<Map<String,Object>> getProductAndEventsCore(int productId) {
+        return productDao.findByIdJoinEvent(productId);
+    }
     public List<productEventVo> getProductEvent(int productId) {
         return productEventDao.findByProductId(productId);
     }

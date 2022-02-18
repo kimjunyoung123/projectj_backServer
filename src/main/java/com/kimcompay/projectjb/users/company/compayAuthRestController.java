@@ -37,6 +37,7 @@ public class compayAuthRestController {
     private productService productService;
 
 
+
     //매장등록
     @RequestMapping(value = "/join",method = RequestMethod.POST)
     public JSONObject storeInsert(@Valid @RequestBody tryInsertStoreDto tryInsertStoreDto) {

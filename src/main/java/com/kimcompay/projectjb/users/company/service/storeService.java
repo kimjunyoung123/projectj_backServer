@@ -45,6 +45,9 @@ public class storeService {
     private deliveryService deliveryService;
     @Autowired
     private flyerService flyerService;
+    @Autowired
+    private productService productService;
+
     
     public JSONObject authGetsActionHub(String kind,int page,String keyword) {
         if(kind.equals("stores")){
@@ -77,6 +80,8 @@ public class storeService {
             return deliveryService.getDeliverAddress(id);
         }else if(kind.equals("flyer")){
             return flyerService.getFlyerAndProducts(id);
+        }else if(kind.equals("product")){
+            return productService.getProductAndEvents(id);
         }else{
             throw utillService.makeRuntimeEX("잘못된요청입니다", "authGetsActionHub");
         }

@@ -56,6 +56,7 @@ public class flyerService {
                 onlyProduct.put("price", product.get("price"));
                 onlyProduct.put("product_img_path", product.get("product_img_path"));
                 onlyProduct.put("event_state", product.get("event_state"));
+                onlyProduct.put("product_name", product.get("product_name"));
                 products.add(onlyProduct);                
             }
         }
