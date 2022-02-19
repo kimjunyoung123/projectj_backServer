@@ -25,8 +25,9 @@ public class deliveryService {
         return utillService.getJson(true, deliverRoomDetailDao.findAddressByRoomId(roomId));
     }
     
-    public JSONObject getDelivers(int page,String startDay,String endDay,int storeId,int state) {
-        List<Map<String,Object>>deliveryInfors=selectByPeriodAndStoreId(page, startDay, endDay, storeId,state);
+    public JSONObject getDelivers(int page,String keyword,int storeId,int state) {
+        List<String>dates=utillService.getDateInStrgin(keyword);
+        List<Map<String,Object>>deliveryInfors=selectByPeriodAndStoreId(page, dates.get(0),dates.get(1), storeId,state);
         //요청페이지,배달건수 검증
         if(utillService.checkEmthy(deliveryInfors)){ 
             throw utillService.makeRuntimeEX("배달건수가 존재하지 않습니다", "getDelivers");

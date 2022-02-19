@@ -53,9 +53,8 @@ public class storeService {
         if(kind.equals("stores")){
             return getStoresByEmail(page,keyword);
         }else if(kind.equals("deliver")){
-            List<String>dates=utillService.getDateInStrgin(keyword);
             HttpServletRequest request=utillService.getHttpServletRequest();
-            return deliveryService.getDelivers(page,dates.get(0),dates.get(1),Integer.parseInt(request.getParameter("storeId")), Integer.parseInt(request.getParameter("state")));
+            return deliveryService.getDelivers(page,keyword,Integer.parseInt(request.getParameter("storeId")), Integer.parseInt(request.getParameter("state")));
         }else if(kind.equals("flyers")){
             HttpServletRequest request=utillService.getHttpServletRequest();
             return flyerService.getFlyers(Integer.parseInt(request.getParameter("storeId")), page, keyword);
