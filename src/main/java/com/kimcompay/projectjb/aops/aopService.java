@@ -6,6 +6,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import com.kimcompay.projectjb.utillService;
 import com.kimcompay.projectjb.apis.aws.services.fileService;
+import com.kimcompay.projectjb.users.company.service.storeService;
 
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
@@ -25,6 +26,8 @@ public class aopService {
     private Logger logger=LoggerFactory.getLogger(aopService.class); 
     @Autowired
     private fileService fileService;
+    @Autowired
+    private storeService storeService;
     
     @Async
     @Before("execution(* com.kimcompay.projectjb.users.company.*.*(..))"
@@ -56,14 +59,7 @@ public class aopService {
         MethodSignature signature = (MethodSignature)joinPoint.getSignature();
         Object[] values=joinPoint.getArgs();
         String[] keys=signature.getParameterNames();
-        SecurityContextHolderAwareRequestWrapper SecurityContextHolderAwareRequestWrapper=null;
-        logger.info("pakage: "+signature.getDeclaringTypeName());
-        for(int i=0;i<keys.length;i++){
-            if(keys[i].equals("request")){
-                SecurityContextHolderAwareRequestWrapper=(org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestWrapper) values[i];
-            }
-        }
-        System.out.println("return: "+response);
+        logger.info(Integer.toString(utillService.getLoginId()));
         //인증 세션 비우기
         /*HttpSession httpSession=SecurityContextHolderAwareRequestWrapper.getSession();
         httpSession.removeAttribute(senums.auth.get()+senums.phonet.get());
@@ -91,12 +87,12 @@ public class aopService {
             }
         } 
     }
-    @Before("execution(* com.kimcompay.projectjb.users.company.service.productService.getProductAndEvents(..))")
+    //매장정보 접근전 주인인지 확인
+    @Before("execution(* com.kimcompay.projectjb.users.company.service.productService.getProductAndEvents(..))"
+    +"execution(* com.kimcompay.projectjb.delivery.service.deliveryService.getDeliverAddress(..))")
     public void checkOwner(JoinPoint joinPoint) {
         logger.info("checkOwner");
-        logger.info(Integer.toString(utillService.getLoginId()));
-        logger.info(utillService.getHttpServletRequest().getParameter("storeId"));
-        
+        storeService.checkExist(Integer.parseInt(utillService.getHttpServletRequest().getParameter("storeId")));
     }
     
     
