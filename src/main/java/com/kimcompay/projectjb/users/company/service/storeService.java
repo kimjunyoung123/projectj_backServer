@@ -57,18 +57,8 @@ public class storeService {
             HttpServletRequest request=utillService.getHttpServletRequest();
             return deliveryService.getDelivers(page,dates.get(0),dates.get(1),Integer.parseInt(request.getParameter("storeId")), Integer.parseInt(request.getParameter("state")));
         }else if(kind.equals("flyers")){
-            List<String>dates=utillService.getDateInStrgin(keyword);
             HttpServletRequest request=utillService.getHttpServletRequest();
-            List<Map<String,Object>>flyerVos=flyerService.getFlyerArr(Integer.parseInt(request.getParameter("storeId")),dates.get(0),dates.get(1),page);
-            if(utillService.checkEmthy(flyerVos)){
-                throw utillService.makeRuntimeEX("등록한 전단(상품)이 없습니다", "authGetsActionHub");
-            }
-            int totalPage=utillService.getTotalPage(Integer.parseInt(flyerVos.get(0).get("totalCount").toString()), pageSize);
-            JSONObject respose=new JSONObject();
-            respose.put("totalPage", totalPage);
-            respose.put("message", flyerVos);
-            respose.put("flag", true);
-            return respose;
+            return flyerService.getFlyers(Integer.parseInt(request.getParameter("storeId")), page, keyword);
         }else {
             throw utillService.makeRuntimeEX("잘못된요청입니다", "authGetsActionHub");
         }

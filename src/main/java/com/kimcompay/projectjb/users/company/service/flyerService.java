@@ -27,8 +27,17 @@ public class flyerService {
     private flyerDao flyerDao;
     @Autowired
     private fileService fileService;
-
     
+    public JSONObject getFlyers(int storeId,int page,String keyword) {
+        List<String>dates=utillService.getDateInStrgin(keyword);
+        List<Map<String,Object>>flyerVos=getFlyerArr(storeId,dates.get(0),dates.get(1),page);
+        int totalPage=utillService.getTotalPage(Integer.parseInt(flyerVos.get(0).get("totalCount").toString()), pageSize);
+        JSONObject respose=new JSONObject();
+        respose.put("totalPage", totalPage);
+        respose.put("message", flyerVos);
+        respose.put("flag", true);
+        return respose;
+    }
     public JSONObject getFlyerAndProducts(int flyerId) {
         JSONObject response=new JSONObject();
         //조회전단 검색
@@ -67,37 +76,7 @@ public class flyerService {
 
         return response;
     }
-
-    /*public JSONObject getProductAndEvent(int productId) {
-        logger.info("getFlyerAndProducts");
-        JSONObject response=new JSONObject();
-        //조회전단 검색
-        //소유자 검사
-        utillService.checkOwner(flyerVo.getCompanyId(), "회사소유의 전단이 아닙니다");
-        response.put("flyerFlag", true);
-        response.put("flyer", flyerVo);
-        //전단에 있는 상품들 검색
-        List<productVo>products=productService.getByFlyerId(flyerId);
-        List<Map<String,Object>>productAndEventArr=new ArrayList<>();
-        if(products.isEmpty()){
-            response.put("productFlag", false);
-        }else{
-            response.put("productFlag", true);
-            //상품별 이벤트 조회
-            for(productVo vo:products){
-                Map<String,Object>productAndEvent=new HashMap<>();
-                productAndEvent.put("product", vo);
-                if(vo.getEventFlag()==1){
-                    productAndEvent.put("event", productService.getProductEvent(vo.getId()));
-                }
-                productAndEventArr.add(productAndEvent);
-            }
-            response.put("productAndEvents", productAndEventArr);
-        }
-        return response;
-    }*/
-
-    public List<Map<String,Object>> getFlyerArr(int storeId,String startDate,String endDate,int page) {
+    private List<Map<String,Object>> getFlyerArr(int storeId,String startDate,String endDate,int page) {
         Map<String,Object>result=utillService.checkRequestDate(startDate, endDate);
         if((boolean)result.get("flag")){
             Timestamp start=Timestamp.valueOf(result.get("start").toString());

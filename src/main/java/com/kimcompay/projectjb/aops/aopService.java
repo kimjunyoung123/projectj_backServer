@@ -89,11 +89,14 @@ public class aopService {
     }
     //매장정보 접근전 주인인지 확인
     @Before("execution(* com.kimcompay.projectjb.users.company.service.productService.getProductAndEvents(..))"
-    +"execution(* com.kimcompay.projectjb.delivery.service.deliveryService.getDeliverAddress(..))")
+    +"||execution(* com.kimcompay.projectjb.delivery.service.deliveryService.getDeliverAddress(..))"
+    +"||execution(* com.kimcompay.projectjb.users.company.service.flyerService.getFlyers(..))"
+    +"||execution(* com.kimcompay.projectjb.users.company.service.deliveryService.getDelivers(..))")
     public void checkOwner(JoinPoint joinPoint) {
         logger.info("checkOwner");
         storeService.checkExist(Integer.parseInt(utillService.getHttpServletRequest().getParameter("storeId")));
     }
+    
     
     
 }
