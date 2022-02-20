@@ -95,7 +95,9 @@ public class aopService {
     //update insert 전 이전 까지 업로드 했던 사진 세션 가져오기
     @Async
     @Before(value = "execution(* com.kimcompay.projectjb.users.company.compayAuthRestController.storeUpdate(..))"
-    )
+    +"||execution(* com.kimcompay.projectjb.users.company.compayAuthRestController.storeInsert(..))"
+    +"||execution(* com.kimcompay.projectjb.users.company.compayAuthRestController.uploadAndOcr(..))"
+    +"||execution(* com.kimcompay.projectjb.users.company.compayAuthRestController.insertFlyerAndProducts(..))")
     public void setHttpSession(JoinPoint joinPoint) {
         logger.info("setHttpSession");
         for (Object obj : joinPoint.getArgs()) {
