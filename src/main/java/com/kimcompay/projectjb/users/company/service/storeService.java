@@ -174,23 +174,11 @@ public class storeService {
         }
         //가게정보가 수정되면 알림메세지/이메일전송
         if(updateFlag){
+            doneInsertOrUpdate(tryUpdateStoreDto.getPhone(), "가게정보가 수정되었습니다");
           // doneUpdate(tryUpdateStoreDto);
             return utillService.getJson(true, "변경이 완료되었습니다");
         }else{
             return utillService.getJson(false, "변경사항이 없습니다");
-        }
-    }
-    @Async
-    public void doneUpdate(tryUpdateStoreDto tryUpdateStoreDto) {
-        String updateMessage="가게정보가 수정되었습니다";
-        try {
-            tryInsertStoreDto dto=new tryInsertStoreDto();
-            dto.setPhone(tryUpdateStoreDto.getPhone());
-            dto.setText(tryUpdateStoreDto.getText());
-            dto.setThumbNail(tryUpdateStoreDto.getThumbNail());
-            doneInsert(dto, updateMessage);
-        } catch (Exception e) {
-            utillService.writeLog("doneUpdate 처리중 예외발생",storeService.class);
         }
     }
     private void updateStoreName(storeVo storeVo,String storeName) {
@@ -275,7 +263,7 @@ public class storeService {
         //결과전송
         try {
             String insertMessage="매장등록을 해주셔서 진심으로 감사합니다 \n 매장이름: "+tryInsertStoreDto.getStoreName()+"\n매장위치: "+tryInsertStoreDto.getAddress();
-            doneInsert(tryInsertStoreDto,insertMessage);
+            doneInsertOrUpdate(tryInsertStoreDto.getPhone(),insertMessage);
         } catch (Exception e) {
             utillService.writeLog("등록되었으므로 예외무시",storeService.class);
         }
@@ -296,21 +284,12 @@ public class storeService {
                     storeDao.save(vo);            
     }
     @Async
-    public void doneInsert(tryInsertStoreDto tryInsertStoreDto,String doneMessage) {
+    public void doneInsertOrUpdate(String storePhone,String doneMessage) {
         principalDetails principalDetails=(principalDetails)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Map<Object,Object>map=principalDetails.getPrinci();
         sqsService.sendEmailAsync(doneMessage,principalDetails.getUsername());//회사이메일
         sqsService.sendPhoneAsync(doneMessage, map.get("phone").toString());//회사휴대폰
-        sqsService.sendPhoneAsync(doneMessage, tryInsertStoreDto.getPhone());//매장휴대폰
-        //인증 세션 비우기
-       /* HttpSession httpSession=utillService.getHttpServletRequest().getSession();
-        httpSession.removeAttribute(senums.auth.get()+senums.phonet.get());
-        //사용하지 않는 사진 지우기
-        //이미지가 있다면 path제거후 이름만 얻어내기
-        List<String>usingImgs=utillService.getOnlyImgNames(tryInsertStoreDto.getText());
-        usingImgs.add(tryInsertStoreDto.getThumbNail().split("/")[4]);
-        fileService.deleteFile(httpSession,usingImgs);
-        httpSession.removeAttribute(senums.imgSessionName.get());*/
+        sqsService.sendPhoneAsync(doneMessage, storePhone);//매장휴대폰
     }
     private void checkValues(tryInsertStoreDto tryInsertStoreDto) {
         //사업자등록번호검사
