@@ -114,7 +114,6 @@ public class aopService {
                 tryUpdateStoreDto tryUpdateStoreDto=(tryUpdateStoreDto)dto;
                 text=tryUpdateStoreDto.getText();
                 thumNail=tryUpdateStoreDto.getThumbNail();
-                authSessionFlag=true;
             }else if(dto instanceof tryInsertStoreDto){
                 tryInsertStoreDto insertStoreDto=(tryInsertStoreDto)dto;
                 text=insertStoreDto.getText();
