@@ -18,6 +18,7 @@ import org.json.simple.JSONObject;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
@@ -98,6 +99,7 @@ public class fileService {
            utillService.writeLog("이미지 삭제 실패",fileService.class);
         }
     }
+    @Async
     public void deleteFile(String fileName) {
         s3Service.deleteFile(bucketName, fileName);
     }

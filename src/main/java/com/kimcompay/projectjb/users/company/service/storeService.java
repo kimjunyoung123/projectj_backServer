@@ -134,10 +134,12 @@ public class storeService {
         }
         //썸네일
         String thumbNail=tryUpdateStoreDto.getThumbNail();
-        if(!thumbNail.equals(storeVo.getSimg())){
+        String oringImg=storeVo.getSimg();
+        if(!thumbNail.equals(oringImg)){
             utillService.writeLog("썸네일이 변경되었습니다",storeService.class);
             updateFlag=true;
             updateThumbNail(storeVo, thumbNail);
+            fileService.deleteFile(oringImg.split("/")[4]);
         }
         //주소
         String postCode=tryUpdateStoreDto.getPostcode();
@@ -175,7 +177,6 @@ public class storeService {
         //가게정보가 수정되면 알림메세지/이메일전송
         if(updateFlag){
             doneInsertOrUpdate(tryUpdateStoreDto.getPhone(), "가게정보가 수정되었습니다");
-          // doneUpdate(tryUpdateStoreDto);
             return utillService.getJson(true, "변경이 완료되었습니다");
         }else{
             return utillService.getJson(false, "변경사항이 없습니다");
