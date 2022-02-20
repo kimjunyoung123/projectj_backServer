@@ -37,7 +37,6 @@ public class aopService {
     @Autowired
     private storeService storeService;
 
-    private Map<String,Object>doAfter=new HashMap<>();
     private HttpSession httpSession;
     
     @Async
@@ -72,22 +71,6 @@ public class aopService {
         storeService.checkExist(Integer.parseInt(utillService.getHttpServletRequest().getParameter("storeId")));
     }
     //----------------------------------------------------------------------------------------------------
-    //update insert에 사용되는 dto가져오기
-    @Async
-    @Before("execution(* com.kimcompay.projectjb.users.company.service.storeService.tryUpdate(..))"
-    +"||execution(* com.kimcompay.projectjb.users.user.*.*(..))"
-    +"||execution(* com.kimcompay.projectjb.users.company.compayAuthRestController.storeInsert(..))"
-    +"||execution(* com.kimcompay.projectjb.users.company.compayAuthRestController.insertFlyerAndProducts(..))")
-    public void getImgAndText(JoinPoint joinPoint) {
-        logger.info("getImgAndText");
-        Object[] values=joinPoint.getArgs();
-        for(Object value:values){
-            if(value instanceof tryUpdateStoreDto || value instanceof tryInsertStoreDto || value instanceof tryProductInsertDto){
-                doAfter.put("dto", value);
-                break;
-            }
-        }
-    }
     private void deleteImgs(String text,String thumNail,HttpSession httpSession) {
         logger.info("deleteImgs");
         List<String>usingImgs=utillService.getOnlyImgNames(text);
@@ -95,7 +78,7 @@ public class aopService {
         fileService.deleteFile(httpSession,usingImgs);
         httpSession.removeAttribute(senums.imgSessionName.get());
     }
-    //update insert 전 이전 까지 업로드 했던 사진 세션 가져오기
+    //update insert 전 이전 까지 업로드 했던 사진 세션 가져오기 컨트롤러에서 낚아챔
     @Async
     @Before(value = "execution(* com.kimcompay.projectjb.users.company.compayAuthRestController.storeUpdate(..))"
     +"||execution(* com.kimcompay.projectjb.users.company.compayAuthRestController.storeInsert(..))"
@@ -121,31 +104,33 @@ public class aopService {
     public void doneInserOrUpdate(JoinPoint joinPoint,Object response) {
         logger.info("doneInserOrUpdate");
         logger.info("response: "+response);
-        logger.info("dto: "+doAfter.toString());
-        Object dto=doAfter.get("dto");
+        Object[] values=joinPoint.getArgs();
+        logger.info("dto: "+utillService.arrToLogString(values));
         String text=null;
         String thumNail=null;
         boolean authSessionFlag=false;
-        if(dto instanceof tryUpdateStoreDto){
-            tryUpdateStoreDto tryUpdateStoreDto=(tryUpdateStoreDto)dto;
-            text=tryUpdateStoreDto.getText();
-            thumNail=tryUpdateStoreDto.getThumbNail();
-            authSessionFlag=true;
-        }else if(dto instanceof tryInsertStoreDto){
-            tryInsertStoreDto insertStoreDto=(tryInsertStoreDto)dto;
-            text=insertStoreDto.getText();
-            thumNail=insertStoreDto.getThumbNail();
-            authSessionFlag=true;
-        }else if(dto instanceof tryProductInsertDto){
-            tryProductInsertDto tryProductInsertDto=(tryProductInsertDto)dto;
-            text=tryProductInsertDto.getText();
-            thumNail=tryProductInsertDto.getProductImgPath();
-        }
-        deleteImgs(text, thumNail, this.httpSession);
-        if(authSessionFlag){
-            removeAuthSession(this.httpSession);
-        }
-        
+        for(Object dto:values){
+            if(dto instanceof tryUpdateStoreDto){
+                tryUpdateStoreDto tryUpdateStoreDto=(tryUpdateStoreDto)dto;
+                text=tryUpdateStoreDto.getText();
+                thumNail=tryUpdateStoreDto.getThumbNail();
+                authSessionFlag=true;
+            }else if(dto instanceof tryInsertStoreDto){
+                tryInsertStoreDto insertStoreDto=(tryInsertStoreDto)dto;
+                text=insertStoreDto.getText();
+                thumNail=insertStoreDto.getThumbNail();
+                authSessionFlag=true;
+            }else if(dto instanceof tryProductInsertDto){
+                tryProductInsertDto tryProductInsertDto=(tryProductInsertDto)dto;
+                text=tryProductInsertDto.getText();
+                thumNail=tryProductInsertDto.getProductImgPath();
+            }
+            deleteImgs(text, thumNail, this.httpSession);
+            if(authSessionFlag){
+                removeAuthSession(this.httpSession);
+            }
+            break;
+        }    
     }
     private void removeAuthSession(HttpSession httpSession) {
         logger.info("removeAuthSession");
