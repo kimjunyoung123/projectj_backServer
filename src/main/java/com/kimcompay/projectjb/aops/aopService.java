@@ -1,6 +1,7 @@
 package com.kimcompay.projectjb.aops;
 
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,7 +25,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
-import org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestWrapper;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -37,6 +37,7 @@ public class aopService {
     private storeService storeService;
 
     private Map<String,Object>doAfter=new HashMap<>();
+    private HttpSession httpSession;
     
     @Async
     @Before("execution(* com.kimcompay.projectjb.users.company.*.*(..))"
@@ -51,8 +52,7 @@ public class aopService {
     +"||execution(* com.kimcompay.projectjb.jwt.*.*(..))"
     +"||execution(* com.kimcompay.projectjb.users.company.service.*.*(..))"
     +"||execution(* com.kimcompay.projectjb.users.user.userService.*(..))"
-    +"||execution(* com.kimcompay.projectjb.utillService.*(..))"
-    +"||execution(* com.kimcompay.projectjb.aops.*.*(..))")
+    +"||execution(* com.kimcompay.projectjb.utillService.*(..))")
     public void writeLog(JoinPoint joinPoint) throws Throwable {
         logger.info("writeLog");
         MethodSignature signature = (MethodSignature)joinPoint.getSignature();
@@ -60,39 +60,6 @@ public class aopService {
         logger.info("pakage: "+signature.getDeclaringTypeName());
         logger.info("mehtod: "+method.getName());
         logger.info("요청변수: "+utillService.arrToLogString(signature.getParameterNames())+" 요청값: "+utillService.arrToLogString(joinPoint.getArgs()));
-    }
-    
-    @Async
-    @Before("execution(* com.kimcompay.projectjb.users.company.service.storeService.tryUpdate(..))"
-    +"||execution(* com.kimcompay.projectjb.users.user.*.*(..))")
-    public void getImgAndText(JoinPoint joinPoint) {
-        Object[] values=joinPoint.getArgs();
-        for(Object value:values){
-            if(value instanceof tryUpdateStoreDto || value instanceof tryInsertStoreDto){
-                doAfter.put("dto", value);
-                break;
-            }
-        }
-    }
-    private void deleteImgs(String text,String thumNail,HttpSession httpSession) {
-        List<String>usingImgs=utillService.getOnlyImgNames(text);
-        usingImgs.add(thumNail.split("/")[4]);
-        fileService.deleteFile(httpSession,usingImgs);
-        httpSession.removeAttribute(senums.imgSessionName.get());
-    }
-    @Before("execution(* com.kimcompay.projectjb.controllers.restController.testaop(..))")
-    public void name(JoinPoint joinPoint) {
-        logger.info("name");
-        System.out.println(utillService.getLoginId());
-        logger.info(utillService.getHttpServletRequest().getParameter("test"));
-        for (Object obj : joinPoint.getArgs()) {
-            if (obj instanceof HttpServletRequest ) {
-                HttpServletRequest request = (HttpServletRequest) obj;
-                System.out.println(request.getParameter("test"));
-                // Doing...
-
-            }
-        } 
     }
     //매장정보 접근전 주인인지 확인
     @Before("execution(* com.kimcompay.projectjb.users.company.service.productService.getProductAndEvents(..))"
@@ -103,14 +70,53 @@ public class aopService {
         logger.info("checkOwner");
         storeService.checkExist(Integer.parseInt(utillService.getHttpServletRequest().getParameter("storeId")));
     }
-    //미사용 사진 정리
+    //----------------------------------------------------------------------------------------------------
+    //update insert에 사용되는 dto가져오기
+    @Async
+    @Before("execution(* com.kimcompay.projectjb.users.company.service.storeService.tryUpdate(..))"
+    +"||execution(* com.kimcompay.projectjb.users.user.*.*(..))")
+    public void getImgAndText(JoinPoint joinPoint) {
+        logger.info("getImgAndText");
+        Object[] values=joinPoint.getArgs();
+        for(Object value:values){
+            if(value instanceof tryUpdateStoreDto || value instanceof tryInsertStoreDto){
+                doAfter.put("dto", value);
+                break;
+            }
+        }
+    }
+    private void deleteImgs(String text,String thumNail,HttpSession httpSession) {
+        logger.info("deleteImgs");
+        List<String>usingImgs=utillService.getOnlyImgNames(text);
+        usingImgs.add(thumNail.split("/")[4]);
+        fileService.deleteFile(httpSession,usingImgs);
+        httpSession.removeAttribute(senums.imgSessionName.get());
+    }
+    //update insert 전 이전 까지 업로드 했던 사진 세션 가져오기
+    @Async
+    @Before(value = "execution(* com.kimcompay.projectjb.users.company.compayAuthRestController.storeUpdate(..))"
+    )
+    public void setHttpSession(JoinPoint joinPoint) {
+        logger.info("setHttpSession");
+        for (Object obj : joinPoint.getArgs()) {
+            if (obj instanceof HttpServletRequest ) {
+                logger.info("find session");
+                HttpServletRequest request = (HttpServletRequest) obj;
+                this.httpSession=request.getSession();
+                break;
+            }
+        } 
+    }
+    //update insert 후 사용 하지 않는 사진들 클라우드 제거 및 인증 정보 제거
+    @Async
     @AfterReturning(value = "execution(* com.kimcompay.projectjb.users.company.service.storeService.tryInsert(..))"
-    +"||execution(* com.kimcompay.projectjb.users.company.service.storeService.tryUpdate(..))",returning="response")
+    +"||execution(* com.kimcompay.projectjb.users.company.service.storeService.tryUpdate(..))"
+    +"||execution(* com.kimcompay.projectjb.users.company.service.productService.insert(..))"
+    ,returning="response")
     public void doneInserOrUpdate(JoinPoint joinPoint,Object response) {
+        logger.info("doneInserOrUpdate");
+        logger.info("response: "+response);
         logger.info("dto: "+doAfter.toString());
-        //인증 세션 비우기
-        HttpSession httpSession=utillService.getHttpServletRequest().getSession();
-        httpSession.removeAttribute(senums.auth.get()+senums.phonet.get());
         Object dto=doAfter.get("dto");
         String text=null;
         String thumNail=null;
@@ -126,12 +132,14 @@ public class aopService {
             thumNail=insertStoreDto.getThumbNail();
             authSessionFlag=true;
         }
-        deleteImgs(text, thumNail, httpSession);
+        deleteImgs(text, thumNail, this.httpSession);
         if(authSessionFlag){
-            removeAuthSession(httpSession);
+            removeAuthSession(this.httpSession);
         }
+        
     }
     private void removeAuthSession(HttpSession httpSession) {
+        logger.info("removeAuthSession");
         httpSession.removeAttribute(senums.auth.get()+senums.phonet.get());
     }
     

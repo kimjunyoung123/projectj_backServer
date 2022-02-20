@@ -4,6 +4,7 @@ package com.kimcompay.projectjb.users.company;
 
 
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import com.kimcompay.projectjb.users.company.model.tryProductInsertDto;
@@ -54,7 +55,7 @@ public class compayAuthRestController {
         return storeService.authGetActionHub(kind,id);
     }
     @RequestMapping(value = "/infor/change",method = RequestMethod.PUT)//매장 정보수정
-    public JSONObject storeUpdate(@Valid @RequestBody tryUpdateStoreDto tryUpdateStoreDto) {
+    public JSONObject storeUpdate(@Valid @RequestBody tryUpdateStoreDto tryUpdateStoreDto,HttpServletRequest request) {
         return storeService.tryUpdate(tryUpdateStoreDto);
     }
     @RequestMapping(value = "/infor/sleep/{flag}/{storeId}",method = RequestMethod.PUT)//매장 영업상태 수정
