@@ -55,7 +55,8 @@ public class aopService {
     +"||execution(* com.kimcompay.projectjb.jwt.*.*(..))"
     +"||execution(* com.kimcompay.projectjb.users.company.service.*.*(..))"
     +"||execution(* com.kimcompay.projectjb.users.user.userService.*(..))"
-    +"||execution(* com.kimcompay.projectjb.utillService.*(..))")
+    +"||execution(* com.kimcompay.projectjb.utillService.*(..))"
+    +"||execution(* com.kimcompay.projectjb.board.service.*.*(..))")
     public void writeLog(JoinPoint joinPoint) throws Throwable {
         logger.info("writeLog");
         MethodSignature signature = (MethodSignature)joinPoint.getSignature();
@@ -77,7 +78,7 @@ public class aopService {
     private void deleteImgs(String text,String thumNail,HttpSession httpSession) {
         logger.info("deleteImgs");
         List<String>usingImgs=utillService.getOnlyImgNames(text);
-        usingImgs.add(thumNail.split("/")[4]);
+        usingImgs.add(utillService.getImgNameInPath(thumNail, 4));
         fileService.deleteFile(httpSession,usingImgs);
         httpSession.removeAttribute(senums.imgSessionName.get());
     }

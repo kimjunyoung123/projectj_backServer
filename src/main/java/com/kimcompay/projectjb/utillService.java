@@ -264,7 +264,7 @@ public class utillService {
         List<String>imgNames=new ArrayList<>();
         if(!imgPaths.isEmpty()){
             for(String path:imgPaths){
-                imgNames.add(path.split("/")[4]);
+                imgNames.add(getImgNameInPath(path, 4));
             }
             return imgNames;
         }else{
@@ -313,7 +313,7 @@ public class utillService {
             throw utillService.makeRuntimeEX(errorMessage, methodName);
         }
     }
-
-    
- 
+    public static String getImgNameInPath(String imgPath,int num) {
+        return imgPath.split("/")[num];
+    }
 }

@@ -11,6 +11,7 @@ import com.kimcompay.projectjb.utillService;
 import com.kimcompay.projectjb.apis.aws.services.fileService;
 import com.kimcompay.projectjb.apis.aws.services.sqsService;
 import com.kimcompay.projectjb.apis.kakao.kakaoMapService;
+import com.kimcompay.projectjb.board.service.boardService;
 import com.kimcompay.projectjb.delivery.service.deliveryService;
 import com.kimcompay.projectjb.enums.intenums;
 import com.kimcompay.projectjb.enums.senums;
@@ -47,6 +48,8 @@ public class storeService {
     private flyerService flyerService;
     @Autowired
     private productService productService;
+    @Autowired
+    private boardService boardService;
 
     
     public JSONObject authGetsActionHub(String kind,int page,String keyword) {
@@ -125,21 +128,21 @@ public class storeService {
         }
         //가게설명
         String text=tryUpdateStoreDto.getText();
-        if(!text.equals(storeVo.getText())){
+        String originText=storeVo.getText();
+        if(!text.equals(originText)){
             utillService.writeLog("가게설명이 변경되었습니다",storeService.class);
             updateFlag=true;
-            System.out.println(text);
-            System.out.println(storeVo.getText());
             updateStoreText(storeVo, text);
+            boardService.deleteOriginImgInText(text, originText);
         }
         //썸네일
         String thumbNail=tryUpdateStoreDto.getThumbNail();
-        String oringImg=storeVo.getSimg();
-        if(!thumbNail.equals(oringImg)){
+        String oringImgPath=storeVo.getSimg();
+        if(!thumbNail.equals(oringImgPath)){
             utillService.writeLog("썸네일이 변경되었습니다",storeService.class);
             updateFlag=true;
             updateThumbNail(storeVo, thumbNail);
-            fileService.deleteFile(oringImg.split("/")[4]);
+            fileService.deleteFile(utillService.getImgNameInPath(oringImgPath, 4) );
         }
         //주소
         String postCode=tryUpdateStoreDto.getPostcode();
