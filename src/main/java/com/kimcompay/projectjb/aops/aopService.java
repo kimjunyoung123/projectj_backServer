@@ -13,6 +13,7 @@ import com.kimcompay.projectjb.utillService;
 import com.kimcompay.projectjb.apis.aws.services.fileService;
 import com.kimcompay.projectjb.enums.senums;
 import com.kimcompay.projectjb.users.company.model.tryInsertStoreDto;
+import com.kimcompay.projectjb.users.company.model.tryProductInsertDto;
 import com.kimcompay.projectjb.users.company.model.tryUpdateStoreDto;
 import com.kimcompay.projectjb.users.company.service.storeService;
 
@@ -58,7 +59,7 @@ public class aopService {
         MethodSignature signature = (MethodSignature)joinPoint.getSignature();
         Method method=signature.getMethod();
         logger.info("pakage: "+signature.getDeclaringTypeName());
-        logger.info("mehtod: "+method.getName());
+        logger.info("method: "+method.getName());
         logger.info("요청변수: "+utillService.arrToLogString(signature.getParameterNames())+" 요청값: "+utillService.arrToLogString(joinPoint.getArgs()));
     }
     //매장정보 접근전 주인인지 확인
@@ -74,12 +75,14 @@ public class aopService {
     //update insert에 사용되는 dto가져오기
     @Async
     @Before("execution(* com.kimcompay.projectjb.users.company.service.storeService.tryUpdate(..))"
-    +"||execution(* com.kimcompay.projectjb.users.user.*.*(..))")
+    +"||execution(* com.kimcompay.projectjb.users.user.*.*(..))"
+    +"||execution(* com.kimcompay.projectjb.users.company.compayAuthRestController.storeInsert(..))"
+    +"||execution(* com.kimcompay.projectjb.users.company.compayAuthRestController.insertFlyerAndProducts(..))")
     public void getImgAndText(JoinPoint joinPoint) {
         logger.info("getImgAndText");
         Object[] values=joinPoint.getArgs();
         for(Object value:values){
-            if(value instanceof tryUpdateStoreDto || value instanceof tryInsertStoreDto){
+            if(value instanceof tryUpdateStoreDto || value instanceof tryInsertStoreDto || value instanceof tryProductInsertDto){
                 doAfter.put("dto", value);
                 break;
             }
@@ -111,7 +114,7 @@ public class aopService {
     }
     //update insert 후 사용 하지 않는 사진들 클라우드 제거 및 인증 정보 제거
     @Async
-    @AfterReturning(value = "execution(* com.kimcompay.projectjb.users.company.service.storeService.tryInsert(..))"
+    @AfterReturning(value = "execution(* com.kimcompay.projectjb.users.company.service.storeService.insert(..))"
     +"||execution(* com.kimcompay.projectjb.users.company.service.storeService.tryUpdate(..))"
     +"||execution(* com.kimcompay.projectjb.users.company.service.productService.insert(..))"
     ,returning="response")
@@ -133,6 +136,10 @@ public class aopService {
             text=insertStoreDto.getText();
             thumNail=insertStoreDto.getThumbNail();
             authSessionFlag=true;
+        }else if(dto instanceof tryProductInsertDto){
+            tryProductInsertDto tryProductInsertDto=(tryProductInsertDto)dto;
+            text=tryProductInsertDto.getText();
+            thumNail=tryProductInsertDto.getProductImgPath();
         }
         deleteImgs(text, thumNail, this.httpSession);
         if(authSessionFlag){

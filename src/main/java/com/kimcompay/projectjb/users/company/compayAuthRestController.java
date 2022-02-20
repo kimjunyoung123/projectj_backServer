@@ -41,7 +41,7 @@ public class compayAuthRestController {
 
     //매장등록
     @RequestMapping(value = "/join",method = RequestMethod.POST)
-    public JSONObject storeInsert(@Valid @RequestBody tryInsertStoreDto tryInsertStoreDto) {
+    public JSONObject storeInsert(@Valid @RequestBody tryInsertStoreDto tryInsertStoreDto,HttpServletRequest request) {
         return storeService.insert(tryInsertStoreDto);
     }
     //매장,배달리스트 조화
@@ -54,11 +54,13 @@ public class compayAuthRestController {
     public JSONObject getStore(@PathVariable int id,@PathVariable String kind) {
         return storeService.authGetActionHub(kind,id);
     }
-    @RequestMapping(value = "/infor/change",method = RequestMethod.PUT)//매장 정보수정
+    //매장 정보수정
+    @RequestMapping(value = "/infor/change",method = RequestMethod.PUT)
     public JSONObject storeUpdate(@Valid @RequestBody tryUpdateStoreDto tryUpdateStoreDto,HttpServletRequest request) {
         return storeService.tryUpdate(tryUpdateStoreDto);
     }
-    @RequestMapping(value = "/infor/sleep/{flag}/{storeId}",method = RequestMethod.PUT)//매장 영업상태 수정
+    //매장 영업상태 수정
+    @RequestMapping(value = "/infor/sleep/{flag}/{storeId}",method = RequestMethod.PUT)
     public JSONObject storeSleepOrOpen(@PathVariable int flag,@PathVariable int storeId) {
         return storeService.updateSleepOrOpen(flag, storeId);
     }
@@ -69,7 +71,7 @@ public class compayAuthRestController {
     }
     //상품등록
     @RequestMapping(value = "/flyer/insert",method = RequestMethod.POST)
-    public JSONObject insertFlyerAndProducts(@Valid @RequestBody tryProductInsertDto tryProductInsertDto) {
+    public JSONObject insertFlyerAndProducts(@Valid @RequestBody tryProductInsertDto tryProductInsertDto,HttpServletRequest request) {
         return productService.insert(tryProductInsertDto);
     }
 }
