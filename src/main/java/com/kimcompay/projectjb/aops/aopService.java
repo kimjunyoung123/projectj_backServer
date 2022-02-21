@@ -1,10 +1,7 @@
 package com.kimcompay.projectjb.aops;
 
 import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -112,7 +109,6 @@ public class aopService {
         logger.info("dto: "+utillService.arrToLogString(values));
         String text=null;
         String thumNail=null;
-        boolean authSessionFlag=false;
         for(Object dto:values){
             if(dto instanceof tryUpdateStoreDto){
                 tryUpdateStoreDto tryUpdateStoreDto=(tryUpdateStoreDto)dto;
@@ -122,21 +118,24 @@ public class aopService {
                 tryInsertStoreDto insertStoreDto=(tryInsertStoreDto)dto;
                 text=insertStoreDto.getText();
                 thumNail=insertStoreDto.getThumbNail();
-                authSessionFlag=true;
             }else if(dto instanceof tryProductInsertDto){
                 tryProductInsertDto tryProductInsertDto=(tryProductInsertDto)dto;
                 text=tryProductInsertDto.getText();
                 thumNail=tryProductInsertDto.getProductImgPath();
             }
             deleteImgs(text, thumNail, this.httpSession);
-            if(authSessionFlag){
-                removeAuthSession(this.httpSession);
-            }
             break;
         }    
     }
-    private void removeAuthSession(HttpSession httpSession) {
+    //-------------------------------------------------------------
+    //인증 서비스 이후 인증 정보 지워주기 
+    @Async
+    @AfterReturning(value = "execution(* com.kimcompay.projectjb.users.company.service.storeService.insert(..))"
+    +"||execution(* com.kimcompay.projectjb.users.company.service.storeService.tryUpdate(..))"
+    ,returning="response")
+    public void removeAuthSession(JoinPoint JoinPoint,Object response) {
         logger.info("removeAuthSession");
+        logger.info("response: "+response);
         httpSession.removeAttribute(senums.auth.get()+senums.phonet.get());
     }
     
