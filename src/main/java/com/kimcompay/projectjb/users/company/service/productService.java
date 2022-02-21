@@ -37,6 +37,7 @@ public class productService {
         product.put("product_img_path", productAndEvnets.get(0).get("product_img_path"));
         product.put("product_name", productAndEvnets.get(0).get("product_name"));
         product.put("text", productAndEvnets.get(0).get("text"));
+        product.put("price", productAndEvnets.get(0).get("price"));
         response.put("product", product);
         //이벤트 조회
         Boolean eventFlag=false;
