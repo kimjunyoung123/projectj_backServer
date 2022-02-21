@@ -25,6 +25,11 @@ public class productService {
     @Autowired
     private productEventDao productEventDao;
 
+    @Transactional(rollbackFor = Exception.class)
+    public JSONObject tryUpdate(int productId,tryProductInsertDto tryProductInsertDto) {
+        productVo productVo=productDao.findById(productId).orElseThrow(()->utillService.makeRuntimeEX("존재하지 않는 상품입니다", "tryUpdate"));
+        return null;
+    }
     public JSONObject getProductAndEvents(int productId) {
         List<Map<String,Object>>productAndEvnets=getProductAndEventsCore(productId);
         utillService.checkDaoResult(productAndEvnets,"존재하지 않는 상품입니다", "getProductAndEvents");

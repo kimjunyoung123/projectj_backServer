@@ -74,4 +74,9 @@ public class compayAuthRestController {
     public JSONObject insertFlyerAndProducts(@Valid @RequestBody tryProductInsertDto tryProductInsertDto,HttpServletRequest request) {
         return productService.insert(tryProductInsertDto);
     }
+    //상품수정
+    @RequestMapping(value = "/product/update/{productId}",method = RequestMethod.PUT)
+    public JSONObject updateProductController(@Valid @RequestBody tryProductInsertDto productInsertDto,@PathVariable int productId) {
+        return productService.tryUpdate(productId, productInsertDto);
+    }
 }
