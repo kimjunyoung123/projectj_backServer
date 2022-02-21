@@ -79,12 +79,14 @@ public class aopService {
         fileService.deleteFile(httpSession,usingImgs);
         httpSession.removeAttribute(senums.imgSessionName.get());
     }
-    //update insert 전 이전 까지 업로드 했던 사진 세션 가져오기 컨트롤러에서 낚아챔
+    //update insert 전 이전 까지 사용했던 세션 가져오기 컨트롤러에서 낚아챔
     @Async
     @Before(value = "execution(* com.kimcompay.projectjb.users.company.compayAuthRestController.storeUpdate(..))"
     +"||execution(* com.kimcompay.projectjb.users.company.compayAuthRestController.storeInsert(..))"
     +"||execution(* com.kimcompay.projectjb.users.company.compayAuthRestController.uploadAndOcr(..))"
-    +"||execution(* com.kimcompay.projectjb.users.company.compayAuthRestController.insertFlyerAndProducts(..))")
+    +"||execution(* com.kimcompay.projectjb.users.company.compayAuthRestController.insertFlyerAndProducts(..))"
+    +"||execution(* com.kimcompay.projectjb.users.user.userRestController.tryJoin(..))"
+    )
     public void setHttpSession(JoinPoint joinPoint) {
         logger.info("setHttpSession");
         for (Object obj : joinPoint.getArgs()) {
@@ -92,6 +94,9 @@ public class aopService {
                 logger.info("find session");
                 HttpServletRequest request = (HttpServletRequest) obj;
                 this.httpSession=request.getSession();
+                break;
+            }else if(obj instanceof HttpSession){
+                this.httpSession=(HttpSession) obj;
                 break;
             }
         } 
