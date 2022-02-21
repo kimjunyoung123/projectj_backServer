@@ -24,4 +24,31 @@ public interface productDao extends JpaRepository<productVo,Integer> {
     @Transactional
     @Query(value = "update products set product_name=? where product_id=?",nativeQuery = true)
     void updateProductNameById(String productName,int productId);
+
+    
+    @Modifying
+    @Transactional
+    @Query(value = "update products set price=? where product_id=?",nativeQuery = true)
+    void updatePriceById(int price,int productId);
+
+       
+    @Modifying
+    @Transactional
+    @Query(value = "update products set origin=? where product_id=?",nativeQuery = true)
+    void updateOriginById(String origin,int productId);
+
+    @Modifying
+    @Transactional
+    @Query(value = "update products set product_img_path=? where product_id=?",nativeQuery = true)
+    void updateImgPathById(String ImgPath,int productId);
+
+    @Modifying
+    @Transactional
+    @Query(value = "update products set text=? where product_id=?",nativeQuery = true)
+    void updateTextById(String text,int productId);
+
+    @Modifying
+    @Transactional
+    @Query(value = "update products set category=? where product_id=?",nativeQuery = true)
+    void updateCategoryById(String category,int productId);
 }   

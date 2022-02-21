@@ -6,7 +6,8 @@ import java.util.List;
 import java.util.Map;
 
 import com.kimcompay.projectjb.utillService;
-
+import com.kimcompay.projectjb.apis.aws.services.fileService;
+import com.kimcompay.projectjb.board.service.boardService;
 import com.kimcompay.projectjb.users.company.model.productDao;
 import com.kimcompay.projectjb.users.company.model.productEventDao;
 import com.kimcompay.projectjb.users.company.model.productEventVo;
@@ -24,16 +25,58 @@ public class productService {
     private productDao productDao;
     @Autowired
     private productEventDao productEventDao;
+    @Autowired
+    private fileService fileService;
+    @Autowired
+    private boardService boardService;
 
     @Transactional(rollbackFor = Exception.class)
     public JSONObject tryUpdate(int productId,tryProductInsertDto tryProductInsertDto) {
         Map<String,Object>product=getProductInArr(getProductAndEvenArr(productId));
+        Boolean changeFlag=false;
         //이번엔 update문으로 해보자 좀 노가다 이긴한데
+        //제품이름변경
         if(!product.get("product_name").equals(tryProductInsertDto.getProductName())){
             utillService.writeLog("상품이름 변경요청", productService.class);
             productDao.updateProductNameById(tryProductInsertDto.getProductName(), productId);
         }
-        return null;
+        //제품가격변경
+        if(Integer.parseInt(product.get("price").toString())!=tryProductInsertDto.getPrice()){
+            utillService.writeLog("상품가격 변경요청", productService.class);
+            productDao.updatePriceById(tryProductInsertDto.getPrice(), productId);
+        }
+        //제품원산지변경
+        if(!product.get("origin").equals(tryProductInsertDto.getOrigin())){
+            utillService.writeLog("상품원산지 변경요청", productService.class);
+            productDao.updateOriginById(tryProductInsertDto.getOrigin(), productId);
+        }
+        //제품사진변경
+        if(!product.get("product_img_path").equals(tryProductInsertDto.getProductImgPath())){
+            utillService.writeLog("상품사진 변경요청", productService.class);
+            productDao.updateImgPathById(tryProductInsertDto.getProductImgPath(), productId);
+            fileService.deleteFile(utillService.getImgNameInPath(product.get("product_img_path").toString(), 4));
+        }
+        //제품설명변경
+        if(!product.get("text").equals(tryProductInsertDto.getText())){
+            utillService.writeLog("상품설명 변경요청", productService.class);
+            productDao.updateTextById(tryProductInsertDto.getText(), productId);
+            boardService.deleteOriginImgInText(product.get("text").toString(), tryProductInsertDto.getText());
+        }
+        //제품카테고리변경
+        if(!product.get("category").equals(tryProductInsertDto.getCategory())){
+            utillService.writeLog("상품카테고리 변경요청", productService.class);
+            productDao.updateCategoryById(tryProductInsertDto.getCategory(), productId);
+        }
+        //제품 이벤트 변경판별
+        
+        //변경되었는지판별
+        if(changeFlag){
+            return utillService.getJson(true, "변경이 완료되었습니다");
+        }
+        return utillService.getJson(true, "변경된 사항이 없습니다");
+    }
+    private void checkChangeEvent() {
+        
     }
     private List<Map<String,Object>> getProductAndEvenArr(int productId) {
         List<Map<String,Object>>productAndEvnets=getProductAndEventsCore(productId);
