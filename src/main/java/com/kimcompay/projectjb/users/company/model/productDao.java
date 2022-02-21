@@ -4,7 +4,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.transaction.annotation.Transactional;
 
 public interface productDao extends JpaRepository<productVo,Integer> {
     
@@ -17,4 +19,9 @@ public interface productDao extends JpaRepository<productVo,Integer> {
     +"from products a left join product_events b on a.product_id=b.product_id "
     +"where a.product_id=?",nativeQuery = true)
     List<Map<String,Object>>findByIdJoinEvent(int productId);
+
+    @Modifying
+    @Transactional
+    @Query(value = "update products set product_name=? where product_id=?",nativeQuery = true)
+    void updateProductNameById(String productName,int productId);
 }   

@@ -27,14 +27,20 @@ public class productService {
 
     @Transactional(rollbackFor = Exception.class)
     public JSONObject tryUpdate(int productId,tryProductInsertDto tryProductInsertDto) {
-        productVo productVo=productDao.findById(productId).orElseThrow(()->utillService.makeRuntimeEX("존재하지 않는 상품입니다", "tryUpdate"));
+        Map<String,Object>product=getProductInArr(getProductAndEvenArr(productId));
+        //이번엔 update문으로 해보자 좀 노가다 이긴한데
+        if(!product.get("product_name").equals(tryProductInsertDto.getProductName())){
+            utillService.writeLog("상품이름 변경요청", productService.class);
+            productDao.updateProductNameById(tryProductInsertDto.getProductName(), productId);
+        }
         return null;
     }
-    public JSONObject getProductAndEvents(int productId) {
+    private List<Map<String,Object>> getProductAndEvenArr(int productId) {
         List<Map<String,Object>>productAndEvnets=getProductAndEventsCore(productId);
         utillService.checkDaoResult(productAndEvnets,"존재하지 않는 상품입니다", "getProductAndEvents");
-        JSONObject response=new JSONObject();
-        //제품정보 꺼내기
+        return productAndEvnets;
+    }
+    private Map<String,Object> getProductInArr(List<Map<String,Object>>productAndEvnets) {
         Map<String,Object>product=new HashMap<>();
         product.put("category", productAndEvnets.get(0).get("category"));
         product.put("origin", productAndEvnets.get(0).get("origin"));
@@ -43,7 +49,13 @@ public class productService {
         product.put("product_name", productAndEvnets.get(0).get("product_name"));
         product.put("text", productAndEvnets.get(0).get("text"));
         product.put("price", productAndEvnets.get(0).get("price"));
-        response.put("product", product);
+        return product;
+    }
+    public JSONObject getProductAndEvents(int productId) {
+        List<Map<String,Object>>productAndEvnets=getProductAndEvenArr(productId);
+        JSONObject response=new JSONObject();
+        //제품정보 꺼내기
+        response.put("product", getProductInArr(productAndEvnets));
         //이벤트 조회
         Boolean eventFlag=false;
         if(Integer.parseInt(productAndEvnets.get(0).get("event_state").toString())==1){
