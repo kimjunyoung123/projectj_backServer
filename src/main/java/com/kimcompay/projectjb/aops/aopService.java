@@ -132,11 +132,13 @@ public class aopService {
     @Async
     @AfterReturning(value = "execution(* com.kimcompay.projectjb.users.company.service.storeService.insert(..))"
     +"||execution(* com.kimcompay.projectjb.users.company.service.storeService.tryUpdate(..))"
+    +"||execution(* com.kimcompay.projectjb.users.user.userService.insert(..))"
     ,returning="response")
     public void removeAuthSession(JoinPoint JoinPoint,Object response) {
         logger.info("removeAuthSession");
         logger.info("response: "+response);
         httpSession.removeAttribute(senums.auth.get()+senums.phonet.get());
+        httpSession.removeAttribute(senums.auth.get()+senums.emailt.get());
     }
     
     

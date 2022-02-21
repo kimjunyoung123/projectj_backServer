@@ -270,19 +270,13 @@ public class userService {
         checkValues(tryInsertDto);
         //인서트 시도
         try_insert(tryInsertDto);
-        //세션비우기,회원가입 이메일 비동기 전송 
+        //회원가입 이메일 비동기 전송 
         try {
-           doneInsert(session,tryInsertDto.getEmail());
+            sqsService.sendEmailAsync("장보고에 회원가입해주셔서 진심으로 감사합니다",tryInsertDto.getEmail());
         } catch (Exception e) {
             utillService.writeLog("회원가입 후 알림메세지 전송실패",userService.class);
         }
         return utillService.getJson(true, "회원가입에 성공하였습니다");
-    }
-    @Async
-    public void doneInsert(HttpSession session,String email) {
-        session.removeAttribute(senums.auth.get()+senums.emailt.get());
-        session.removeAttribute(senums.auth.get()+senums.phonet.get());
-        sqsService.sendEmailAsync("장보고에 회원가입해주셔서 진심으로 감사합니다",email);
     }
     private void try_insert(tryInsertDto tryInsertDto) {
        String hash_pwd=securityConfig.pwdEncoder().encode(tryInsertDto.getPwd());
