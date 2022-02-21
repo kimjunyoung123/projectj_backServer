@@ -5,6 +5,7 @@ package com.kimcompay.projectjb.users.company;
 
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
 import com.kimcompay.projectjb.users.company.model.tryProductInsertDto;
@@ -76,7 +77,7 @@ public class compayAuthRestController {
     }
     //상품수정
     @RequestMapping(value = "/product/update/{productId}",method = RequestMethod.PUT)
-    public JSONObject updateProductController(@Valid @RequestBody tryProductInsertDto productInsertDto,@PathVariable int productId) {
+    public JSONObject updateProductController(@Valid @RequestBody tryProductInsertDto productInsertDto,@PathVariable int productId,HttpServletRequest httpServletRequest) {
         return productService.tryUpdate(productId, productInsertDto);
     }
 }

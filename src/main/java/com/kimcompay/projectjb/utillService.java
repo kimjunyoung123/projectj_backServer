@@ -41,14 +41,19 @@ public class utillService {
         }
     }
     public static List<String> getImgSrc(String text) {
-    	System.out.println("getImgSrc");
     	List<String>array=new ArrayList<>();
-    	Pattern nonValidPattern = Pattern.compile("<img[^>]*src=[\"']?([^>\"']+)[\"']?[^>]*>");
-		Matcher matcher = nonValidPattern.matcher(text);
-		while (matcher.find()) {
-			array.add(matcher.group(1));
-		}
-		return array;
+        try {
+            Pattern nonValidPattern = Pattern.compile("<img[^>]*src=[\"']?([^>\"']+)[\"']?[^>]*>");
+            Matcher matcher = nonValidPattern.matcher(text);
+            while (matcher.find()) {
+                array.add(matcher.group(1));
+            }
+            return array;
+        } catch (NullPointerException e) {
+            writeLog("삭제할 사진을 찾지 못했습니다", utillService.class);
+            throw utillService.makeRuntimeEX("삭제할 사진을 찾지 못했습니다", "utillService");
+        }
+    	
     }
     public static void deleteCookie(String cookieName,HttpServletRequest request,HttpServletResponse response) {
         ResponseCookie cookie = ResponseCookie.from(cookieName, null) 

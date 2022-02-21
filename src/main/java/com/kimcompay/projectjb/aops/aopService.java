@@ -86,7 +86,7 @@ public class aopService {
     +"||execution(* com.kimcompay.projectjb.users.company.compayAuthRestController.storeInsert(..))"
     +"||execution(* com.kimcompay.projectjb.users.company.compayAuthRestController.uploadAndOcr(..))"
     +"||execution(* com.kimcompay.projectjb.users.company.compayAuthRestController.insertFlyerAndProducts(..))"
-    +"||execution(* com.kimcompay.projectjb.users.user.userRestController.tryJoin(..))"
+    +"||execution(* com.kimcompay.projectjb.users.company.compayAuthRestController.updateProductController(..))"
     )
     public void setHttpSession(JoinPoint joinPoint) {
         logger.info("setHttpSession");
@@ -97,16 +97,18 @@ public class aopService {
                 this.httpSession=request.getSession();
                 break;
             }else if(obj instanceof HttpSession){
+                logger.info("find session");
                 this.httpSession=(HttpSession) obj;
                 break;
             }
         } 
     }
-    //update insert 후 사용 하지 않는 사진들 클라우드 제거 및 인증 정보 제거
+    //update insert 후 사용 하지 않는 사진들 클라우드 제거 
     @Async
     @AfterReturning(value = "execution(* com.kimcompay.projectjb.users.company.service.storeService.insert(..))"
     +"||execution(* com.kimcompay.projectjb.users.company.service.storeService.tryUpdate(..))"
     +"||execution(* com.kimcompay.projectjb.users.company.service.productService.insert(..))"
+    +"||execution(* com.kimcompay.projectjb.users.company.service.productService.tryUpdate(..))"
     ,returning="response")
     public void doneInserOrUpdate(JoinPoint joinPoint,Object response) {
         logger.info("doneInserOrUpdate");
