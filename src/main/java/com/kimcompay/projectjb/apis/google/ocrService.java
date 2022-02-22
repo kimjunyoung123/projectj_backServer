@@ -47,13 +47,13 @@ public class ocrService {
       for (AnnotateImageResponse res : responses) {
         if (res.hasError()) {
           System.out.format("Error: %s%n", res.getError().getMessage());
-          return null;
+          return utillService.getJson(false, "글자 추출에 실패했습니다");
         }
         
         // For full list of available annotations, see http://g.co/cloud/vision/docs
         for (EntityAnnotation annotation : res.getTextAnnotationsList()) {
-          System.out.format("Text: %s%n", annotation.getDescription());
-          System.out.format("Position : %s%n", annotation.getBoundingPoly());
+          //System.out.format("Text: %s%n", annotation.getDescription());
+          //System.out.format("Position : %s%n", annotation.getBoundingPoly());
           strings.add(annotation.getDescription());
           strings.add(annotation.getBoundingPoly().toString());
         }

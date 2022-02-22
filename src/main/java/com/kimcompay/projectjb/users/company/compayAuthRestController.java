@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
+import com.kimcompay.projectjb.users.company.model.flyers.tryInsertFlyerDto;
 import com.kimcompay.projectjb.users.company.model.products.tryProductInsertDto;
 import com.kimcompay.projectjb.users.company.model.stores.tryInsertStoreDto;
 import com.kimcompay.projectjb.users.company.model.stores.tryUpdateStoreDto;
@@ -69,6 +70,11 @@ public class compayAuthRestController {
     @RequestMapping(value = "/uploadAndGet/{storeId}",method = RequestMethod.POST)
     public JSONObject uploadAndOcr(MultipartHttpServletRequest request,@PathVariable int storeId) {
         return flyerService.ocrAndUpload(request,storeId);
+    }
+    //전단등록
+    @RequestMapping(value = "/flyer/insert/{storeId}",method = RequestMethod.POST)
+    public JSONObject tryInsertFlyer(@PathVariable int storeId,HttpServletRequest httpServletRequest,@Valid @RequestBody tryInsertFlyerDto tryInsertFlyerDto) {
+        return flyerService.insert(tryInsertFlyerDto, storeId);
     }
     //상품등록
     @RequestMapping(value = "/flyer/insert",method = RequestMethod.POST)

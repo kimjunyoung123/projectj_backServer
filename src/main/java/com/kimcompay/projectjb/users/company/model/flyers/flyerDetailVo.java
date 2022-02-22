@@ -1,11 +1,15 @@
 package com.kimcompay.projectjb.users.company.model.flyers;
 
+import java.sql.Timestamp;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+
+import org.hibernate.annotations.CreationTimestamp;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -35,5 +39,9 @@ public class flyerDetailVo {
 
     @Column(name = "flyer_detail_default",columnDefinition = "TINYINT")
     private int defaultFlag;
+
+    @Column(name = "flyer_detail_created")
+    @CreationTimestamp
+    private Timestamp created;
 
 }

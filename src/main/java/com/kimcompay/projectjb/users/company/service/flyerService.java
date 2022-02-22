@@ -12,7 +12,10 @@ import com.kimcompay.projectjb.utillService;
 import com.kimcompay.projectjb.apis.aws.services.fileService;
 import com.kimcompay.projectjb.apis.google.ocrService;
 import com.kimcompay.projectjb.users.company.model.flyers.flyerDao;
+import com.kimcompay.projectjb.users.company.model.flyers.flyerDetailVo;
+import com.kimcompay.projectjb.users.company.model.flyers.flyerDetialDao;
 import com.kimcompay.projectjb.users.company.model.flyers.flyerVo;
+import com.kimcompay.projectjb.users.company.model.flyers.tryInsertFlyerDto;
 
 import org.json.simple.JSONObject;
 
@@ -29,6 +32,8 @@ public class flyerService {
     private flyerDao flyerDao;
     @Autowired
     private fileService fileService;
+    @Autowired
+    private flyerDetialDao flyerDetialDao;
     
     public JSONObject getFlyers(int storeId,int page,String keyword) {
         List<String>dates=utillService.getDateInStrgin(keyword);
@@ -93,11 +98,19 @@ public class flyerService {
         return flyerDao.findById(flyerId).orElseThrow(()->utillService.makeRuntimeEX("존재하지 않는 전단입니다", "getFlyer"));
     }
     @Transactional(rollbackFor = Exception.class)
-    public int insert(String imgPath,int storeId) {
-        flyerVo vo=flyerVo.builder().defaultSelect(0).storeId(storeId).companyId(utillService.getLoginId()).build();
+    public JSONObject insert(tryInsertFlyerDto tryInsertFlyerDto ,int storeId) {
+        List<String>flyerImgs=tryInsertFlyerDto.getFlyerImgs();
+        flyerVo vo=flyerVo.builder().defaultSelect(tryInsertFlyerDto.getDefaultFlag()).storeId(storeId).companyId(utillService.getLoginId()).build();
         flyerDao.save(vo);
-        
-        return vo.getId();
+        for(String img:flyerImgs){
+            int defaultNum=0;
+            if(tryInsertFlyerDto.getThumbNail().equals(img)){
+                defaultNum=1;
+            }
+            flyerDetailVo vo2=flyerDetailVo.builder().defaultFlag(defaultNum).flyerId(vo.getId()).imgPath(img).build();
+            flyerDetialDao.save(vo2);
+        }
+        return utillService.getJson(true, vo.getId());
     }
     public JSONObject ocrAndUpload(MultipartHttpServletRequest request,int storeId) {
         List<JSONObject>responses=new ArrayList<>();

@@ -1,5 +1,7 @@
 package com.kimcompay.projectjb.users.company.model.flyers;
 
-public class flyerDetialDao {
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface flyerDetialDao extends JpaRepository<flyerDetailVo,Integer> {
     
 }

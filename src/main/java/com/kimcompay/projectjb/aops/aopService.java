@@ -53,7 +53,8 @@ public class aopService {
     +"||execution(* com.kimcompay.projectjb.users.company.service.*.*(..))"
     +"||execution(* com.kimcompay.projectjb.users.user.userService.*(..))"
     +"||execution(* com.kimcompay.projectjb.utillService.*(..))"
-    +"||execution(* com.kimcompay.projectjb.board.service.*.*(..))")
+    +"||execution(* com.kimcompay.projectjb.board.service.*.*(..))"
+    +"||execution(* com.kimcompay.projectjb.apis.google.ocrService.*(..))")
     public void writeLog(JoinPoint joinPoint) throws Throwable {
         logger.info("writeLog");
         MethodSignature signature = (MethodSignature)joinPoint.getSignature();
@@ -62,6 +63,7 @@ public class aopService {
         logger.info("method: "+method.getName());
         logger.info("요청변수: "+utillService.arrToLogString(signature.getParameterNames())+" 요청값: "+utillService.arrToLogString(joinPoint.getArgs()));
     }
+    //-----------------------------------------------------------------------------------------------------
     //매장정보 접근전 주인인지 확인
     @Before("execution(* com.kimcompay.projectjb.users.company.service.productService.getProductAndEvents(..))"
     +"||execution(* com.kimcompay.projectjb.delivery.service.deliveryService.getDeliverAddress(..))"
@@ -88,7 +90,7 @@ public class aopService {
     +"||execution(* com.kimcompay.projectjb.users.company.compayAuthRestController.uploadAndOcr(..))"
     +"||execution(* com.kimcompay.projectjb.users.company.compayAuthRestController.insertFlyerAndProducts(..))"
     +"||execution(* com.kimcompay.projectjb.users.company.compayAuthRestController.updateProductController(..))"
-    +"||execution(* com.kimcompay.projectjb.users.company.compayAuthRestController.uploadAndOcr(..))"///전단 업로드 역시 추가해야함  
+    +"||execution(* com.kimcompay.projectjb.users.company.compayAuthRestController.tryInsertFlyer(..))"///전단 업로드 역시 추가해야함  
     )
     public void setHttpSession(JoinPoint joinPoint) {
         logger.info("setHttpSession");
