@@ -11,13 +11,15 @@ import java.util.Optional;
 import com.kimcompay.projectjb.utillService;
 import com.kimcompay.projectjb.apis.aws.services.fileService;
 import com.kimcompay.projectjb.apis.google.ocrService;
-import com.kimcompay.projectjb.users.company.model.flyerDao;
-import com.kimcompay.projectjb.users.company.model.flyerVo;
+import com.kimcompay.projectjb.users.company.model.flyers.flyerDao;
+import com.kimcompay.projectjb.users.company.model.flyers.flyerVo;
 
 import org.json.simple.JSONObject;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 @Service
@@ -90,27 +92,32 @@ public class flyerService {
     public flyerVo getFlyer(int flyerId) {
         return flyerDao.findById(flyerId).orElseThrow(()->utillService.makeRuntimeEX("존재하지 않는 전단입니다", "getFlyer"));
     }
-    private int insert(String imgPath,int storeId) {
-        flyerVo vo=flyerVo.builder().img_path(imgPath).defaultSelect(0).storeId(storeId).companyId(utillService.getLoginId()).build();
+    @Transactional(rollbackFor = Exception.class)
+    public int insert(String imgPath,int storeId) {
+        flyerVo vo=flyerVo.builder().defaultSelect(0).storeId(storeId).companyId(utillService.getLoginId()).build();
         flyerDao.save(vo);
+        
         return vo.getId();
     }
     public JSONObject ocrAndUpload(MultipartHttpServletRequest request,int storeId) {
-        JSONObject response=new JSONObject();
-        File file=fileService.convert(request.getFile("upload"));
-        //aws upload
-        response=fileService.upload(file);
-        //글자추출
-        try {
-            response.put("ocr",ocrService.detectText(file.toPath().toString()));
-        } catch (Exception e) {
-            utillService.writeLog("ocr 글자 추출 실패",flyerService.class);
-            e.printStackTrace();
+        List<JSONObject>responses=new ArrayList<>();
+        List<MultipartFile>imgs=request.getFiles("upload");
+        for(MultipartFile img:imgs){
+            JSONObject response=new JSONObject();
+            File file=fileService.convert(img);
+            //aws upload
+            response=fileService.upload(file);
+            //글자추출
+            try {
+                response.put("ocr",ocrService.detectText(file.toPath().toString()));
+            } catch (Exception e) {
+                utillService.writeLog("ocr 글자 추출 실패",flyerService.class);
+                e.printStackTrace();
+            }
+            //로컬 파일 삭제
+            file.delete();
+            responses.add(response);
         }
-        //로컬 파일 삭제
-        file.delete();
-        //전단지 insert 
-        response.put("id",insert(response.get("message").toString(),storeId));
-        return response;
+        return utillService.getJson(true, responses);
     }
 }

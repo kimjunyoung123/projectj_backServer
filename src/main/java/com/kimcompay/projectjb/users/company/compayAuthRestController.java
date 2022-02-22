@@ -8,10 +8,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
-import com.kimcompay.projectjb.users.company.model.tryProductInsertDto;
+import com.kimcompay.projectjb.users.company.model.products.tryProductInsertDto;
+import com.kimcompay.projectjb.users.company.model.stores.tryInsertStoreDto;
+import com.kimcompay.projectjb.users.company.model.stores.tryUpdateStoreDto;
 import com.kimcompay.projectjb.delivery.service.deliveryService;
-import com.kimcompay.projectjb.users.company.model.tryInsertStoreDto;
-import com.kimcompay.projectjb.users.company.model.tryUpdateStoreDto;
 import com.kimcompay.projectjb.users.company.service.flyerService;
 import com.kimcompay.projectjb.users.company.service.productService;
 import com.kimcompay.projectjb.users.company.service.storeService;
@@ -65,7 +65,7 @@ public class compayAuthRestController {
     public JSONObject storeSleepOrOpen(@PathVariable int flag,@PathVariable int storeId) {
         return storeService.updateSleepOrOpen(flag, storeId);
     }
-    //전단등록
+    //전단업로드 글자 추출
     @RequestMapping(value = "/uploadAndGet/{storeId}",method = RequestMethod.POST)
     public JSONObject uploadAndOcr(MultipartHttpServletRequest request,@PathVariable int storeId) {
         return flyerService.ocrAndUpload(request,storeId);

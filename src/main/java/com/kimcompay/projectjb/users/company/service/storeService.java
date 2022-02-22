@@ -15,11 +15,11 @@ import com.kimcompay.projectjb.board.service.boardService;
 import com.kimcompay.projectjb.delivery.service.deliveryService;
 import com.kimcompay.projectjb.enums.intenums;
 import com.kimcompay.projectjb.enums.senums;
-import com.kimcompay.projectjb.users.principalDetails;            
-import com.kimcompay.projectjb.users.company.model.storeDao;
-import com.kimcompay.projectjb.users.company.model.storeVo;
-import com.kimcompay.projectjb.users.company.model.tryInsertStoreDto;
-import com.kimcompay.projectjb.users.company.model.tryUpdateStoreDto;
+import com.kimcompay.projectjb.users.principalDetails;
+import com.kimcompay.projectjb.users.company.model.stores.storeDao;
+import com.kimcompay.projectjb.users.company.model.stores.storeVo;
+import com.kimcompay.projectjb.users.company.model.stores.tryInsertStoreDto;
+import com.kimcompay.projectjb.users.company.model.stores.tryUpdateStoreDto;
 
 import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;

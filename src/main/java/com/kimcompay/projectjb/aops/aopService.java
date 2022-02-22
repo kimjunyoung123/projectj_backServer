@@ -9,9 +9,9 @@ import javax.servlet.http.HttpSession;
 import com.kimcompay.projectjb.utillService;
 import com.kimcompay.projectjb.apis.aws.services.fileService;
 import com.kimcompay.projectjb.enums.senums;
-import com.kimcompay.projectjb.users.company.model.tryInsertStoreDto;
-import com.kimcompay.projectjb.users.company.model.tryProductInsertDto;
-import com.kimcompay.projectjb.users.company.model.tryUpdateStoreDto;
+import com.kimcompay.projectjb.users.company.model.products.tryProductInsertDto;
+import com.kimcompay.projectjb.users.company.model.stores.tryInsertStoreDto;
+import com.kimcompay.projectjb.users.company.model.stores.tryUpdateStoreDto;
 import com.kimcompay.projectjb.users.company.service.storeService;
 
 import org.aspectj.lang.JoinPoint;
@@ -77,6 +77,7 @@ public class aopService {
         logger.info("deleteImgs");
         List<String>usingImgs=utillService.getOnlyImgNames(text);
         usingImgs.add(utillService.getImgNameInPath(thumNail, 4));
+        logger.info("삭제방지 배열만듬");
         fileService.deleteFile(httpSession,usingImgs);
         httpSession.removeAttribute(senums.imgSessionName.get());
     }

@@ -8,11 +8,11 @@ import java.util.Map;
 import com.kimcompay.projectjb.utillService;
 import com.kimcompay.projectjb.apis.aws.services.fileService;
 import com.kimcompay.projectjb.board.service.boardService;
-import com.kimcompay.projectjb.users.company.model.productDao;
-import com.kimcompay.projectjb.users.company.model.productEventDao;
-import com.kimcompay.projectjb.users.company.model.productEventVo;
-import com.kimcompay.projectjb.users.company.model.productVo;
-import com.kimcompay.projectjb.users.company.model.tryProductInsertDto;
+import com.kimcompay.projectjb.users.company.model.products.productDao;
+import com.kimcompay.projectjb.users.company.model.products.productEventDao;
+import com.kimcompay.projectjb.users.company.model.products.productEventVo;
+import com.kimcompay.projectjb.users.company.model.products.productVo;
+import com.kimcompay.projectjb.users.company.model.products.tryProductInsertDto;
 
 import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;

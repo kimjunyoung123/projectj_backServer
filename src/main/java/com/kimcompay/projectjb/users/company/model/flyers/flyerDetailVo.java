@@ -32,4 +32,8 @@ public class flyerDetailVo {
 
     @Column(name = "flyer_img_path",nullable = false)
     private String imgPath;
+
+    @Column(name = "flyer_detail_default",columnDefinition = "TINYINT")
+    private int defaultFlag;
+
 }
