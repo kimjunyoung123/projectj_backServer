@@ -74,15 +74,19 @@ public class productService {
             productDao.updateCategoryById(tryProductInsertDto.getCategory(), productId);
         }
         //제품 이벤트 변경판별
-
+        List<Map<String,Object>>eventInfors=(List<Map<String,Object>>)tryProductInsertDto.getEventInfors();
+        changeFlag=checkChangeEvent(tryProductInsertDto.getEventFlag(),productId,eventInfors);
         //변경되었는지판별
         if(changeFlag){
             return utillService.getJson(true, "변경이 완료되었습니다");
         }
         return utillService.getJson(true, "변경된 사항이 없습니다");
     }
-    private void checkChangeEvent() {
-        
+    private Boolean checkChangeEvent(int eventFlag,int productId,List<Map<String,Object>>eventInfors) {  
+        productEventDao.deleteEventsByProductId(productId);
+        checkEvent(eventInfors);
+        insertEvents(eventInfors,productId);
+        return true;
     }
     private List<Map<String,Object>> getProductAndEvenArr(int productId) {
         List<Map<String,Object>>productAndEvnets=getProductAndEventsCore(productId);
@@ -108,19 +112,22 @@ public class productService {
         //이벤트 조회
         Boolean eventFlag=false;
         if(Integer.parseInt(productAndEvnets.get(0).get("event_state").toString())==1){
-            eventFlag=true;
-            List<Map<String,Object>>events=new ArrayList<>();
-            for(Map<String,Object>productAndEvnet:productAndEvnets){
-                Map<String,Object>event=new HashMap<>();
-                event.put("event_date", productAndEvnet.get("product_event_date"));
-                event.put("id", productAndEvnet.get("product_event_id"));
-                event.put("event_price", productAndEvnet.get("product_event_price"));
-                events.add(event);
-            }
-            response.put("events", events);
+            eventFlag=true;           
+            response.put("events", getEventsInArr(productAndEvnets));
         }
-       response.put("event_flag", eventFlag);
+        response.put("event_flag", eventFlag);
         return utillService.getJson(true, response);
+    }
+    private List<Map<String,Object>> getEventsInArr(List<Map<String,Object>>productAndEvnets) {
+        List<Map<String,Object>>events=new ArrayList<>();
+        for(Map<String,Object>productAndEvnet:productAndEvnets){
+            Map<String,Object>event=new HashMap<>();
+            event.put("event_date", productAndEvnet.get("product_event_date"));
+            event.put("id", productAndEvnet.get("product_event_id"));
+            event.put("event_price", productAndEvnet.get("product_event_price"));
+            events.add(event);
+        }
+        return events;
     }
     private List<Map<String,Object>> getProductAndEventsCore(int productId) {
         return productDao.findByIdJoinEvent(productId);
@@ -143,12 +150,15 @@ public class productService {
         if(tryProductInsertDto.getEventFlag()==1){
             List<Map<String,Object>>eventInfors=(List<Map<String,Object>>)tryProductInsertDto.getEventInfors();
             checkEvent(eventInfors);
-            for(Map<String,Object>eventInfor:eventInfors){
-                productEventVo vo2=productEventVo.builder().date(eventInfor.get("date").toString()).productId(vo.getId()).eventPrice(Integer.parseInt(eventInfor.get("price").toString())).build();
-                productEventDao.save(vo2);
-            }
+            insertEvents(eventInfors,vo.getId());
         } 
         return utillService.getJson(true, "상품등록에 성공 하였습니다");
+    }
+    private void insertEvents(List<Map<String,Object>>eventInfors,int productId) {
+        for(Map<String,Object>eventInfor:eventInfors){
+            productEventVo vo2=productEventVo.builder().date(eventInfor.get("date").toString()).productId(productId).eventPrice(Integer.parseInt(eventInfor.get("price").toString())).build();
+            productEventDao.save(vo2);
+        }
     }
     private void checkExist(int flyerId) {
         if(productDao.countFlyerByFlyerId(flyerId)==0){
