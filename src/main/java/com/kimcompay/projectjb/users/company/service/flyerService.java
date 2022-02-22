@@ -99,10 +99,16 @@ public class flyerService {
     }
     @Transactional(rollbackFor = Exception.class)
     public JSONObject insert(tryInsertFlyerDto tryInsertFlyerDto ,int storeId) {
+        //이미지 꺼내기
         List<String>flyerImgs=tryInsertFlyerDto.getFlyerImgs();
+        //전단 만들기
         flyerVo vo=flyerVo.builder().defaultSelect(tryInsertFlyerDto.getDefaultFlag()).storeId(storeId).companyId(utillService.getLoginId()).build();
         flyerDao.save(vo);
+        //전단 디테일 만들기
         for(String img:flyerImgs){
+            if(utillService.checkBlank(img)){
+                continue;
+            }
             int defaultNum=0;
             if(tryInsertFlyerDto.getThumbNail().equals(img)){
                 defaultNum=1;
