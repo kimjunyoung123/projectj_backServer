@@ -87,7 +87,7 @@ public class aopService {
     +"||execution(* com.kimcompay.projectjb.users.company.compayAuthRestController.uploadAndOcr(..))"
     +"||execution(* com.kimcompay.projectjb.users.company.compayAuthRestController.insertFlyerAndProducts(..))"
     +"||execution(* com.kimcompay.projectjb.users.company.compayAuthRestController.updateProductController(..))"
-    +"||execution(* com.kimcompay.projectjb.users.company.compayAuthRestController.uploadAndOcr(..))"
+    +"||execution(* com.kimcompay.projectjb.users.company.compayAuthRestController.uploadAndOcr(..))"///전단 업로드 역시 추가해야함  
     )
     public void setHttpSession(JoinPoint joinPoint) {
         logger.info("setHttpSession");
@@ -109,7 +109,6 @@ public class aopService {
     @AfterReturning(value = "execution(* com.kimcompay.projectjb.users.company.service.storeService.insert(..))"
     +"||execution(* com.kimcompay.projectjb.users.company.service.storeService.tryUpdate(..))"
     +"||execution(* com.kimcompay.projectjb.users.company.service.productService.insert(..))"
-    +"||execution(* com.kimcompay.projectjb.users.company.service.productService.tryUpdate(..))"
     +"||execution(* com.kimcompay.projectjb.users.company.service.productService.tryUpdate(..))"
     ,returning="response")
     public void doneInserOrUpdate(JoinPoint joinPoint,Object response) {
