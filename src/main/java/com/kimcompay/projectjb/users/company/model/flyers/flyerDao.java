@@ -4,8 +4,12 @@ import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
 
+import com.kimcompay.projectjb.users.company.model.stores.storeVo;
+
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.transaction.annotation.Transactional;
 
 public interface flyerDao extends JpaRepository<flyerVo,Integer> {
     
@@ -19,5 +23,10 @@ public interface flyerDao extends JpaRepository<flyerVo,Integer> {
     +" from flyers a left join products b on a.flyer_id=b.flyer_id"
     +" where a.flyer_id=?",nativeQuery = true)
     List<Map<String,Object>>findFlyerJoinProducts(int flyerId);
+
+    @Modifying
+    @Transactional
+    @Query(value = "update flyers set default_select=? where store_id=?",nativeQuery = true)
+    void updateDefaultFlyerById(int defaultFlag,int storeId);
 
 }

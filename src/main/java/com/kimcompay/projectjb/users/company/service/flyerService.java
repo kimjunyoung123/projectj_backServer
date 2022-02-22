@@ -101,6 +101,10 @@ public class flyerService {
     public JSONObject insert(tryInsertFlyerDto tryInsertFlyerDto ,int storeId) {
         //이미지 꺼내기
         List<String>flyerImgs=tryInsertFlyerDto.getFlyerImgs();
+        //기본전단이라면 이전 기본전단 찾아서 꺼주기
+        if(tryInsertFlyerDto.getDefaultFlag()==1){
+            flyerDao.updateDefaultFlyerById(0, storeId);
+        }
         //전단 만들기
         flyerVo vo=flyerVo.builder().defaultSelect(tryInsertFlyerDto.getDefaultFlag()).storeId(storeId).companyId(utillService.getLoginId()).build();
         flyerDao.save(vo);
