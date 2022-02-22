@@ -1,4 +1,4 @@
-package com.kimcompay.projectjb.users.company.model;
+package com.kimcompay.projectjb.users.company.model.products;
 
 import java.util.List;
 import java.util.Map;

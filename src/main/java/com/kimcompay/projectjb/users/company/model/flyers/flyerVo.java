@@ -1,4 +1,4 @@
-package com.kimcompay.projectjb.users.company.model;
+package com.kimcompay.projectjb.users.company.model.flyers;
 
 import java.sql.Timestamp;
 
@@ -37,9 +37,6 @@ public class flyerVo {
 
     @Column(name = "company_id",nullable = false)
     private int companyId;
-
-    @Column(name = "flyer_img_path",nullable = false)
-    private String img_path;
 
     @Column(name = "flyer_created")
     @CreationTimestamp

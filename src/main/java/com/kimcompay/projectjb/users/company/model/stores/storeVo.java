@@ -1,4 +1,4 @@
-package com.kimcompay.projectjb.users.company.model;
+package com.kimcompay.projectjb.users.company.model.stores;
 
 import java.sql.Timestamp;
 

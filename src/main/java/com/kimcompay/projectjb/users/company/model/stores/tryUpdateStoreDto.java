@@ -1,7 +1,9 @@
-package com.kimcompay.projectjb.users.company.model;
+package com.kimcompay.projectjb.users.company.model.stores;
 
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
+
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -10,7 +12,7 @@ import lombok.ToString;
 @NoArgsConstructor
 @Data
 @ToString
-public class tryInsertStoreDto {
+public class tryUpdateStoreDto {
 
     
     @NotBlank(message = "주소가 빈칸입니다")
@@ -34,11 +36,12 @@ public class tryInsertStoreDto {
     private String openTime;
     @NotBlank(message = "매장종료 시간을 선택해주세요")
     private String closeTime;
-    @NotBlank(message = "최소배달금액이 빈칸입니다")
-    private String minPrice;
-    @NotBlank(message = "최대배달반경이 빈칸입니다")
-    private String deliverRadius;
+    @Min(value = 0,message = "최소배달금액은 0원 입니다")
+    private int minPrice;
+    @Min(value = 0,message = "최대배달반경은 0보다 커야합니다")
+    private int deliverRadius;
     @NotBlank(message = "간단한 가게 설명을 적어주세요")
     private String text;
+    private int id;
 
 }

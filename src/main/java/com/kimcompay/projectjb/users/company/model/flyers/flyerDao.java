@@ -1,4 +1,4 @@
-package com.kimcompay.projectjb.users.company.model;
+package com.kimcompay.projectjb.users.company.model.flyers;
 
 import java.sql.Timestamp;
 import java.util.List;

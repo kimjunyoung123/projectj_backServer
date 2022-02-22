@@ -1,4 +1,4 @@
-package com.kimcompay.projectjb.users.company.model;
+package com.kimcompay.projectjb.users.company.model.flyers;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -11,28 +11,25 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @Data
-@Table(name = "product_events")
+@ToString
+@Table(name = "flyer_details")
 @Entity
-public class productEventVo {
+public class flyerDetailVo {
     
     @Id 
-    @Column(name = "product_event_id",nullable = false,unique = true)
+    @Column(name = "flyer_details_id",nullable = false,unique = true)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(name = "product_event_date",nullable = false)
-    private String date;
+    @Column(name = "flyer_id")
+    private int flyerId;
 
-    @Column(name = "product_event_price",nullable = false)
-    private int eventPrice;
-
-    @Column(name = "product_id",nullable = false)
-    private int productId;
-
-    
+    @Column(name = "flyer_img_path",nullable = false)
+    private String imgPath;
 }
