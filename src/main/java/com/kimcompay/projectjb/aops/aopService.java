@@ -115,24 +115,22 @@ public class aopService {
         logger.info("response: "+response);
         Object[] values=joinPoint.getArgs();
         logger.info("dto: "+utillService.arrToLogString(values));
-        String text=null;
-        String thumNail=null;
         for(Object dto:values){
             if(dto instanceof tryUpdateStoreDto){
                 tryUpdateStoreDto tryUpdateStoreDto=(tryUpdateStoreDto)dto;
-                text=tryUpdateStoreDto.getText();
-                thumNail=tryUpdateStoreDto.getThumbNail();
+                deleteImgs(tryUpdateStoreDto.getText(), tryUpdateStoreDto.getThumbNail(), this.httpSession);
+                break;
             }else if(dto instanceof tryInsertStoreDto){
                 tryInsertStoreDto insertStoreDto=(tryInsertStoreDto)dto;
-                text=insertStoreDto.getText();
-                thumNail=insertStoreDto.getThumbNail();
+                deleteImgs(insertStoreDto.getText(), insertStoreDto.getThumbNail(), this.httpSession);
+                break;
             }else if(dto instanceof tryProductInsertDto){
                 tryProductInsertDto tryProductInsertDto=(tryProductInsertDto)dto;
-                text=tryProductInsertDto.getText();
-                thumNail=tryProductInsertDto.getProductImgPath();
-            }
-            deleteImgs(text, thumNail, this.httpSession);
-            break;
+                deleteImgs(tryProductInsertDto.getText(), tryProductInsertDto.getProductImgPath(), this.httpSession);
+                break;
+            }else {
+                continue;
+            }   
         }    
     }
     //-------------------------------------------------------------

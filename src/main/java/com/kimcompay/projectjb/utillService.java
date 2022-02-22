@@ -48,12 +48,10 @@ public class utillService {
             while (matcher.find()) {
                 array.add(matcher.group(1));
             }
-            return array;
         } catch (NullPointerException e) {
-            writeLog("삭제할 사진을 찾지 못했습니다", utillService.class);
-            throw utillService.makeRuntimeEX("삭제할 사진을 찾지 못했습니다", "utillService");
+            utillService.writeLog("삭제할 사진을 찾지 못했습니다", utillService.class);
         }
-    	
+        return array;
     }
     public static void deleteCookie(String cookieName,HttpServletRequest request,HttpServletResponse response) {
         ResponseCookie cookie = ResponseCookie.from(cookieName, null) 
@@ -273,7 +271,7 @@ public class utillService {
             }
             return imgNames;
         }else{
-            writeLog("이미지가 존재하지 않습니다",utillService.class);
+            writeLog("기존에 사용중이던 이미지가 존재하지 않습니다",utillService.class);
         }
         return imgNames;
     }
@@ -319,6 +317,7 @@ public class utillService {
         }
     }
     public static String getImgNameInPath(String imgPath,int num) {
+        writeLog("분리할 이미지path: "+imgPath, utillService.class);
         return imgPath.split("/")[num];
     }
 }
