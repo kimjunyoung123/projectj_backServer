@@ -31,6 +31,7 @@ public class flyerService {
     public JSONObject getFlyers(int storeId,int page,String keyword) {
         List<String>dates=utillService.getDateInStrgin(keyword);
         List<Map<String,Object>>flyerVos=getFlyerArr(storeId,dates.get(0),dates.get(1),page);
+        utillService.checkDaoResult(flyerVos, "등록한 전단이 없습니다", "getFlyers");
         int totalPage=utillService.getTotalPage(Integer.parseInt(flyerVos.get(0).get("totalCount").toString()), pageSize);
         JSONObject respose=new JSONObject();
         respose.put("totalPage", totalPage);
