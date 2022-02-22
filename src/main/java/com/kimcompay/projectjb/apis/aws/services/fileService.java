@@ -85,7 +85,6 @@ public class fileService {
         return response;
     }
     public void deleteFile(HttpSession httpSession,List<String>usingImgs) {
-        System.out.println("----------------------4");
         try {
             List<String>imgNames=(List<String>)httpSession.getAttribute(senums.imgSessionName.get());
             for(String img:imgNames){
