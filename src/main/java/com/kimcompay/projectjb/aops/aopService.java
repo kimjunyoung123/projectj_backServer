@@ -1,7 +1,9 @@
 package com.kimcompay.projectjb.aops;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -9,6 +11,7 @@ import javax.servlet.http.HttpSession;
 import com.kimcompay.projectjb.utillService;
 import com.kimcompay.projectjb.apis.aws.services.fileService;
 import com.kimcompay.projectjb.enums.senums;
+import com.kimcompay.projectjb.users.company.model.flyers.tryInsertFlyerDto;
 import com.kimcompay.projectjb.users.company.model.products.tryProductInsertDto;
 import com.kimcompay.projectjb.users.company.model.stores.tryInsertStoreDto;
 import com.kimcompay.projectjb.users.company.model.stores.tryUpdateStoreDto;
@@ -89,23 +92,25 @@ public class aopService {
         }
     }
     //----------------------------------------------------------------------------------------------------
-    private void deleteImgs(String text,String thumNail,HttpSession httpSession) {
+    private void deleteImgs(String text,String thumNail) {
         logger.info("deleteImgs");
         List<String>usingImgs=utillService.getOnlyImgNames(text);
         usingImgs.add(utillService.getImgNameInPath(thumNail, 4));
         logger.info("삭제방지 배열만듬");
-        fileService.deleteFile(httpSession,usingImgs);
-        httpSession.removeAttribute(senums.imgSessionName.get());
+        deleteImgsCore(usingImgs);
+    }
+    private void deleteImgsCore(List<String>usingImgs) {
+        fileService.deleteFile(this.httpSession,usingImgs);
+        this.httpSession.removeAttribute(senums.imgSessionName.get());
     }
     //update insert 전 이전 까지 사용했던 세션 가져오기 컨트롤러에서 낚아챔
     @Async
     @Before(value = "execution(* com.kimcompay.projectjb.users.company.compayAuthRestController.storeUpdate(..))"
     +"||execution(* com.kimcompay.projectjb.users.company.compayAuthRestController.storeInsert(..))"
-    +"||execution(* com.kimcompay.projectjb.users.company.compayAuthRestController.uploadAndOcr(..))"
     +"||execution(* com.kimcompay.projectjb.users.company.compayAuthRestController.insertFlyerAndProducts(..))"
     +"||execution(* com.kimcompay.projectjb.users.company.compayAuthRestController.updateProductController(..))"
-    +"||execution(* com.kimcompay.projectjb.users.company.compayAuthRestController.tryInsertFlyer(..))"///전단 업로드 역시 추가해야함  
-    )
+    +"||execution(* com.kimcompay.projectjb.users.company.compayAuthRestController.tryInsertFlyer(..))"
+    +"||execution(* com.kimcompay.projectjb.users.company.compayAuthRestController.tryInsertProduct(..))")
     public void setHttpSession(JoinPoint joinPoint) {
         logger.info("setHttpSession");
         for (Object obj : joinPoint.getArgs()) {
@@ -127,6 +132,7 @@ public class aopService {
     +"||execution(* com.kimcompay.projectjb.users.company.service.storeService.tryUpdate(..))"
     +"||execution(* com.kimcompay.projectjb.users.company.service.productService.insert(..))"
     +"||execution(* com.kimcompay.projectjb.users.company.service.productService.tryUpdate(..))"
+    +"||execution(* com.kimcompay.projectjb.users.company.service.flyerService.insert(..))"
     ,returning="response")
     public void doneInserOrUpdate(JoinPoint joinPoint,Object response) {
         logger.info("doneInserOrUpdate");
@@ -136,20 +142,33 @@ public class aopService {
         for(Object dto:values){
             if(dto instanceof tryUpdateStoreDto){
                 tryUpdateStoreDto tryUpdateStoreDto=(tryUpdateStoreDto)dto;
-                deleteImgs(tryUpdateStoreDto.getText(), tryUpdateStoreDto.getThumbNail(), this.httpSession);
+                deleteImgs(tryUpdateStoreDto.getText(), tryUpdateStoreDto.getThumbNail());
                 break;
             }else if(dto instanceof tryInsertStoreDto){
                 tryInsertStoreDto insertStoreDto=(tryInsertStoreDto)dto;
-                deleteImgs(insertStoreDto.getText(), insertStoreDto.getThumbNail(), this.httpSession);
+                deleteImgs(insertStoreDto.getText(), insertStoreDto.getThumbNail());
                 break;
             }else if(dto instanceof tryProductInsertDto){
                 tryProductInsertDto tryProductInsertDto=(tryProductInsertDto)dto;
-                deleteImgs(tryProductInsertDto.getText(), tryProductInsertDto.getProductImgPath(), this.httpSession);
+                deleteImgs(tryProductInsertDto.getText(), tryProductInsertDto.getProductImgPath());
                 break;
+            }else if(dto instanceof tryInsertFlyerDto){
+                tryInsertFlyerDto tryInsertFlyerDto=(tryInsertFlyerDto)dto;
+                deleteImgs(tryInsertFlyerDto.getFlyerImgs());
             }else {
                 continue;
             }   
         }    
+    }
+    private void deleteImgs(List<String>imgs) {
+        for(int i=0;i<imgs.size();i++){
+            if(Optional.ofNullable(imgs.get(i)).orElseGet(()->null)==null){
+                continue;
+            }
+            imgs.set(i, utillService.getImgNameInPath(imgs.get(i),4));
+        }
+        logger.info("삭제방지배열생성");
+        deleteImgsCore(imgs);
     }
     //-------------------------------------------------------------
     //인증 서비스 이후 인증 정보 지워주기 
