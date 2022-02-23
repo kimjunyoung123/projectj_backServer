@@ -62,6 +62,9 @@ public class flyerService {
         List<JSONObject>flyerDetails=new ArrayList<>();
         for(Map<String,Object>flyerDetail:flyerAndProducts){
             JSONObject detail=new JSONObject();
+            if(flyerDetail.get("flyer_details_id")==null){
+                continue;
+            }
             detail.put("flyer_img_path", flyerDetail.get("flyer_img_path"));
             detail.put("default", flyerDetail.get("flyer_detail_default"));
             detail.put("id",  flyerDetail.get("flyer_details_id"));
@@ -75,6 +78,9 @@ public class flyerService {
         List<Map<String,Object>>products=new ArrayList<>();
         for(Map<String,Object>product:flyerAndProducts){
             if(Optional.ofNullable(product.get("product_id")).orElseGet(()->null)!=null){
+                if(product.get("product_id")==null){
+                    continue;
+                }
                 productFlag=true;
                 Map<String,Object>onlyProduct=new HashMap<>();
                 onlyProduct.put("product_id", product.get("product_id"));
