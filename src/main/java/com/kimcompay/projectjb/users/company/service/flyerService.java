@@ -112,8 +112,7 @@ public class flyerService {
         boolean productFlag=false;
         List<Map<String,Object>>products=new ArrayList<>();
         for(Map<String,Object>product:flyerAndProducts){
-            if(Optional.ofNullable(product.get("product_id")).orElseGet(()->null)!=null){
-                if(product.get("product_id")==null){
+                if(product.get("product_id")!=null){
                     continue;
                 }
                 productFlag=true;
@@ -125,7 +124,6 @@ public class flyerService {
                 onlyProduct.put("event_state", product.get("event_state"));
                 onlyProduct.put("product_name", product.get("product_name"));
                 products.add(onlyProduct);                
-            }
         }
         if(productFlag){
             response.put("products", products);
