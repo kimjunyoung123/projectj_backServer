@@ -65,7 +65,7 @@ public class compayAuthRestController {
     @RequestMapping(value = "/get/{kind}/{id}",method = RequestMethod.GET)
     public JSONObject getActionHub(@PathVariable int id,@PathVariable String kind) {
         if(kind.equals("store")){
-            return storeService.getStore(id);
+            return storeService.getStore(id);//안에서 정보로 검사하니까 aop에서 주인확인 안해도됨
         }else if(kind.equals("deliver")){
             return deliveryService.getDeliverAddress(id);
         }else if(kind.equals("flyer")){

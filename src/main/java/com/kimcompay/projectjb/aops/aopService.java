@@ -67,16 +67,18 @@ public class aopService {
         logger.info("요청변수: "+utillService.arrToLogString(signature.getParameterNames())+" 요청값: "+utillService.arrToLogString(joinPoint.getArgs()));
     }
     //-----------------------------------------------------------------------------------------------------
-    //매장정보 접근전 주인인지 확인
+    //매장정보 접근전 주인인지 확인 select
     @Before("execution(* com.kimcompay.projectjb.users.company.service.productService.getProductAndEvents(..))"
     +"||execution(* com.kimcompay.projectjb.delivery.service.deliveryService.getDeliverAddress(..))"
     +"||execution(* com.kimcompay.projectjb.users.company.service.flyerService.getFlyers(..))"
     +"||execution(* com.kimcompay.projectjb.delivery.service.deliveryService.getDelivers(..))"
-    +"||execution(* com.kimcompay.projectjb.users.company.compayAuthRestController.updateProductController(..))")
+    +"||execution(* com.kimcompay.projectjb.users.company.compayAuthRestController.updateProductController(..))"
+    +"||execution(* com.kimcompay.projectjb.users.company.service.flyerService.getFlyerAndProducts(..))")
     public void checkOwnerParam(JoinPoint joinPoint) {
         logger.info("checkOwnerParam");
         storeService.checkExist(Integer.parseInt(utillService.getHttpServletRequest().getParameter("storeId")));
     }
+    //update,insert,delete
     @Before("execution(* com.kimcompay.projectjb.users.company.compayAuthRestController.tryInsertFlyer(..))"
     +"||execution(* com.kimcompay.projectjb.users.company.compayAuthRestController.tryInsertProduct(..))"
     +"||execution(* com.kimcompay.projectjb.users.company.compayAuthRestController.deleteActionHub(..))")
