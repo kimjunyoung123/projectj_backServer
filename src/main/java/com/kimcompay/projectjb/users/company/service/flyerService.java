@@ -43,8 +43,12 @@ public class flyerService {
         //삭제전 사진경로 모두 가져오기
         List<Map<String,Object>>flyerImgs=flyerDetialDao.findAllImgPathsByFlyerId(flyerId);
         flyerDetialDao.deleteByFlyerId(flyerId);
+        productService.deleteAllByFlyerId(flyerId);
+        //사진 모두 삭제
         if(!flyerImgs.isEmpty()){
-
+            for(Map<String,Object>img:flyerImgs){
+                fileService.deleteFile(utillService.getImgNameInPath(img.get("flyer_img_path").toString(), 4));
+            }
         }
         return  "전단 및 제품을 모두 삭제하였습니다";       
     }

@@ -57,4 +57,9 @@ public interface productDao extends JpaRepository<productVo,Integer> {
     @Transactional
     @Query(value = "update products set event_state=? where product_id=?",nativeQuery = true)
     void updatEventById(int flag,int productId);
+
+    @Query(value = "select event_state,product_img_path,product_id from products where flyer_id=?",nativeQuery = true)
+    List<Map<String,Object>> findEventAndImgsByFlyerId(int flyerID);
+
+    void deleteByFlyerId(int flyerId);
 }   

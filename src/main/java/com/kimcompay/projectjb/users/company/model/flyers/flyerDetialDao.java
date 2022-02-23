@@ -13,7 +13,7 @@ public interface flyerDetialDao extends JpaRepository<flyerDetailVo,Integer> {
 
     void deleteByFlyerId(int flyerId);
 
-    @Query(value = "select ",nativeQuery = true)
+    @Query(value = "select flyer_img_path from flyer_details where flyer_id=?",nativeQuery = true)
     List<Map<String,Object>> findAllImgPathsByFlyerId(int flyerId);
 
 }

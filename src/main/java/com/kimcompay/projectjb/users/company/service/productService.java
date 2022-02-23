@@ -30,6 +30,19 @@ public class productService {
     @Autowired
     private boardService boardService;
     
+    public void deleteAllByFlyerId(int flyerId) {
+        List<Map<String,Object>>imgsAndEvents=productDao.findEventAndImgsByFlyerId(flyerId);
+        productDao.deleteByFlyerId(flyerId);
+        if(!imgsAndEvents.isEmpty()){
+            productDao.deleteByFlyerId(flyerId);
+            for(Map<String,Object>imgAnd:imgsAndEvents){
+                if(imgAnd.get("event_state").equals("1")){
+                    productEventDao.deleteEventsByProductId(Integer.parseInt(imgAnd.get("product_id").toString()));
+                }
+                fileService.deleteFile(utillService.getImgNameInPath(imgAnd.get("product_img_path").toString(),4));
+            }
+        }
+    }
     @Transactional(rollbackFor = Exception.class)
     public String deleteWithEvents(int id) {
         productVo productVo=productDao.findById(id).orElseThrow(()->utillService.makeRuntimeEX("존재하지 않는 상품입니다", "deleteWithEvents"));
