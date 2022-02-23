@@ -32,8 +32,16 @@ public class productService {
     
     @Transactional(rollbackFor = Exception.class)
     public void deleteWithEvents(int id) {
+        productVo productVo=productDao.findById(id).orElseThrow(()->utillService.makeRuntimeEX("존재하지 않는 상품입니다", "deleteWithEvents"));
+        //db삭제
         delete(id);
         deleteProductEventByProductId(id);
+        try {
+            //사진삭제 롤백이 안일어나도 됨
+            fileService.deleteFile(utillService.getImgNameInPath(productVo.getProductImgPath(), 4)); 
+        } catch (Exception e) {
+            utillService.writeLog("상품삭제중 사진삭제 실패", productService.class);
+        }
     }
     private void delete(int id) {
         productDao.deleteById(id);

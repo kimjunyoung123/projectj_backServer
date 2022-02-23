@@ -78,7 +78,8 @@ public class aopService {
         storeService.checkExist(Integer.parseInt(utillService.getHttpServletRequest().getParameter("storeId")));
     }
     @Before("execution(* com.kimcompay.projectjb.users.company.compayAuthRestController.tryInsertFlyer(..))"
-    +"||execution(* com.kimcompay.projectjb.users.company.compayAuthRestController.tryInsertProduct(..))")
+    +"||execution(* com.kimcompay.projectjb.users.company.compayAuthRestController.tryInsertProduct(..))"
+    +"||execution(* com.kimcompay.projectjb.users.company.compayAuthRestController.deleteActionHub(..))")
     public void checkOwnerPath(JoinPoint joinPoint) {
         logger.info("checkOwnerPath");
         MethodSignature signature = (MethodSignature)joinPoint.getSignature();

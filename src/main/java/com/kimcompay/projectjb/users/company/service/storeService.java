@@ -4,17 +4,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
+
 
 import com.kimcompay.projectjb.utillService;
 import com.kimcompay.projectjb.apis.aws.services.fileService;
 import com.kimcompay.projectjb.apis.aws.services.sqsService;
 import com.kimcompay.projectjb.apis.kakao.kakaoMapService;
 import com.kimcompay.projectjb.board.service.boardService;
-import com.kimcompay.projectjb.delivery.service.deliveryService;
 import com.kimcompay.projectjb.enums.intenums;
-import com.kimcompay.projectjb.enums.senums;
 import com.kimcompay.projectjb.users.principalDetails;
 import com.kimcompay.projectjb.users.company.model.stores.storeDao;
 import com.kimcompay.projectjb.users.company.model.stores.storeVo;
@@ -43,41 +40,9 @@ public class storeService {
     @Autowired
     private RedisTemplate<String,String>redisTemplate;
     @Autowired
-    private deliveryService deliveryService;
-    @Autowired
-    private flyerService flyerService;
-    @Autowired
-    private productService productService;
-    @Autowired
     private boardService boardService;
 
-    
-    public JSONObject authGetsActionHub(String kind,int page,String keyword) {
-        if(kind.equals("stores")){
-            return getStoresByEmail(page,keyword);
-        }else if(kind.equals("deliver")){
-            HttpServletRequest request=utillService.getHttpServletRequest();
-            return deliveryService.getDelivers(page,keyword,Integer.parseInt(request.getParameter("storeId")), Integer.parseInt(request.getParameter("state")));
-        }else if(kind.equals("flyers")){
-            HttpServletRequest request=utillService.getHttpServletRequest();
-            return flyerService.getFlyers(Integer.parseInt(request.getParameter("storeId")), page, keyword);
-        }else {
-            throw utillService.makeRuntimeEX("잘못된요청입니다", "authGetsActionHub");
-        }
-    }
-    public JSONObject authGetActionHub(String kind,int id) {
-        if(kind.equals("store")){
-            return getStore(id);
-        }else if(kind.equals("deliver")){
-            return deliveryService.getDeliverAddress(id);
-        }else if(kind.equals("flyer")){
-            return flyerService.getFlyerAndProducts(id);
-        }else if(kind.equals("product")){
-            return productService.getProductAndEvents(id);
-        }else{
-            throw utillService.makeRuntimeEX("잘못된요청입니다", "authGetsActionHub");
-        }
-    }
+
     public void checkExist(int storeId) {
         storeVo storeVo=getStoreCore(storeId);
         utillService.checkOwner(storeVo.getCid(), "본인 소유의 매장이 아닙니다");
@@ -221,7 +186,7 @@ public class storeService {
     public String findDeliver(String loginId) {
         return redisTemplate.opsForValue().get(loginId+"delivery");
     }
-    private JSONObject getStore(int id) {
+    public JSONObject getStore(int id) {
         storeVo storeVo=getStoreCore(id);
         //매장 소유 회사 계정인지 검사
         utillService.checkOwner(storeVo.getCid(),"매장 소유자의 계정이 아닙니다");
@@ -230,7 +195,7 @@ public class storeService {
     private storeVo getStoreCore(int id) {
         return storeDao.findById(id).orElseThrow(()->utillService.makeRuntimeEX("존재하지 않는 매장입니다", "getStore"));
     }
-    private JSONObject getStoresByEmail(int page,String keyword) {
+    public JSONObject getStores(int page,String keyword) {
         int requestPage=page;
         List<Map<String,Object>>storeSelectInfor=getStoresInfor(utillService.getLoginId(), keyword, requestPage);
         if(utillService.checkEmthy(storeSelectInfor)){

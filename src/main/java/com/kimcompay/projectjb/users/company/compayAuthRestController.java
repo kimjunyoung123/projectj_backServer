@@ -5,7 +5,6 @@ package com.kimcompay.projectjb.users.company;
 
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
 import com.kimcompay.projectjb.users.company.model.flyers.tryInsertFlyerDto;
@@ -49,13 +48,33 @@ public class compayAuthRestController {
     }
     //매장,배달리스트 조화
     @RequestMapping(value = "/gets/{kind}/{page}/{keyword}",method = RequestMethod.GET)
-    public JSONObject getStores(@PathVariable int page,@PathVariable String keyword,@PathVariable String kind) {
-        return storeService.authGetsActionHub(kind,page,keyword);
+    public JSONObject getsActionHub(@PathVariable int page,@PathVariable String keyword,@PathVariable String kind) {
+        if(kind.equals("stores")){
+            return storeService.getStores(page, keyword);
+        }else if(kind.equals("deliver")){
+            HttpServletRequest request=utillService.getHttpServletRequest();
+            return deliveryService.getDelivers(page,keyword,Integer.parseInt(request.getParameter("storeId")), Integer.parseInt(request.getParameter("state")));
+        }else if(kind.equals("flyers")){
+            HttpServletRequest request=utillService.getHttpServletRequest();
+            return flyerService.getFlyers(Integer.parseInt(request.getParameter("storeId")), page, keyword);
+        }else {
+            throw utillService.makeRuntimeEX("잘못된요청입니다", "authGetsActionHub");
+        }
     }
     //매장,배달 디테일 정보조회
     @RequestMapping(value = "/get/{kind}/{id}",method = RequestMethod.GET)
-    public JSONObject getStore(@PathVariable int id,@PathVariable String kind) {
-        return storeService.authGetActionHub(kind,id);
+    public JSONObject getActionHub(@PathVariable int id,@PathVariable String kind) {
+        if(kind.equals("store")){
+            return storeService.getStore(id);
+        }else if(kind.equals("deliver")){
+            return deliveryService.getDeliverAddress(id);
+        }else if(kind.equals("flyer")){
+            return flyerService.getFlyerAndProducts(id);
+        }else if(kind.equals("product")){
+            return productService.getProductAndEvents(id);
+        }else{
+            throw utillService.makeRuntimeEX("잘못된요청입니다", "authGetsActionHub");
+        }
     }
     //매장 정보수정
     @RequestMapping(value = "/infor/change",method = RequestMethod.PUT)
