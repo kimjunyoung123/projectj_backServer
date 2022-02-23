@@ -76,12 +76,12 @@ public class compayAuthRestController {
             throw utillService.makeRuntimeEX("잘못된요청입니다", "authGetsActionHub");
         }
     }
-    //매장 정보수정
+    //매장 정보수정 주인검사는 안에서 하므로 aop에서 하지않는다
     @RequestMapping(value = "/infor/change",method = RequestMethod.PUT)
     public JSONObject storeUpdate(@Valid @RequestBody tryUpdateStoreDto tryUpdateStoreDto,HttpServletRequest request) {
         return storeService.tryUpdate(tryUpdateStoreDto);
     }
-    //매장 영업상태 수정
+    //매장 영업상태 수정 주인검사는 안에서 하므로 aop에서 하지않는다
     @RequestMapping(value = "/infor/sleep/{flag}/{storeId}",method = RequestMethod.PUT)
     public JSONObject storeSleepOrOpen(@PathVariable int flag,@PathVariable int storeId) {
         return storeService.updateSleepOrOpen(flag, storeId);
@@ -102,8 +102,8 @@ public class compayAuthRestController {
         return productService.insert(tryProductInsertDto);
     }
     //상품수정
-    @RequestMapping(value = "/product/update/{productId}",method = RequestMethod.PUT)
-    public JSONObject updateProductController(@Valid @RequestBody tryProductInsertDto productInsertDto,@PathVariable int productId,HttpServletRequest httpServletRequest) {
+    @RequestMapping(value = "/product/update/{productId}/{storeId}",method = RequestMethod.PUT)
+    public JSONObject updateProductController(@Valid @RequestBody tryProductInsertDto productInsertDto,@PathVariable int productId,HttpServletRequest httpServletRequest,@PathVariable int storeId) {
         return productService.tryUpdate(productId, productInsertDto);
     }
     //상품,전단삭제

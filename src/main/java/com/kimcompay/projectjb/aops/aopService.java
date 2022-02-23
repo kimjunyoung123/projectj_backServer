@@ -72,7 +72,6 @@ public class aopService {
     +"||execution(* com.kimcompay.projectjb.delivery.service.deliveryService.getDeliverAddress(..))"
     +"||execution(* com.kimcompay.projectjb.users.company.service.flyerService.getFlyers(..))"
     +"||execution(* com.kimcompay.projectjb.delivery.service.deliveryService.getDelivers(..))"
-    +"||execution(* com.kimcompay.projectjb.users.company.compayAuthRestController.updateProductController(..))"
     +"||execution(* com.kimcompay.projectjb.users.company.service.flyerService.getFlyerAndProducts(..))")
     public void checkOwnerParam(JoinPoint joinPoint) {
         logger.info("checkOwnerParam");
@@ -81,7 +80,9 @@ public class aopService {
     //update,insert,delete
     @Before("execution(* com.kimcompay.projectjb.users.company.compayAuthRestController.tryInsertFlyer(..))"
     +"||execution(* com.kimcompay.projectjb.users.company.compayAuthRestController.tryInsertProduct(..))"
-    +"||execution(* com.kimcompay.projectjb.users.company.compayAuthRestController.deleteActionHub(..))")
+    +"||execution(* com.kimcompay.projectjb.users.company.compayAuthRestController.deleteActionHub(..))"
+    +"||execution(* com.kimcompay.projectjb.users.company.compayAuthRestController.tryInsertFlyer(..))"
+    +"||execution(* com.kimcompay.projectjb.users.company.compayAuthRestController.updateProductController(..))")
     public void checkOwnerPath(JoinPoint joinPoint) {
         logger.info("checkOwnerPath");
         MethodSignature signature = (MethodSignature)joinPoint.getSignature();
