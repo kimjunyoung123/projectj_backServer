@@ -102,9 +102,18 @@ public class productService {
         return utillService.getJson(true, "변경된 사항이 없습니다");
     }
     private Boolean checkChangeEvent(int eventFlag,int productId,List<Map<String,Object>>eventInfors) {  
+        Boolean newFlag=false;
         productEventDao.deleteEventsByProductId(productId);
-        checkEvent(eventInfors);
-        insertEvents(eventInfors,productId);
+        if(eventFlag==1){
+            newFlag=true;
+            checkEvent(eventInfors);
+            insertEvents(eventInfors,productId);
+        }
+        if(newFlag){
+            productDao.updatEventById(1, productId);
+        }else{
+            productDao.updatEventById(0, productId);
+        }
         return true;
     }
     private List<Map<String,Object>> getProductAndEvenArr(int productId) {
@@ -140,6 +149,9 @@ public class productService {
     private List<Map<String,Object>> getEventsInArr(List<Map<String,Object>>productAndEvnets) {
         List<Map<String,Object>>events=new ArrayList<>();
         for(Map<String,Object>productAndEvnet:productAndEvnets){
+            if(productAndEvnet.get("product_event_id")==null){
+                continue;
+            }
             Map<String,Object>event=new HashMap<>();
             event.put("event_date", productAndEvnet.get("product_event_date"));
             event.put("id", productAndEvnet.get("product_event_id"));
