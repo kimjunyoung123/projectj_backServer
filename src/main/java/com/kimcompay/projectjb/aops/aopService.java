@@ -70,9 +70,23 @@ public class aopService {
     +"||execution(* com.kimcompay.projectjb.users.company.service.flyerService.getFlyers(..))"
     +"||execution(* com.kimcompay.projectjb.delivery.service.deliveryService.getDelivers(..))"
     +"||execution(* com.kimcompay.projectjb.users.company.compayAuthRestController.updateProductController(..))")
-    public void checkOwner(JoinPoint joinPoint) {
-        logger.info("checkOwner");
+    public void checkOwnerParam(JoinPoint joinPoint) {
+        logger.info("checkOwnerParam");
         storeService.checkExist(Integer.parseInt(utillService.getHttpServletRequest().getParameter("storeId")));
+    }
+    @Before("execution(* com.kimcompay.projectjb.users.company.compayAuthRestController.tryInsertFlyer(..))"
+    +"||execution(* com.kimcompay.projectjb.users.company.compayAuthRestController.tryInsertProduct(..))")
+    public void checkOwnerPath(JoinPoint joinPoint) {
+        logger.info("checkOwnerPath");
+        MethodSignature signature = (MethodSignature)joinPoint.getSignature();
+        String[] paramNames=signature.getParameterNames();
+        Object[] values=joinPoint.getArgs();
+        for(int i=0;i<paramNames.length;i++){
+            if(paramNames[i].equals("storeId")){
+                storeService.checkExist(Integer.parseInt(values[i].toString()));
+                break;
+            }
+        }
     }
     //----------------------------------------------------------------------------------------------------
     private void deleteImgs(String text,String thumNail,HttpSession httpSession) {
