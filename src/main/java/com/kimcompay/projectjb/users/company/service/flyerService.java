@@ -58,7 +58,16 @@ public class flyerService {
         Map<String,Object>flyer=new HashMap<>();
         flyer.put("flyer_id", flyerAndProducts.get(0).get("flyer_id"));
         flyer.put("default", flyerAndProducts.get(0).get("default_select"));
-        flyer.put("flyer_img_path", flyerAndProducts.get(0).get("flyer_img_path"));
+        //전단 사진들 꺼내기
+        List<JSONObject>flyerDetails=new ArrayList<>();
+        for(Map<String,Object>flyerDetail:flyerAndProducts){
+            JSONObject detail=new JSONObject();
+            detail.put("flyer_img_path", flyerDetail.get("flyer_img_path"));
+            detail.put("default", flyerDetail.get("flyer_detail_default"));
+            detail.put("id",  flyerDetail.get("flyer_details_id"));
+            flyerDetails.add(detail);
+        }  
+        response.put("flyerDetail", flyerDetails);
         response.put("flyerFlag", true);
         response.put("flyer", flyer);
         //전단에 있는 상품들 추출
