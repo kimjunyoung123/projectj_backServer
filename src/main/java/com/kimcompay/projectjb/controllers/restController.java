@@ -80,6 +80,7 @@ public class restController {
     public JSONObject imgController(@PathVariable String action,MultipartHttpServletRequest request) {
         return fileService.upload(request);
     }
+    //----------------------------------------------------------------------------------------------------
     @RequestMapping(value = "/pitest")
     public void pitest(HttpServletRequest request) {
         System.out.println("pietest");
@@ -104,9 +105,5 @@ public class restController {
         JSONObject body=new JSONObject();
         body.put("txid", txid);
         System.out.println(requestTo.requestPost(body, "https://api.minepi.com/v2/payments/"+paymentid+"/complete", headers).toString());
-    }
-    @RequestMapping(value = "/testaop")
-    public void testaop(HttpServletRequest request) {
-        System.out.println(request.getParameter("test"));
     }
 }

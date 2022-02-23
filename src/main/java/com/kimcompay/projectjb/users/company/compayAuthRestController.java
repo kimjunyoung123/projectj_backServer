@@ -113,6 +113,9 @@ public class compayAuthRestController {
         if(kind.equals("product")){
             productService.deleteWithEvents(targetId);
             message="상품을 삭제하였습니다";
+        }else if(kind.equals("flyer")){
+            flyerService.tryDelete(targetId);
+            message="전단을 삭제하였습니다";
         }
         return utillService.getJson(true, message);
     }

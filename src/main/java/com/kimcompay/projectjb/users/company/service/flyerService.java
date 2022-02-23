@@ -35,6 +35,10 @@ public class flyerService {
     @Autowired
     private flyerDetialDao flyerDetialDao;
     
+    @Transactional(rollbackFor = Exception.class)
+    public JSONObject tryDelete(int flyerDetailId) {
+        return null;
+    }
     public JSONObject getFlyers(int storeId,int page,String keyword) {
         List<String>dates=utillService.getDateInStrgin(keyword);
         List<Map<String,Object>>flyerVos=getFlyerArr(storeId,dates.get(0),dates.get(1),page);
