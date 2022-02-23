@@ -47,7 +47,11 @@ public class flyerService {
         //사진 모두 삭제
         if(!flyerImgs.isEmpty()){
             for(Map<String,Object>img:flyerImgs){
-                fileService.deleteFile(utillService.getImgNameInPath(img.get("flyer_img_path").toString(), 4));
+                try {
+                    fileService.deleteFile(utillService.getImgNameInPath(img.get("flyer_img_path").toString(), 4));
+                } catch (Exception e) {
+                    utillService.writeLog("전단 전체 삭저중 이미지 삭제 실패", flyerService.class);
+                }
             }
         }
         return  "전단 및 제품을 모두 삭제하였습니다";       

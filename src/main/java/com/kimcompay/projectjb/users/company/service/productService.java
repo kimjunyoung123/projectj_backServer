@@ -39,7 +39,12 @@ public class productService {
                 if(imgAnd.get("event_state").equals("1")){
                     productEventDao.deleteEventsByProductId(Integer.parseInt(imgAnd.get("product_id").toString()));
                 }
-                fileService.deleteFile(utillService.getImgNameInPath(imgAnd.get("product_img_path").toString(),4));
+                try {
+                    fileService.deleteFile(utillService.getImgNameInPath(imgAnd.get("product_img_path").toString(),4));
+
+                } catch (Exception e) {
+                    utillService.writeLog("제품전체 삭제중 이미지 삭제 실패", productService.class);
+                }
             }
         }
     }
