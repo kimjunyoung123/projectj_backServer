@@ -31,7 +31,7 @@ public class productService {
     private boardService boardService;
     
     @Transactional(rollbackFor = Exception.class)
-    public void deleteWithEvents(int id) {
+    public String deleteWithEvents(int id) {
         productVo productVo=productDao.findById(id).orElseThrow(()->utillService.makeRuntimeEX("존재하지 않는 상품입니다", "deleteWithEvents"));
         //db삭제
         delete(id);
@@ -42,6 +42,7 @@ public class productService {
         } catch (Exception e) {
             utillService.writeLog("상품삭제중 사진삭제 실패", productService.class);
         }
+        return "상품을 삭제 하였습니다";
     }
     private void delete(int id) {
         productDao.deleteById(id);

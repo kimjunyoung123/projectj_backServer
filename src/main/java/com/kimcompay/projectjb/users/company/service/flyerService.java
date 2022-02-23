@@ -34,9 +34,22 @@ public class flyerService {
     private fileService fileService;
     @Autowired
     private flyerDetialDao flyerDetialDao;
+    @Autowired
+    private productService productService;
     
     @Transactional(rollbackFor = Exception.class)
-    public JSONObject tryDeleteDetail(int flyerDetailId) {
+    public String deleteWithAll(int flyerId) {
+        flyerDao.deleteById(flyerId); 
+        //삭제전 사진경로 모두 가져오기
+        List<Map<String,Object>>flyerImgs=flyerDetialDao.findAllImgPathsByFlyerId(flyerId);
+        flyerDetialDao.deleteByFlyerId(flyerId);
+        if(!flyerImgs.isEmpty()){
+
+        }
+        return  "전단 및 제품을 모두 삭제하였습니다";       
+    }
+    @Transactional(rollbackFor = Exception.class)
+    public String tryDeleteDetail(int flyerDetailId) {
         //전단 조회
         flyerDetailVo flyerDetailVo=flyerDetialDao.findById(flyerDetailId).orElseThrow(()->utillService.makeRuntimeEX("존재하지 않는 전단입니다", "tryDelete"));
         //요청 전단 삭제
@@ -47,7 +60,7 @@ public class flyerService {
             //롤백할 필요없음
             utillService.writeLog("전단 이미지 삭제중 오류발생 ", flyerService.class);
         }
-        return utillService.getJson(true, "전단이 삭제되었습니다");
+        return "전단이 삭제되었습니다";
     }
     public JSONObject getFlyers(int storeId,int page,String keyword) {
         List<String>dates=utillService.getDateInStrgin(keyword);

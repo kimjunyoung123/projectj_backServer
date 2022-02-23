@@ -111,11 +111,11 @@ public class compayAuthRestController {
     public JSONObject deleteActionHub(@PathVariable String kind,@PathVariable int storeId,@PathVariable int targetId) {
         String message=null;
         if(kind.equals("product")){
-            productService.deleteWithEvents(targetId);
-            message="상품을 삭제하였습니다";
+            message=productService.deleteWithEvents(targetId);
         }else if(kind.equals("flyerDetail")){
-            flyerService.tryDeleteDetail(targetId);
-            message="전단을 삭제하였습니다";
+            message=flyerService.tryDeleteDetail(targetId);
+        }else if(kind.equals("flyer")){
+            message=flyerService.deleteWithAll(targetId);
         }
         return utillService.getJson(true, message);
     }
