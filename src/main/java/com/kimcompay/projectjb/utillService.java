@@ -264,16 +264,15 @@ public class utillService {
     }
     public static List<String> getOnlyImgNames(String text) {
         List<String>imgPaths=getImgSrc(text);
-        List<String>imgNames=new ArrayList<>();
         if(!imgPaths.isEmpty()){
-            for(String path:imgPaths){
-                imgNames.add(getImgNameInPath(path, 4));
+            for(int i=0;i<imgPaths.size();i++){
+                imgPaths.set(i, getImgNameInPath(imgPaths.get(i), 4));
             }
-            return imgNames;
+            return imgPaths;
         }else{
             writeLog("기존에 사용중이던 이미지가 존재하지 않습니다",utillService.class);
         }
-        return imgNames;
+        return imgPaths;
     }
     public static  List<String> getDateInStrgin(String keyword) {
         List<String>dates=Arrays.asList(keyword.split(","));
