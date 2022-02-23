@@ -12,6 +12,7 @@ import com.kimcompay.projectjb.users.company.model.flyers.tryInsertFlyerDto;
 import com.kimcompay.projectjb.users.company.model.products.tryProductInsertDto;
 import com.kimcompay.projectjb.users.company.model.stores.tryInsertStoreDto;
 import com.kimcompay.projectjb.users.company.model.stores.tryUpdateStoreDto;
+import com.kimcompay.projectjb.utillService;
 import com.kimcompay.projectjb.delivery.service.deliveryService;
 import com.kimcompay.projectjb.users.company.service.flyerService;
 import com.kimcompay.projectjb.users.company.service.productService;
@@ -85,5 +86,15 @@ public class compayAuthRestController {
     @RequestMapping(value = "/product/update/{productId}",method = RequestMethod.PUT)
     public JSONObject updateProductController(@Valid @RequestBody tryProductInsertDto productInsertDto,@PathVariable int productId,HttpServletRequest httpServletRequest) {
         return productService.tryUpdate(productId, productInsertDto);
+    }
+    //상품,전단삭제
+    @RequestMapping(value = "/{kind}/{storeId}/{targetId}",method = RequestMethod.DELETE)
+    public JSONObject deleteActionHub(@PathVariable String kind,@PathVariable int storeId,@PathVariable int targetId) {
+        String message=null;
+        if(kind.equals("product")){
+            productService.deleteWithEvents(targetId);
+            message="상품을 삭제하였습니다";
+        }
+        return utillService.getJson(true, message);
     }
 }

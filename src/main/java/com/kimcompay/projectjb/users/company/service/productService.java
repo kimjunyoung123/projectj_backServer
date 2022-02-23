@@ -29,7 +29,18 @@ public class productService {
     private fileService fileService;
     @Autowired
     private boardService boardService;
-
+    
+    @Transactional(rollbackFor = Exception.class)
+    public void deleteWithEvents(int id) {
+        delete(id);
+        deleteProductEventByProductId(id);
+    }
+    private void delete(int id) {
+        productDao.deleteById(id);
+    }
+    private void deleteProductEventByProductId(int productId) {
+        productEventDao.deleteEventsByProductId(productId);
+    }
     @Transactional(rollbackFor = Exception.class)
     public JSONObject tryUpdate(int productId,tryProductInsertDto tryProductInsertDto) {
         Map<String,Object>product=getProductInArr(getProductAndEvenArr(productId));
