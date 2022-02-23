@@ -106,7 +106,7 @@ public class flyerService {
             flyerDao.updateDefaultFlyerById(0, storeId);
         }
         //전단 만들기
-        flyerVo vo=flyerVo.builder().defaultSelect(tryInsertFlyerDto.getDefaultFlag()).storeId(storeId).companyId(utillService.getLoginId()).build();
+        flyerVo vo=flyerVo.builder().defaultSelect(tryInsertFlyerDto.getDefaultFlag()).storeId(storeId).companyId(utillService.getLoginId()).thumbNail(tryInsertFlyerDto.getThumbNail()).build();
         flyerDao.save(vo);
         //전단 디테일 만들기
         for(String img:flyerImgs){

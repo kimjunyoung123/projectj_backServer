@@ -38,6 +38,9 @@ public class flyerVo {
     @Column(name = "company_id",nullable = false)
     private int companyId;
 
+    @Column(name = "flyer_thumb_nail",nullable = false)
+    private String thumbNail;
+
     @Column(name = "flyer_created")
     @CreationTimestamp
     private Timestamp created;
