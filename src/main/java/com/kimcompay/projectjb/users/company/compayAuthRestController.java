@@ -122,7 +122,7 @@ public class compayAuthRestController {
         }else if(kind.equals("flyer")){
             message=flyerService.deleteWithAll(targetId);
         }else if(kind.equals("flyerDetail")){
-            
+            message=flyerService.deleteDetail(targetId);
         }else{
             return utillService.getJson(false, "잘못된 요청입니다");
         }
