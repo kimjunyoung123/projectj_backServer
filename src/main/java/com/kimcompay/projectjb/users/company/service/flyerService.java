@@ -97,40 +97,57 @@ public class flyerService {
         List<JSONObject>flyerDetails=new ArrayList<>();
         List<Map<String,Object>>products=new ArrayList<>();
         boolean productFlag=false;
+        boolean flyerDetailsFlag=false;
+        String emthyMessage="존재하지 않습니다";
         //join으로 인한 중복 체크를 위해
         //list contain 보다 map contain이 더빠르다고한다
-        Map<String,Integer> flyerDetailIdsArr=new HashMap<>();
-        Map<String,Integer> productIdsArr=new HashMap<>();
+        Map<String,Integer> ids=new HashMap<>();
         for(Map<String,Object>flyerAndProduct:flyerAndProducts){
             //join으로 인한 중복 체크
-            int id=Integer.parseInt(flyerAndProduct.get("flyer_details_id").toString());
-            if(!flyerDetailIdsArr.containsKey(id+"flyerDetail")){
-                flyerDetailIdsArr.put(id+"flyerDetail", id);
-                JSONObject detail=new JSONObject();
-                detail.put("flyer_img_path", flyerAndProduct.get("flyer_img_path"));
-                detail.put("default", flyerAndProduct.get("flyer_detail_default"));
-                detail.put("id", id);
-                flyerDetails.add(detail);
+            int id=0;
+            try {
+                id=Integer.parseInt(flyerAndProduct.get("flyer_details_id").toString());
+                if(!ids.containsKey(id+"flyerDetail")){
+                    flyerDetailsFlag=true;
+                    ids.put(id+"flyerDetail", id);
+                    JSONObject detail=new JSONObject();
+                    detail.put("flyer_img_path", flyerAndProduct.get("flyer_img_path"));
+                    detail.put("default", flyerAndProduct.get("flyer_detail_default"));
+                    detail.put("id", id);
+                    flyerDetails.add(detail);
+                }
+            } catch (NullPointerException e) {
+                utillService.writeLog("존재하는 전단 디테일 없음", flyerService.class);
             }
-            id=Integer.parseInt(flyerAndProduct.get("product_id").toString());
-            if(!productIdsArr.containsKey(id+"product")){
-                productFlag=true;
-                productIdsArr.put(id+"product", id);
-                JSONObject product= new JSONObject();
-                product.put("product_id",id);
-                product.put("origin", flyerAndProduct.get("origin"));
-                product.put("price", flyerAndProduct.get("price"));
-                product.put("product_img_path", flyerAndProduct.get("product_img_path"));
-                product.put("event_state", flyerAndProduct.get("event_state"));
-                product.put("product_name", flyerAndProduct.get("product_name"));
-                products.add(product);  
+            try {
+                id=Integer.parseInt(flyerAndProduct.get("product_id").toString());
+                if(!ids.containsKey(id+"product")){
+                    productFlag=true;
+                    ids.put(id+"product", id);
+                    JSONObject product= new JSONObject();
+                    product.put("product_id",id);
+                    product.put("origin", flyerAndProduct.get("origin"));
+                    product.put("price", flyerAndProduct.get("price"));
+                    product.put("product_img_path", flyerAndProduct.get("product_img_path"));
+                    product.put("event_state", flyerAndProduct.get("event_state"));
+                    product.put("product_name", flyerAndProduct.get("product_name"));
+                    products.add(product);  
+                }
+            } catch (NullPointerException e) {
+                utillService.writeLog("존재하는 상품이 없음", flyerService.class);
             }
+           
         }  
         response.put("flyerDetail", flyerDetails);
-        response.put("flyerFlag", true);
+        response.put("flyerFlag", flyerDetailsFlag);
         response.put("flyer", flyer);
         if(productFlag){
             response.put("products", products);
+        }else{
+            response.put("productMessage", "제품이 "+emthyMessage);
+        }
+        if(!flyerDetailsFlag){
+            response.put("flyerMessage", "전단이미지가 "+emthyMessage);
         }
         response.put("productFlag", productFlag);
 
