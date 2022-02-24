@@ -82,7 +82,8 @@ public class aopService {
     +"||execution(* com.kimcompay.projectjb.users.company.compayAuthRestController.tryInsertProduct(..))"
     +"||execution(* com.kimcompay.projectjb.users.company.compayAuthRestController.deleteActionHub(..))"
     +"||execution(* com.kimcompay.projectjb.users.company.compayAuthRestController.tryInsertFlyer(..))"
-    +"||execution(* com.kimcompay.projectjb.users.company.compayAuthRestController.updateProductController(..))")
+    +"||execution(* com.kimcompay.projectjb.users.company.compayAuthRestController.updateProductController(..))"
+    +"||execution(* com.kimcompay.projectjb.users.company.compayAuthRestController.tryUpdateFlyer(..))")
     public void checkOwnerPath(JoinPoint joinPoint) {
         logger.info("checkOwnerPath");
         MethodSignature signature = (MethodSignature)joinPoint.getSignature();
@@ -114,7 +115,8 @@ public class aopService {
     +"||execution(* com.kimcompay.projectjb.users.company.compayAuthRestController.insertFlyerAndProducts(..))"
     +"||execution(* com.kimcompay.projectjb.users.company.compayAuthRestController.updateProductController(..))"
     +"||execution(* com.kimcompay.projectjb.users.company.compayAuthRestController.tryInsertFlyer(..))"
-    +"||execution(* com.kimcompay.projectjb.users.company.compayAuthRestController.tryInsertProduct(..))")
+    +"||execution(* com.kimcompay.projectjb.users.company.compayAuthRestController.tryInsertProduct(..))"
+    +"||execution(* com.kimcompay.projectjb.users.company.compayAuthRestController.tryUpdateFlyer(..))")
     public void setHttpSession(JoinPoint joinPoint) {
         logger.info("setHttpSession");
         for (Object obj : joinPoint.getArgs()) {
@@ -137,6 +139,7 @@ public class aopService {
     +"||execution(* com.kimcompay.projectjb.users.company.service.productService.insert(..))"
     +"||execution(* com.kimcompay.projectjb.users.company.service.productService.tryUpdate(..))"
     +"||execution(* com.kimcompay.projectjb.users.company.service.flyerService.insert(..))"
+    +"||execution(* com.kimcompay.projectjb.users.company.service.flyerService.tryUpdate(..))"
     ,returning="response")
     public void doneInserOrUpdate(JoinPoint joinPoint,Object response) {
         logger.info("doneInserOrUpdate");

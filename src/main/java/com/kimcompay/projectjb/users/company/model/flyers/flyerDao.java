@@ -19,8 +19,8 @@ public interface flyerDao extends JpaRepository<flyerVo,Integer> {
     List<Map<String,Object>>findByDay(Timestamp start,Timestamp end,int storeId,Timestamp sameStart,Timestamp sameEnd,int sameStoreId,int page,int pageSize);
 
     @Query(value = "select a.*,b.product_id,b.event_state,b.price,b.product_img_path,b.product_name,b.origin,c.flyer_img_path,c.flyer_details_id,c.flyer_detail_default"
-    +" from flyers a left join products b on a.flyer_id=b.flyer_id left join flyer_details c on a.flyer_id=c.flyer_id"
-    +" where a.flyer_id=?",nativeQuery = true)
+    +" from flyers a left join products b on a.flyer_id=b.flyer_id left join flyer_details c on a.flyer_id=c.flyer_id" 
+    +" where a.flyer_id=? order by c.flyer_id",nativeQuery = true)
     List<Map<String,Object>>findFlyerJoinProducts(int flyerId);
 
     @Modifying
