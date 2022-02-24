@@ -98,7 +98,7 @@ public class compayAuthRestController {
     }
     //전단수정
     @RequestMapping(value = "/flyer/update/{flyerId}/{storeId}",method = RequestMethod.PUT)
-    public JSONObject tryUpdateFlyer(@PathVariable int storeId,@PathVariable int flyerId,@Valid @RequestBody tryInsertFlyerDto tryInsertFlyerDto) {
+    public JSONObject tryUpdateFlyer(@PathVariable int storeId,@PathVariable int flyerId,@Valid @RequestBody tryInsertFlyerDto tryInsertFlyerDto,HttpServletRequest request) {
         return flyerService.tryUpdate(flyerId, tryInsertFlyerDto,storeId);
     }
     //상품등록
