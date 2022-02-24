@@ -93,38 +93,42 @@ public class flyerService {
         Map<String,Object>flyer=new HashMap<>();
         flyer.put("flyer_id", flyerAndProducts.get(0).get("flyer_id"));
         flyer.put("default", flyerAndProducts.get(0).get("default_select"));
-        //전단 사진들 꺼내기
+        //전단 사진들 꺼내기& 전단에 있는 상품들 추출
         List<JSONObject>flyerDetails=new ArrayList<>();
-        for(Map<String,Object>flyerDetail:flyerAndProducts){
-            JSONObject detail=new JSONObject();
-            if(flyerDetail.get("flyer_details_id")==null){
-                continue;
+        List<Map<String,Object>>products=new ArrayList<>();
+        boolean productFlag=false;
+        //join으로 인한 중복 체크를 위해
+        //list contain 보다 map contain이 더빠르다고한다
+        Map<String,Integer> flyerDetailIdsArr=new HashMap<>();
+        Map<String,Integer> productIdsArr=new HashMap<>();
+        for(Map<String,Object>flyerAndProduct:flyerAndProducts){
+            //join으로 인한 중복 체크
+            int id=Integer.parseInt(flyerAndProduct.get("flyer_details_id").toString());
+            if(!flyerDetailIdsArr.containsKey(id+"flyerDetail")){
+                flyerDetailIdsArr.put(id+"flyerDetail", id);
+                JSONObject detail=new JSONObject();
+                detail.put("flyer_img_path", flyerAndProduct.get("flyer_img_path"));
+                detail.put("default", flyerAndProduct.get("flyer_detail_default"));
+                detail.put("id", id);
+                flyerDetails.add(detail);
             }
-            detail.put("flyer_img_path", flyerDetail.get("flyer_img_path"));
-            detail.put("default", flyerDetail.get("flyer_detail_default"));
-            detail.put("id",  flyerDetail.get("flyer_details_id"));
-            flyerDetails.add(detail);
+            id=Integer.parseInt(flyerAndProduct.get("product_id").toString());
+            if(!productIdsArr.containsKey(id+"product")){
+                productFlag=true;
+                productIdsArr.put(id+"product", id);
+                JSONObject product= new JSONObject();
+                product.put("product_id",id);
+                product.put("origin", flyerAndProduct.get("origin"));
+                product.put("price", flyerAndProduct.get("price"));
+                product.put("product_img_path", flyerAndProduct.get("product_img_path"));
+                product.put("event_state", flyerAndProduct.get("event_state"));
+                product.put("product_name", flyerAndProduct.get("product_name"));
+                products.add(product);  
+            }
         }  
         response.put("flyerDetail", flyerDetails);
         response.put("flyerFlag", true);
         response.put("flyer", flyer);
-        //전단에 있는 상품들 추출
-        boolean productFlag=false;
-        List<Map<String,Object>>products=new ArrayList<>();
-        for(Map<String,Object>product:flyerAndProducts){
-                if(product.get("product_id")!=null){
-                    continue;
-                }
-                productFlag=true;
-                Map<String,Object>onlyProduct=new HashMap<>();
-                onlyProduct.put("product_id", product.get("product_id"));
-                onlyProduct.put("origin", product.get("origin"));
-                onlyProduct.put("price", product.get("price"));
-                onlyProduct.put("product_img_path", product.get("product_img_path"));
-                onlyProduct.put("event_state", product.get("event_state"));
-                onlyProduct.put("product_name", product.get("product_name"));
-                products.add(onlyProduct);                
-        }
         if(productFlag){
             response.put("products", products);
         }

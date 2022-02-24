@@ -168,9 +168,6 @@ public class productService {
     private List<Map<String,Object>> getEventsInArr(List<Map<String,Object>>productAndEvnets) {
         List<Map<String,Object>>events=new ArrayList<>();
         for(Map<String,Object>productAndEvnet:productAndEvnets){
-            if(productAndEvnet.get("product_event_id")==null){
-                continue;
-            }
             Map<String,Object>event=new HashMap<>();
             event.put("event_date", productAndEvnet.get("product_event_date"));
             event.put("id", productAndEvnet.get("product_event_id"));
