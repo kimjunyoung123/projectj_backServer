@@ -38,6 +38,41 @@ public class flyerService {
     private productService productService;
     
     @Transactional(rollbackFor = Exception.class)
+    public JSONObject tryUpdate(int flyerId,tryInsertFlyerDto tryInsertFlyerDto,int storeId) {
+        //전단 조회
+        flyerVo flyerVo= flyerDao.findById(flyerId).orElseThrow(()->utillService.makeRuntimeEX("존재하지 않는 전단입니다", "tryUpdate"));
+        //기본전단이라면 이전 기본전단 찾아서 꺼주기
+        if(tryInsertFlyerDto.getDefaultFlag()==1){
+            flyerDao.updateDefaultFlyerById(0, storeId);
+            flyerVo.setDefaultSelect(1);
+        }
+        //썸네일 수정 여부  
+        if(!flyerVo.getThumbNail().equals(tryInsertFlyerDto.getThumbNail())){
+            flyerVo.setThumbNail(tryInsertFlyerDto.getThumbNail());
+        }
+        //기존 사진 삭제를 위해 찾기
+        List<flyerDetailVo>flyerDetailVos=flyerDetialDao.findByFlyerId(flyerId);
+        //기존 전단들제거
+        flyerDetialDao.deleteByFlyerId(flyerId);
+        //전단 재 생성
+        System.out.println("idd:"+flyerId);
+        insertDetail(tryInsertFlyerDto.getThumbNail(),tryInsertFlyerDto.getFlyerImgs(), flyerId);
+        //기존 사진 제거
+        try {
+            List<String>imgs=tryInsertFlyerDto.getFlyerImgs();
+            if(!flyerDetailVos.isEmpty()){
+                for(flyerDetailVo vo:flyerDetailVos){
+                    if(!imgs.contains(vo.getImgPath())){
+                        fileService.deleteFile(utillService.getImgNameInPath(vo.getImgPath(), 4));
+                    }
+                }
+            } 
+        } catch (Exception e) {
+            utillService.writeLog("전단 수정중 이미지 삭제 실패", flyerService.class);
+        }
+        return utillService.getJson(true, "수정이 완료되었습니다");
+    }
+    @Transactional(rollbackFor = Exception.class)
     public String deleteWithAll(int flyerId) {
         flyerDao.deleteById(flyerId); 
         //삭제전 사진경로 모두 가져오기
@@ -178,18 +213,21 @@ public class flyerService {
         flyerVo vo=flyerVo.builder().defaultSelect(tryInsertFlyerDto.getDefaultFlag()).storeId(storeId).companyId(utillService.getLoginId()).thumbNail(tryInsertFlyerDto.getThumbNail()).build();
         flyerDao.save(vo);
         //전단 디테일 만들기
-        for(String img:flyerImgs){
+        insertDetail(tryInsertFlyerDto.getThumbNail(), flyerImgs, vo.getId());
+        return utillService.getJson(true, vo.getId());
+    }
+    private void insertDetail(String thumbNail,List<String> imgs,int flyerId) {
+        for(String img:imgs){
             if(utillService.checkBlank(img)){
                 continue;
             }
             int defaultNum=0;
-            if(tryInsertFlyerDto.getThumbNail().equals(img)){
+            if(thumbNail.equals(img)){
                 defaultNum=1;
             }
-            flyerDetailVo vo2=flyerDetailVo.builder().defaultFlag(defaultNum).flyerId(vo.getId()).imgPath(img).build();
+            flyerDetailVo vo2=flyerDetailVo.builder().defaultFlag(defaultNum).flyerId(flyerId).imgPath(img).build();
             flyerDetialDao.save(vo2);
         }
-        return utillService.getJson(true, vo.getId());
     }
     public JSONObject ocrAndUpload(MultipartHttpServletRequest request,int storeId) {
         List<JSONObject>responses=new ArrayList<>();

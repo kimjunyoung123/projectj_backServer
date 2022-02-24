@@ -16,4 +16,6 @@ public interface flyerDetialDao extends JpaRepository<flyerDetailVo,Integer> {
     @Query(value = "select flyer_img_path from flyer_details where flyer_id=?",nativeQuery = true)
     List<Map<String,Object>> findAllImgPathsByFlyerId(int flyerId);
 
+    List<flyerDetailVo>findByFlyerId(int flyerId);
+
 }
