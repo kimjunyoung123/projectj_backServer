@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import com.kimcompay.projectjb.utillService;
 import com.kimcompay.projectjb.apis.aws.services.fileService;
@@ -124,6 +125,7 @@ public class productService {
         Boolean newFlag=false;
         productEventDao.deleteEventsByProductId(productId);
         if(eventFlag==1){
+
             newFlag=true;
             checkEvent(eventInfors);
             insertEvents(eventInfors,productId);
@@ -219,6 +221,9 @@ public class productService {
         return false;
     }
     private void checkEvent(List<Map<String,Object>>eventInfors) {
+            if(eventInfors.isEmpty()){
+                throw utillService.makeRuntimeEX("이벤트 날짜를 확인해 주세요", "checkEvent");
+            }
             for(Map<String,Object>eventInfor:eventInfors){
                 try {
                     if(checkPrice(Integer.parseInt(eventInfor.get("price").toString()))){
