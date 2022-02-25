@@ -58,7 +58,7 @@ public class storeService {
     public JSONObject getStore(String address,String storeName,int page) {
         List<Map<String,Object>> storeAndReviews=storeDao.findJoinReviewsSaddressAndSname(address.trim(), storeName.trim(),utillService.getStart(page, pageSize)-1,pageSize);
         if(storeAndReviews.isEmpty()){
-            throw utillService.makeRuntimeEX("존재하지 않는 매장입니다", "getStore");
+            throw utillService.makeRuntimeEX("등록되지 않는 매장입니다", "getStore");
         }
         //유효성검사
         LocalDateTime now=LocalDateTime.now();
