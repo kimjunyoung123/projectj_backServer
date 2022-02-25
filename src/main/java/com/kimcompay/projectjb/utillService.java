@@ -69,6 +69,7 @@ public class utillService {
         return jsonObject;
     }
     public static RuntimeException makeRuntimeEX(String message,String methodName) {
+        writeLog(message, utillService.class);
         return new RuntimeException("메세지: "+message);
     }
     public static RuntimeException throwRuntimeEX(String message) {

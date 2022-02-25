@@ -57,6 +57,9 @@ public class storeService {
     }
     public JSONObject getStore(String address,String storeName,int page) {
         List<Map<String,Object>> storeAndReviews=storeDao.findJoinReviewsSaddressAndSname(address.trim(), storeName.trim(),utillService.getStart(page, pageSize)-1,pageSize);
+        if(storeAndReviews.isEmpty()){
+            throw utillService.makeRuntimeEX("존재하지 않는 매장입니다", "getStore");
+        }
         //유효성검사
         LocalDateTime now=LocalDateTime.now();
         String snow=now.toString();
@@ -64,9 +67,7 @@ public class storeService {
         String closeTime=storeAndReviews.get(0).get("close_time").toString();
         Timestamp tOpenTime=Timestamp.valueOf(snow.split("T")[0]+" "+openTime+":00");
         Timestamp tCloseTime=Timestamp.valueOf(snow.split("T")[0]+" "+closeTime+":00");
-        if(storeAndReviews.isEmpty()){
-            throw utillService.makeRuntimeEX("존재하지 않는 매장입니다", "getStore");
-        }else if(Integer.parseInt(storeAndReviews.get(0).get("store_sleep").toString())==1){
+        if(Integer.parseInt(storeAndReviews.get(0).get("store_sleep").toString())==1){
             throw utillService.makeRuntimeEX("영업을 준비중인 매장입니다", "getStore");
         }else if(now.isBefore(tOpenTime.toLocalDateTime())||now.isAfter(tCloseTime.toLocalDateTime())){
             throw utillService.makeRuntimeEX("영업시간이 아닙니다", "getStore");
