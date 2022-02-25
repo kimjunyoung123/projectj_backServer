@@ -36,16 +36,6 @@ public class flyerService {
     @Autowired
     private productService productService;
     
-    public String deleteDetail(int flyerDetailId) {
-        flyerDetailVo flyerDetailVo=flyerDetialDao.findById(flyerDetailId).orElseThrow(()->utillService.makeRuntimeEX("존재하지 않는 전단입니다", "deleteDetail"));
-        flyerDetialDao.deleteById(flyerDetailId);
-        try {
-            fileService.deleteFile(utillService.getImgNameInPath(flyerDetailVo.getImgPath(), 4));
-        } catch (Exception e) {
-            utillService.writeLog("전단 디테일 삭제중 사진삭제 예외발생", flyerService.class);
-        }
-        return "전단이 삭제 되었습니다";
-    }
     @Transactional(rollbackFor = Exception.class)
     public JSONObject tryUpdate(int flyerId,tryInsertFlyerDto tryInsertFlyerDto,int storeId) {
         //전단 조회
@@ -100,7 +90,6 @@ public class flyerService {
         }
         return  "전단 및 제품을 모두 삭제하였습니다";       
     }
-    @Transactional(rollbackFor = Exception.class)
     public String tryDeleteDetail(int flyerDetailId) {
         //전단 조회
         flyerDetailVo flyerDetailVo=flyerDetialDao.findById(flyerDetailId).orElseThrow(()->utillService.makeRuntimeEX("존재하지 않는 전단입니다", "tryDelete"));
