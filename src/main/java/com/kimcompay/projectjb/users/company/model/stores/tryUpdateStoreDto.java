@@ -42,6 +42,8 @@ public class tryUpdateStoreDto {
     private int deliverRadius;
     @NotBlank(message = "간단한 가게 설명을 적어주세요")
     private String text;
+    
     private int id;
+    private String roadAddress;
 
 }

@@ -122,7 +122,7 @@ public class storeService {
         if(!postCode.equals(storeVo.getSpostcode())||!address.equals(storeVo.getSaddress())||!detailAddress.equals(storeVo.getSdetail_address())){
             utillService.writeLog("주소가 변경되었습니다",storeService.class);
             updateFlag=true;
-            updateAddress(storeVo, address, postCode, detailAddress);
+            updateAddress(storeVo, address, postCode, detailAddress,tryUpdateStoreDto.getRoadAddress());
         }
         //휴대폰/일반전화
         String phone=tryUpdateStoreDto.getPhone();
@@ -168,10 +168,11 @@ public class storeService {
     private void updateTel(storeVo storeVo,String tel) {
         storeVo.setStel(tel);
     }
-    private void updateAddress(storeVo storeVo,String address,String postCode,String detailAddress) {
+    private void updateAddress(storeVo storeVo,String address,String postCode,String detailAddress,String roadAddress) {
         storeVo.setSpostcode(postCode);
         storeVo.setSaddress(address);
         storeVo.setSdetail_address(detailAddress);
+        storeVo.setRoadAddress(roadAddress);
     }
     private void updateThumbNail(storeVo storeVo,String thumbNail) {
         storeVo.setSimg(thumbNail);
@@ -255,7 +256,8 @@ public class storeService {
                     .saddress(tryInsertStoreDto.getAddress()).sdetail_address(tryInsertStoreDto.getDetailAddress()).simg(tryInsertStoreDto.getThumbNail())
                     .sname(tryInsertStoreDto.getStoreName()).snum(tryInsertStoreDto.getNum()).sphone(tryInsertStoreDto.getPhone()).spostcode(tryInsertStoreDto.getPostcode())
                     .minPrice(Integer.parseInt(tryInsertStoreDto.getMinPrice())).deliverRadius(Integer.parseInt(tryInsertStoreDto.getDeliverRadius()))
-                    .cid(utillService.getLoginId()).ssleep(intenums.NOT_FLAG.get()).stel(tryInsertStoreDto.getTel()).text(tryInsertStoreDto.getText()).build();
+                    .cid(utillService.getLoginId()).ssleep(intenums.NOT_FLAG.get()).stel(tryInsertStoreDto.getTel()).text(tryInsertStoreDto.getText())
+                    .roadAddress(tryInsertStoreDto.getRoadAddress()).build();
                     storeDao.save(vo);            
     }
     @Async

@@ -15,6 +15,7 @@ public class tryInsertStoreDto {
     
     @NotBlank(message = "주소가 빈칸입니다")
     private String address;
+    private String roadAddress;
     @NotBlank(message = "상세주가 빈칸입니다")
     private String detailAddress;
     @NotBlank(message = "우편번호가 빈칸입니다")

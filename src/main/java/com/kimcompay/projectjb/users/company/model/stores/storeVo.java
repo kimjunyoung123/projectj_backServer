@@ -40,6 +40,9 @@ public class storeVo {
     @Column(name = "store_detail_address",nullable = false ,length = 50)
     private String sdetail_address;
 
+    @Column(name = "store_road_address",length = 50)
+    private String roadAddress;
+
     @Column(name = "store_postcode",nullable = false,length = 20 )
     private String spostcode;
 
