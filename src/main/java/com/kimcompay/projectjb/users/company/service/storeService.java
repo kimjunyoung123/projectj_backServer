@@ -49,11 +49,14 @@ public class storeService {
     private storeReviewsDao storeReviewsDao;
 
     public JSONObject getReviews(int storeId,int page) {
-        List<Map<String,Object>>reviews=storeReviewsDao.findByStoreIdLimit(storeId, utillService.getStart(page, pageSize)-1, pageSize);
+        List<Map<String,Object>>reviews=storeReviewsDao.findByStoreIdLimit(storeId,storeId, utillService.getStart(page, pageSize)-1, pageSize);
         if(reviews.isEmpty()){
             throw utillService.makeRuntimeEX("불러오는데 실패했습니다", "getReviews");
         }
-        return utillService.getJson(true, reviews);
+        JSONObject response=new JSONObject();
+        response.put("reviews", reviews);
+        response.put("totalPage", utillService.getTotalPage(Integer.parseInt(reviews.get(0).get("totalCount").toString()), pageSize));
+        return utillService.getJson(true, response);
     }
     public JSONObject getStore(String address,String storeName,int page) {
         List<Map<String,Object>> storeAndReviews=storeDao.findJoinReviewsSaddressAndSname(address.trim(), storeName.trim(),utillService.getStart(page, pageSize)-1,pageSize);
