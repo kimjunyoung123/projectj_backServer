@@ -18,10 +18,15 @@ public class comPanyRestController {
 
     //스토어 정보 불러오기 원래는 매장 고유값으로 해야하나 
     //데이터가 없는 관계로 주소 매장이름으로 조회
-    @RequestMapping(value ="/get/{storeAddress}/{storeName}",method=RequestMethod.GET)
-    public JSONObject getStore(@PathVariable String storeAddress,@PathVariable String storeName) {
-        System.out.println(storeAddress);
-        System.out.println(storeName);
-        return storeService.getStore(storeAddress, storeName);
+    @RequestMapping(value ="/get/{storeAddress}/{storeName}/{page}",method=RequestMethod.GET)
+    public JSONObject getStore(@PathVariable String storeAddress,@PathVariable String storeName,@PathVariable int page) {
+        return storeService.getStore(storeAddress, storeName,page);
+    }
+    //매장 리뷰 페이징
+    @RequestMapping(value ="/get/reviews/{storeId}/{page}",method=RequestMethod.GET)
+    public JSONObject getStoreReviews(@PathVariable int storeId,@PathVariable int page) {
+        System.out.println(storeId);
+        System.out.println(page);
+        return storeService.getReviews(storeId, page);
     }
 }

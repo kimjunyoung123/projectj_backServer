@@ -16,6 +16,7 @@ import com.kimcompay.projectjb.board.service.boardService;
 import com.kimcompay.projectjb.enums.intenums;
 import com.kimcompay.projectjb.users.principalDetails;
 import com.kimcompay.projectjb.users.company.model.stores.storeDao;
+import com.kimcompay.projectjb.users.company.model.stores.storeReviewsDao;
 import com.kimcompay.projectjb.users.company.model.stores.storeVo;
 import com.kimcompay.projectjb.users.company.model.stores.tryInsertStoreDto;
 import com.kimcompay.projectjb.users.company.model.stores.tryUpdateStoreDto;
@@ -27,6 +28,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 
 @Service
 public class storeService {
@@ -43,9 +45,18 @@ public class storeService {
     private RedisTemplate<String,String>redisTemplate;
     @Autowired
     private boardService boardService;
+    @Autowired
+    private storeReviewsDao storeReviewsDao;
 
-    public JSONObject getStore(String address,String storeName) {
-        List<Map<String,Object>> storeAndReviews=storeDao.findJoinReviewsSaddressAndSname(address.trim(), storeName.trim());
+    public JSONObject getReviews(int storeId,int page) {
+        List<Map<String,Object>>reviews=storeReviewsDao.findByStoreIdLimit(storeId, utillService.getStart(page, pageSize)-1, pageSize);
+        if(reviews.isEmpty()){
+            throw utillService.makeRuntimeEX("불러오는데 실패했습니다", "getReviews");
+        }
+        return utillService.getJson(true, reviews);
+    }
+    public JSONObject getStore(String address,String storeName,int page) {
+        List<Map<String,Object>> storeAndReviews=storeDao.findJoinReviewsSaddressAndSname(address.trim(), storeName.trim(),utillService.getStart(page, pageSize)-1,pageSize);
         //유효성검사
         LocalDateTime now=LocalDateTime.now();
         String snow=now.toString();
@@ -60,8 +71,14 @@ public class storeService {
         }else if(now.isBefore(tOpenTime.toLocalDateTime())||now.isAfter(tCloseTime.toLocalDateTime())){
             throw utillService.makeRuntimeEX("영업시간이 아닙니다", "getStore");
         }
+        //페이지 검사
+        int totalPage=utillService.getTotalPage(Integer.parseInt(storeAndReviews.get(0).get("totalCount").toString()), pageSize);
+        if(totalPage<page){
+            throw utillService.makeRuntimeEX("전체페이지보다 요청페이지가 큽니다", "getStore");
+        }
         //매장 정보 꺼내기
         JSONObject response=new JSONObject();
+        response.put("totalPage", totalPage);
         response.put("storeName", storeAndReviews.get(0).get("store_name"));
         response.put("storeAddress", storeAndReviews.get(0).get("store_address"));
         response.put("storeRoadAddress", storeAndReviews.get(0).get("store_road_address"));
@@ -89,6 +106,7 @@ public class storeService {
                 review.put("id", storeAndReview.get("store_review_id"));
                 review.put("created", storeAndReview.get("store_review_created"));
                 review.put("writer", storeAndReview.get("store_review_writer"));
+                reviews.add(review);
             }
         }
         if(flag){
