@@ -42,7 +42,13 @@ public class storeService {
     @Autowired
     private boardService boardService;
 
-
+    public JSONObject getStore(String address,String storeName) {
+        storeVo storeVo=storeDao.findBySaddressAndSname(address.trim(), storeName.trim()).orElseThrow(()->utillService.makeRuntimeEX("등록되지 않은 상점입니다", "getStore"));
+        if(storeVo.getSsleep()==1){
+            throw utillService.makeRuntimeEX("영업을 준비중인 매장입니다", "getStore");
+        }
+        return utillService.getJson(true, storeVo);
+    }
     public void checkExist(int storeId) {
         storeVo storeVo=getStoreCore(storeId);
         utillService.checkOwner(storeVo.getCid(), "본인 소유의 매장이 아닙니다");

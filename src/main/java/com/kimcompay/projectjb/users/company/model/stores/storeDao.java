@@ -2,6 +2,7 @@ package com.kimcompay.projectjb.users.company.model.stores;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -19,5 +20,7 @@ public interface storeDao extends JpaRepository<storeVo,Integer> {
 
     @Query(value = "select store_name,thumb_nail,store_address,store_sleep,store_id,(select count(*) from stores where company_id=? and store_name like %?%)totalCount from stores where company_id=? and store_name like %?% order by store_id desc limit ?,?",nativeQuery = true)
     List<Map<String,Object>> findByStoreInKeyword(int companyId,String keyword,int sameCompany_id,String sameKeyword,int start,int pageSize);
+
+    Optional<storeVo>findBySaddressAndSname(String storeAddress,String storeName);
     
 }
