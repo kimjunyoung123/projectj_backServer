@@ -20,7 +20,9 @@ public interface storeDao extends JpaRepository<storeVo,Integer> {
 
     @Query(value = "select store_name,thumb_nail,store_address,store_sleep,store_id,(select count(*) from stores where company_id=? and store_name like %?%)totalCount from stores where company_id=? and store_name like %?% order by store_id desc limit ?,?",nativeQuery = true)
     List<Map<String,Object>> findByStoreInKeyword(int companyId,String keyword,int sameCompany_id,String sameKeyword,int start,int pageSize);
-
-    Optional<storeVo>findBySaddressAndSname(String storeAddress,String storeName);
+    @Query(value = "select a.*,b.store_review_id,b.store_review_created,b.store_review_text,b.store_review_writer"
+    +" from stores a left join store_reviews b on a.store_id=b.store_id"
+    +" where a.store_address=? and a.store_name=?",nativeQuery = true)
+    List<Map<String,Object>> findJoinReviewsSaddressAndSname(String storeAddress,String storeName);
     
 }

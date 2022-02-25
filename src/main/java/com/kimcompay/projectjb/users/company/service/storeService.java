@@ -1,10 +1,12 @@
 package com.kimcompay.projectjb.users.company.service;
 
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-
+import java.util.Optional;
 
 import com.kimcompay.projectjb.utillService;
 import com.kimcompay.projectjb.apis.aws.services.fileService;
@@ -43,11 +45,57 @@ public class storeService {
     private boardService boardService;
 
     public JSONObject getStore(String address,String storeName) {
-        storeVo storeVo=storeDao.findBySaddressAndSname(address.trim(), storeName.trim()).orElseThrow(()->utillService.makeRuntimeEX("등록되지 않은 상점입니다", "getStore"));
-        if(storeVo.getSsleep()==1){
+        List<Map<String,Object>> storeAndReviews=storeDao.findJoinReviewsSaddressAndSname(address.trim(), storeName.trim());
+        //유효성검사
+        LocalDateTime now=LocalDateTime.now();
+        String snow=now.toString();
+        String openTime=storeAndReviews.get(0).get("open_time").toString();
+        String closeTime=storeAndReviews.get(0).get("close_time").toString();
+        Timestamp tOpenTime=Timestamp.valueOf(snow.split("T")[0]+" "+openTime+":00");
+        Timestamp tCloseTime=Timestamp.valueOf(snow.split("T")[0]+" "+closeTime+":00");
+        if(storeAndReviews.isEmpty()){
+            throw utillService.makeRuntimeEX("존재하지 않는 매장입니다", "getStore");
+        }else if(Integer.parseInt(storeAndReviews.get(0).get("store_sleep").toString())==1){
             throw utillService.makeRuntimeEX("영업을 준비중인 매장입니다", "getStore");
+        }else if(now.isBefore(tOpenTime.toLocalDateTime())||now.isAfter(tCloseTime.toLocalDateTime())){
+            throw utillService.makeRuntimeEX("영업시간이 아닙니다", "getStore");
         }
-        return utillService.getJson(true, storeVo);
+        //매장 정보 꺼내기
+        JSONObject response=new JSONObject();
+        response.put("storeName", storeAndReviews.get(0).get("store_name"));
+        response.put("storeAddress", storeAndReviews.get(0).get("store_address"));
+        response.put("storeRoadAddress", storeAndReviews.get(0).get("store_road_address"));
+        response.put("storeDetailAddress", storeAndReviews.get(0).get("store_detail_address"));
+        response.put("storeNum", storeAndReviews.get(0).get("store_name"));
+        response.put("storePhone", storeAndReviews.get(0).get("store_phone"));
+        response.put("storeTel", storeAndReviews.get(0).get("store_tel"));
+        response.put("openTime",openTime);
+        response.put("closeTime", closeTime);
+        response.put("thumbNail", storeAndReviews.get(0).get("thumb_nail"));        
+        response.put("deliverRadius", storeAndReviews.get(0).get("deliver_radius"));
+        response.put("minPrice", storeAndReviews.get(0).get("min_price"));
+        response.put("text", storeAndReviews.get(0).get("store_text"));
+        response.put("id", storeAndReviews.get(0).get("store_id"));
+        //리뷰 꺼내기
+        Boolean flag=false;
+        List<JSONObject>reviews=new ArrayList<>();
+        for(Map<String,Object>storeAndReview:storeAndReviews){
+            if(Optional.ofNullable(storeAndReview.get("store_review_id")).orElseGet(()->null)==null){
+                break;
+            }else{
+                flag=true;
+                JSONObject review=new JSONObject();
+                review.put("text", storeAndReview.get("store_review_text"));
+                review.put("id", storeAndReview.get("store_review_id"));
+                review.put("created", storeAndReview.get("store_review_created"));
+                review.put("writer", storeAndReview.get("store_review_writer"));
+            }
+        }
+        if(flag){
+            response.put("reviews", reviews);
+        }
+        response.put("reviewFlag", flag);
+        return utillService.getJson(true, response);
     }
     public void checkExist(int storeId) {
         storeVo storeVo=getStoreCore(storeId);
