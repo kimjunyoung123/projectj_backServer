@@ -222,7 +222,7 @@ public class userService {
             principalDetails principalDetails=(principalDetails)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             //요청분류
             if(detail.equals("email")){
-                return utillService.getJson(true, principalDetails.getUsername()+","+principalDetails.getRole());
+                return utillService.getJson(true, principalDetails.getUsername()+","+principalDetails.getRole()+","+principalDetails.getPrinci().get("id"));
             }else if(detail.equals(senums.allt.get())){
                 Map<Object,Object>map=principalDetails.getPrinci();
                 map.put(refreshTokenCookieName, null);//refresh token제거 비밀번호는 로그인시 애초에 redis에 저장하지 않음
