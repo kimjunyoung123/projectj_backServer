@@ -45,4 +45,9 @@ public class comPanyRestController {
     public JSONObject getProducts(@PathVariable int storeId,@PathVariable String category,@PathVariable int page,@PathVariable String keyword) {
         return productService.getProducts(storeId, page, keyword, category);
     }
+    //제품정보가져오기
+    @RequestMapping(value = "/get/product/{productId}",method = RequestMethod.GET)
+    public JSONObject getProducts(@PathVariable int productId) {
+        return productService.getProduct(productId);
+    }
 }

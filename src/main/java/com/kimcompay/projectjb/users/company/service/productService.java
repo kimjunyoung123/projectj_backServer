@@ -38,6 +38,19 @@ public class productService {
     @Autowired
     private flyerDao flyerDao;
     
+    public JSONObject getProduct(int productId) {
+        productVo productVo=productDao.findById(productId).orElseThrow(()->utillService.makeRuntimeEX("존재하지 않는 제품입니다", "getProduct"));
+        if(productVo.getEventFlag()==1){
+            productEventVo productEventVo=productEventDao.findByProductIdAndDate(productVo.getId(),LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")).toString()).orElseGet(()->null);
+            if(productEventVo!=null){
+                productVo.setPrice(productEventVo.getEventPrice());
+            }
+        }
+        //일반유저들은 고유번호모르게 select 에서 안가져와도 되는데 그냥 이렇게 하자
+        productVo.setStoreId(0);
+        productVo.setFlyerId(0);
+        return utillService.getJson(true, productVo);
+    }
     public JSONObject getProducts(int storeId,int page,String keyword,String category) {
         //그냥 전단 아이디 받으면 되는데 이제 귀찮아서,,, ,한번더 들렀다오자...
         int flyerId=flyerDao.findByStoreIdGetId(storeId, 1);
