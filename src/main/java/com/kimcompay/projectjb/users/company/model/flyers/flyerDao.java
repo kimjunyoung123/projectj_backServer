@@ -28,4 +28,7 @@ public interface flyerDao extends JpaRepository<flyerVo,Integer> {
     @Query(value = "update flyers set default_select=? where store_id=?",nativeQuery = true)
     void updateDefaultFlyerById(int defaultFlag,int storeId);
 
+    @Query(value = "select b.flyer_img_path from flyers a left join flyer_details b on a.flyer_id=b.flyer_id where default_select=? and store_id=? order by b.flyer_details_id desc",nativeQuery=true)
+    List<String>findJoinWithDetail(int defaultSelect,int storeId);
+
 }

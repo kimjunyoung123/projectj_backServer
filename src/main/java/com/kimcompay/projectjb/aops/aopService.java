@@ -55,6 +55,7 @@ public class aopService {
     +"||execution(* com.kimcompay.projectjb.jwt.*.*(..))"
     +"||execution(* com.kimcompay.projectjb.users.company.service.*.*(..))"
     +"||execution(* com.kimcompay.projectjb.users.user.userService.*(..))"
+    +"||execution(* com.kimcompay.projectjb.users.user.service.*.*(..))"
     +"||execution(* com.kimcompay.projectjb.utillService.*(..))"
     +"||execution(* com.kimcompay.projectjb.board.service.*.*(..))"
     +"||execution(* com.kimcompay.projectjb.apis.google.ocrService.*(..))")

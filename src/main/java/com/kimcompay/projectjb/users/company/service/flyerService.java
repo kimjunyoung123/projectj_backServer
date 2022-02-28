@@ -36,6 +36,11 @@ public class flyerService {
     @Autowired
     private productService productService;
     
+    public JSONObject getFlyersImg(int storeId) {
+        List<String>imgs=flyerDao.findJoinWithDetail(1, storeId);
+        utillService.checkDaoResult(imgs, "기본전단을 제공하지 않는 매장입니다", "getFlyerImg");
+        return utillService.getJson(true, imgs);
+    }
     @Transactional(rollbackFor = Exception.class)
     public JSONObject tryUpdate(int flyerId,tryInsertFlyerDto tryInsertFlyerDto,int storeId) {
         //전단 조회

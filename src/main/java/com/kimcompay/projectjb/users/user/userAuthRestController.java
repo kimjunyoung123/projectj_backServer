@@ -2,6 +2,9 @@ package com.kimcompay.projectjb.users.user;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.kimcompay.projectjb.utillService;
+import com.kimcompay.projectjb.users.user.service.reviewService;
+
 import org.json.simple.JSONObject;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +18,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping(value = "/auth/user")
 public class userAuthRestController {
     
-
+    @Autowired
+    private reviewService reviewService;
     @Autowired
     private userService userService;
 
@@ -24,13 +28,16 @@ public class userAuthRestController {
         return userService.getAuthActionHub(action,request);
     }
     //매장 리뷰 등록
-    @RequestMapping(value = "/review",method = RequestMethod.POST)
-    public void tryInsertReview(@RequestBody JSONObject jsonObject) {
-        System.out.println(jsonObject.toString());
-    }
-    //매장 리뷰 수정
-    @RequestMapping(value = "/review",method = RequestMethod.PUT)
-    public void tryPutReview(@RequestBody JSONObject jsonObject) {
-        System.out.println(jsonObject.toString());
-    }    
+    @RequestMapping(value = "/review/{action}/{id}",method = {RequestMethod.POST,RequestMethod.PUT,RequestMethod.DELETE})
+    public JSONObject tryInsertReview(@RequestBody(required = false) JSONObject jsonObject,@PathVariable int id,@PathVariable String action) {
+        if(action.equals("insert")){
+            return reviewService.tryInsert(jsonObject,id);
+        }else if(action.equals("update")){
+            return reviewService.tryUpadte(jsonObject, id);
+        }else if(action.equals("delete")){
+            return reviewService.tryDelete(id);
+        }else{
+            return utillService.getJson(false, "유효하지 않는 요청입니다");
+        }
+    }  
 }

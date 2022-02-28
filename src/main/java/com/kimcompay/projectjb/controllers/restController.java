@@ -15,7 +15,6 @@ import com.kimcompay.projectjb.apis.sns.snsService;
 import com.kimcompay.projectjb.enums.senums;
 import com.kimcompay.projectjb.users.user.userService;
 
-
 import org.json.simple.JSONObject;
 
 
