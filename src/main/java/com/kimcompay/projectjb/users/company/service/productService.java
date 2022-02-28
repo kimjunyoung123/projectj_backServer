@@ -44,28 +44,32 @@ public class productService {
         if(flyerId==0){
             throw utillService.makeRuntimeEX("존재하지 않는 전단입니다", "getProducts");
         }
-        List<productVo>products=getVos(flyerId, page, keyword, category);
-        utillService.checkDaoResult(products, "상품등록이 없습니다", "getProducts");
+        List<Map<String,Object>>products=getVos(flyerId, page, keyword, category);
+        utillService.checkDaoResult(products, "등록상품이 없습니다", "getProducts");
         List<JSONObject>productAndEvents=new ArrayList<>();
-        for(productVo vo:products){
+        for(Map<String,Object> vo:products){
             JSONObject product=new JSONObject();
-            if(vo.getEventFlag()==1){
-                productEventVo productEventVo=productEventDao.findByProductIdAndDate(vo.getId(),LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")).toString()).orElseGet(()->null);
+            if(Integer.parseInt(vo.get("event_state").toString())==1){
+                productEventVo productEventVo=productEventDao.findByProductIdAndDate(Integer.parseInt(vo.get("product_id").toString()),LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")).toString()).orElseGet(()->null);
                 if(productEventVo!=null){
-                    vo.setPrice(productEventVo.getEventPrice());
+                    vo.put("price", productEventVo.getEventPrice());
                 }
             }
             product.put("product", vo);
             productAndEvents.add(product);
         }
-        return utillService.getJson(true, productAndEvents);
+        JSONObject response=new JSONObject();
+        response.put("products", productAndEvents);
+        response.put("totalPage", utillService.getTotalPage(Integer.parseInt(products.get(0).get("totalCount").toString()), pageSize));
+        response.put("flag", true);
+        return response;
        
     }
-    private  List<productVo> getVos(int flyerId,int page,String keyword,String category) {
+    private  List<Map<String,Object>> getVos(int flyerId,int page,String keyword,String category) {
         if(utillService.checkBlank(keyword)){
-            return productDao.findByFlyerIdAndCategory(flyerId,category,utillService.getStart(page, pageSize)-1,pageSize);
+            return productDao.findByFlyerIdAndCategory(flyerId,category,flyerId,category,utillService.getStart(page, pageSize)-1,pageSize);
         }
-        return  productDao.findByFlyerIdAndCategory(flyerId,category,utillService.getStart(page, pageSize)-1,pageSize);
+        return  productDao.findByFlyerIdAndCategoryAndKeyword(flyerId,category,keyword,flyerId,category,keyword,utillService.getStart(page, pageSize)-1,pageSize);
     }
     public void deleteAllByFlyerId(int flyerId) {
         List<Map<String,Object>>imgsAndEvents=productDao.findEventAndImgsByFlyerId(flyerId);

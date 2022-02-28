@@ -12,8 +12,14 @@ public interface productDao extends JpaRepository<productVo,Integer> {
     
     List<productVo>findByFlyerId(int flyerId);
 
-    @Query(value = "select *from products where flyer_id=? and category=? order by product_id desc limit ?,?",nativeQuery = true)
-    List<productVo>findByFlyerIdAndCategory(int flyerId,String category,int start,int pageSize);
+    @Query(value = "select *,(select count(*) from  products where flyer_id=? and category=?)totalCount "
+    +" from products where flyer_id=? and category=? order by product_id desc limit ?,?",nativeQuery = true)
+    List<Map<String,Object>>findByFlyerIdAndCategory(int flyerId,String category, int sameFlyerId,String sameCategory,int start,int pageSize);
+
+    
+    @Query(value = "select *,(select count(*) from  products where flyer_id=? and category=? and product_name like %?%)totalCount "
+    +" from products where flyer_id=? and category=?  and product_name like %?% order by product_id desc limit ?,?",nativeQuery = true)
+    List<Map<String,Object>>findByFlyerIdAndCategoryAndKeyword(int flyerId,String category,String keyword,int sameFlyerId,String sameCategory,String sameKeyword,int start,int pageSize);
 
     
     @Query(value = "select *from products where flyer_id=? and category=? and product_name like %?% order by product_id desc limit ?,?",nativeQuery = true)
