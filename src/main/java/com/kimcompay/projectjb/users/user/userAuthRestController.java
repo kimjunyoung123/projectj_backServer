@@ -1,8 +1,10 @@
 package com.kimcompay.projectjb.users.user;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 
 import com.kimcompay.projectjb.utillService;
+import com.kimcompay.projectjb.payments.basket.model.tryInsertDto;
 import com.kimcompay.projectjb.users.user.service.reviewService;
 
 import org.json.simple.JSONObject;
@@ -40,4 +42,9 @@ public class userAuthRestController {
             return utillService.getJson(false, "유효하지 않는 요청입니다");
         }
     }  
+    //장바구니 등록
+    @RequestMapping(value = "/basket",method = RequestMethod.POST)
+    public JSONObject tryInsertBaket(@Valid @RequestBody tryInsertDto tryInsertDto) {
+        return null;
+    } 
 }
