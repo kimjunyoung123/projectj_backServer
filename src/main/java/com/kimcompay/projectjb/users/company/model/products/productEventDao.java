@@ -15,4 +15,6 @@ public interface productEventDao extends JpaRepository<productEventVo,Integer>{
     @Transactional
     @Query(value = "delete  from product_events where product_id=?",nativeQuery = true)
     void deleteEventsByProductId(int productId);
+
+    Optional<productEventVo>findByProductIdAndDate(int productId,String date);
 }

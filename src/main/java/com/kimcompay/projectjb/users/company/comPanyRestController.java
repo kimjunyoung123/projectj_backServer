@@ -1,6 +1,7 @@
 package com.kimcompay.projectjb.users.company;
 
 import com.kimcompay.projectjb.users.company.service.flyerService;
+import com.kimcompay.projectjb.users.company.service.productService;
 import com.kimcompay.projectjb.users.company.service.storeService;
 
 import org.json.simple.JSONObject;
@@ -19,6 +20,8 @@ public class comPanyRestController {
     private storeService storeService;
     @Autowired
     private flyerService flyerService;
+    @Autowired
+    private productService productService;
 
     //스토어 정보 불러오기 원래는 매장 고유값으로 해야하나 
     //데이터가 없는 관계로 주소 매장이름으로 조회
@@ -36,5 +39,10 @@ public class comPanyRestController {
     @RequestMapping(value = "/get/flyerImg/{storeId}",method = RequestMethod.GET)
     public JSONObject getFlyerImg(@PathVariable int storeId) {
         return flyerService.getFlyersImg(storeId);
+    }
+    //매장 현재 제품 가져오기
+    @RequestMapping(value = "/get/products/{storeId}/{category}/{page}/{keyword}",method = RequestMethod.GET)
+    public JSONObject getProducts(@PathVariable int storeId,@PathVariable String category,@PathVariable int page,@PathVariable String keyword) {
+        return productService.getProducts(storeId, page, keyword, category);
     }
 }

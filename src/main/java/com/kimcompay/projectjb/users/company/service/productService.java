@@ -1,5 +1,8 @@
 package com.kimcompay.projectjb.users.company.service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -9,6 +12,7 @@ import java.util.Optional;
 import com.kimcompay.projectjb.utillService;
 import com.kimcompay.projectjb.apis.aws.services.fileService;
 import com.kimcompay.projectjb.board.service.boardService;
+import com.kimcompay.projectjb.users.company.model.flyers.flyerDao;
 import com.kimcompay.projectjb.users.company.model.products.productDao;
 import com.kimcompay.projectjb.users.company.model.products.productEventDao;
 import com.kimcompay.projectjb.users.company.model.products.productEventVo;
@@ -22,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class productService {
+    private final int pageSize=2;
     @Autowired
     private productDao productDao;
     @Autowired
@@ -30,7 +35,38 @@ public class productService {
     private fileService fileService;
     @Autowired
     private boardService boardService;
+    @Autowired
+    private flyerDao flyerDao;
     
+    public JSONObject getProducts(int storeId,int page,String keyword,String category) {
+        //그냥 전단 아이디 받으면 되는데 이제 귀찮아서,,, ,한번더 들렀다오자...
+        int flyerId=flyerDao.findByStoreIdGetId(storeId, 1);
+        if(flyerId==0){
+            throw utillService.makeRuntimeEX("존재하지 않는 전단입니다", "getProducts");
+        }
+        List<productVo>products=getVos(flyerId, page, keyword, category);
+        utillService.checkDaoResult(products, "상품등록이 없습니다", "getProducts");
+        List<JSONObject>productAndEvents=new ArrayList<>();
+        for(productVo vo:products){
+            JSONObject product=new JSONObject();
+            if(vo.getEventFlag()==1){
+                productEventVo productEventVo=productEventDao.findByProductIdAndDate(vo.getId(),LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")).toString()).orElseGet(()->null);
+                if(productEventVo!=null){
+                    vo.setPrice(productEventVo.getEventPrice());
+                }
+            }
+            product.put("product", vo);
+            productAndEvents.add(product);
+        }
+        return utillService.getJson(true, productAndEvents);
+       
+    }
+    private  List<productVo> getVos(int flyerId,int page,String keyword,String category) {
+        if(utillService.checkBlank(keyword)){
+            return productDao.findByFlyerIdAndCategory(flyerId,category,utillService.getStart(page, pageSize)-1,pageSize);
+        }
+        return  productDao.findByFlyerIdAndCategory(flyerId,category,utillService.getStart(page, pageSize)-1,pageSize);
+    }
     public void deleteAllByFlyerId(int flyerId) {
         List<Map<String,Object>>imgsAndEvents=productDao.findEventAndImgsByFlyerId(flyerId);
         productDao.deleteByFlyerId(flyerId);
