@@ -43,9 +43,9 @@ public class basketService {
             basket.put("price", prouctVo.getPrice());
             basket.put("product_name", prouctVo.getProductName());
             basket.put("product_img_path", prouctVo.getProductImgPath());
-            basket.put("basket_count", basket.get("basket_count"));
-            basket.put("id", basket.get("id"));
-            basket.put("basket_created", basket.get("basket_created"));
+            basket.put("basket_count", baskets.get(i).get("basket_count"));
+            basket.put("id", baskets.get(i).get("basket_id"));
+            basket.put("basket_created", baskets.get(i).get("basket_created"));
             baskets.set(i, basket);
         }
         JSONObject response=new JSONObject();
