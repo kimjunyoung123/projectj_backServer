@@ -76,6 +76,7 @@ public class paymentService {
                 throw utillService.makeRuntimeEX("중복 쿠폰 발견:"+couponName, "confrimByStore");
             }
             couponService.checkExist(couponName);
+            //품절시 행위 로직 추가해야함
             conponNames.put(Integer.parseInt(coupon.get("id").toString()),couponName);
         }
         return conponNames;
