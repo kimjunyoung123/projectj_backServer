@@ -1,5 +1,7 @@
 package com.kimcompay.projectjb.payments.service;
 
+import java.time.LocalDateTime;
+
 import com.kimcompay.projectjb.utillService;
 import com.kimcompay.projectjb.payments.model.coupon.couponDao;
 import com.kimcompay.projectjb.payments.model.coupon.couponVo;
@@ -19,7 +21,15 @@ public class couponService {
         return utillService.getJson(true, "사용가능 쿠폰");
     }
     public void confrimCoupon(couponVo couponVo) {
-        
+        String message=null;
+        if(LocalDateTime.now().isAfter(couponVo.getExpire().toLocalDateTime())){
+            message="유효기간이 지난 쿠폰입니다";
+        }else if(couponVo.getUsed()==1){
+            message="이미 사용된 쿠폰입니다";
+        }else{
+            utillService.writeLog("쿠폰 검사통과", couponService.class);
+        }
+        throw utillService.makeRuntimeEX(message, "confrimCoupon");
     }
     private couponVo getVo(String couponName) {
         return couponDao.findByName(couponName).orElseThrow(()->utillService.makeRuntimeEX("존재하지 않는 쿠폰", "checkExist"));

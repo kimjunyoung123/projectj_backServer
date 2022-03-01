@@ -35,6 +35,9 @@ public class couponVo {
     @Column(name = "coupon_kind",nullable = false,columnDefinition = "TINYINT")
     private int kind;
 
+    @Column(name = "coupon_used",nullable = false,columnDefinition = "TINYINT")
+    private int used;
+
     @Column(name = "coupon_name",nullable = false)
     private String name;
 
