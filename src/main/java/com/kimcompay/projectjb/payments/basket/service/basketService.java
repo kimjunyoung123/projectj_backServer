@@ -36,17 +36,21 @@ public class basketService {
         utillService.checkDaoResult(baskets, "불러올 제품이 없습니다", "getBaskets");
         //제품 이벤트 판단후 가격 계산
         int size=baskets.size();
+        int totalCount=Integer.parseInt(baskets.get(0).get("totalCount").toString());
         for(int i=0;i<size;i++){
             Map<String,Object>basket=new HashMap<>();
             productVo prouctVo=(productVo)productService.getProduct(Integer.parseInt(baskets.get(i).get("product_id").toString())).get("message");
             basket.put("price", prouctVo.getPrice());
             basket.put("product_name", prouctVo.getProductName());
             basket.put("product_img_path", prouctVo.getProductImgPath());
+            basket.put("basket_count", basket.get("basket_count"));
+            basket.put("id", basket.get("id"));
+            basket.put("basket_created", basket.get("basket_created"));
             baskets.set(i, basket);
         }
         JSONObject response=new JSONObject();
         response.put("baskets", baskets);
-        response.put("totalPage", utillService.getTotalPage(Integer.parseInt(baskets.get(0).get("totalCount").toString()), pageSize));
+        response.put("totalPage", utillService.getTotalPage(totalCount, pageSize));
         response.put("flag", true);
         return response;    
     }
