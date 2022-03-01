@@ -15,6 +15,7 @@ import com.kimcompay.projectjb.users.company.service.productService;
 import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class basketService {
@@ -25,6 +26,14 @@ public class basketService {
     @Autowired
     private productService productService;
 
+    @Transactional
+    public JSONObject tryUpadte(int basketId,int count) {
+        basketVo basketVo=basketDao.findById(basketId).orElseThrow(()->utillService.makeRuntimeEX("존재하지 않는 장바구니 품목입니다", "tryUpadte"));
+        utillService.checkOwner(basketVo.getUserId(), "상품 주인이아닙니다");
+        basketVo.setCount(count);
+        return utillService.getJson(true, ((productVo)productService.getProduct(basketVo.getProductId()).get("message")).getPrice()*count);   
+        
+    }
     public JSONObject tryInsert(tryInsertDto tryInsertDto) {
         basketVo vo=basketVo.builder().count(tryInsertDto.getCount()).productId(tryInsertDto.getProductId()).userId(utillService.getLoginId()).build();
         basketDao.save(vo);
@@ -40,10 +49,11 @@ public class basketService {
         for(int i=0;i<size;i++){
             Map<String,Object>basket=new HashMap<>();
             productVo prouctVo=(productVo)productService.getProduct(Integer.parseInt(baskets.get(i).get("product_id").toString())).get("message");
-            basket.put("price", prouctVo.getPrice());
+            int count=Integer.parseInt( baskets.get(i).get("basket_count").toString());
+            basket.put("price", prouctVo.getPrice()*count);
             basket.put("product_name", prouctVo.getProductName());
             basket.put("product_img_path", prouctVo.getProductImgPath());
-            basket.put("basket_count", baskets.get(i).get("basket_count"));
+            basket.put("basket_count", count);
             basket.put("id", baskets.get(i).get("basket_id"));
             basket.put("basket_created", baskets.get(i).get("basket_created"));
             baskets.set(i, basket);

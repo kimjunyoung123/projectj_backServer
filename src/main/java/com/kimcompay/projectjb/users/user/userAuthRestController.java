@@ -55,4 +55,9 @@ public class userAuthRestController {
     public JSONObject tryInsertBaket(@PathVariable int page) {
         return basketService.getBaskets(page);
     } 
+    //장바구니 수정
+    @RequestMapping(value = "/basket/{basketId}/{count}",method = RequestMethod.PUT)
+    public JSONObject tryInsertBaket(@PathVariable int basketId,@PathVariable int count) {
+        return basketService.tryUpadte(basketId, count);
+    } 
 }
