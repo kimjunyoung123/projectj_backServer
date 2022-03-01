@@ -5,6 +5,7 @@ import javax.validation.Valid;
 
 import com.kimcompay.projectjb.utillService;
 import com.kimcompay.projectjb.payments.basket.model.tryInsertDto;
+import com.kimcompay.projectjb.payments.basket.service.basketService;
 import com.kimcompay.projectjb.users.user.service.reviewService;
 
 import org.json.simple.JSONObject;
@@ -24,6 +25,8 @@ public class userAuthRestController {
     private reviewService reviewService;
     @Autowired
     private userService userService;
+    @Autowired
+    private basketService basketService;
 
     @RequestMapping(value = "/{action}",method = RequestMethod.GET)//매 페이지 이동 마다 로그인정보 조회
     public JSONObject userAction(@PathVariable String action,HttpServletRequest request) {
@@ -45,6 +48,6 @@ public class userAuthRestController {
     //장바구니 등록
     @RequestMapping(value = "/basket",method = RequestMethod.POST)
     public JSONObject tryInsertBaket(@Valid @RequestBody tryInsertDto tryInsertDto) {
-        return null;
+        return basketService.tryInsert(tryInsertDto);
     } 
 }

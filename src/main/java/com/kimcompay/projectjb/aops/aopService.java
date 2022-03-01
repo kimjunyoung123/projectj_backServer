@@ -43,9 +43,7 @@ public class aopService {
     private HttpSession httpSession;
     
     @Async
-    @Before("execution(* com.kimcompay.projectjb.users.company.*.*(..))"
-    +"||execution(* com.kimcompay.projectjb.users.user.*.*(..))"
-    +"||execution(* com.kimcompay.projectjb.apis.aws.services.*.*(..))"
+    @Before("execution(* com.kimcompay.projectjb.apis.aws.services.*.*(..))"
     +"||execution(* com.kimcompay.projectjb.apis.jungbu.*.*(..))"
     +"||execution(* com.kimcompay.projectjb.apis.kakao.*.*(..))"
     +"||execution(* com.kimcompay.projectjb.apis.naver.*.*(..))"
@@ -58,7 +56,8 @@ public class aopService {
     +"||execution(* com.kimcompay.projectjb.users.user.service.*.*(..))"
     +"||execution(* com.kimcompay.projectjb.utillService.*(..))"
     +"||execution(* com.kimcompay.projectjb.board.service.*.*(..))"
-    +"||execution(* com.kimcompay.projectjb.apis.google.ocrService.*(..))")
+    +"||execution(* com.kimcompay.projectjb.apis.google.ocrService.*(..))"
+    +"||execution(* com.kimcompay.projectjb.payments.basket.service.basketService.*(..))")
     public void writeLog(JoinPoint joinPoint) throws Throwable {
         logger.info("writeLog");
         MethodSignature signature = (MethodSignature)joinPoint.getSignature();
