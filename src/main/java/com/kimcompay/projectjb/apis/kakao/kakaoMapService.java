@@ -1,6 +1,7 @@
 package com.kimcompay.projectjb.apis.kakao;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 
 import com.kimcompay.projectjb.utillService;
 import com.kimcompay.projectjb.apis.requestTo;
@@ -37,7 +38,7 @@ public class kakaoMapService {
         httpHeaders.add(senums.Authorization.get(),"KakaoAK "+rest_key);
         return  requestTo.requestGet(null,"https://dapi.kakao.com/v2/local/search/address.json?query="+address,httpHeaders);
     }
-    public void checkAddress(String address) {
+    public List<LinkedHashMap<String,Object>> checkAddress(String address) {
         logger.info("checkAddress");
         JSONObject krespon=getAddress(address);
         logger.info("카카오 주소찾기 결과: "+krespon);
@@ -47,5 +48,6 @@ public class kakaoMapService {
             throw utillService.makeRuntimeEX("주소검색결과가 없습니다", "checkValues");
         }
         logger.info("주소 유효성 검사통과");
+        return (List<LinkedHashMap<String,Object>>)krespon.get("documents");
     }
 }

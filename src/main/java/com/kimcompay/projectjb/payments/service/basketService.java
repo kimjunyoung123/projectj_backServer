@@ -26,6 +26,9 @@ public class basketService {
     @Autowired
     private productService productService;
 
+    public List<Map<String,Object>> getBasketsAndProduct(int userId) {
+        return basketDao.findByUserIdJoinProduct(userId);
+    }
     public JSONObject tryDelete(int basketId) {
         basketDao.deleteIdAndUserId(basketId,utillService.getLoginId());
         return utillService.getJson(true, "삭제되었습니다");
@@ -51,11 +54,11 @@ public class basketService {
     }
     public JSONObject getBaskets(int page) {
         int userId=utillService.getLoginId();
-        List<Map<String,Object>>baskets=basketDao.findByUserId(userId,userId, utillService.getStart(page, pageSize)-1, pageSize);
+        List<Map<String,Object>>baskets=basketDao.findByUserId(userId); //basketDao.findByUserId(userId,userId, utillService.getStart(page, pageSize)-1, pageSize);
         utillService.checkDaoResult(baskets, "불러올 제품이 없습니다", "getBaskets");
         //제품 이벤트 판단후 가격 계산
         int size=baskets.size();
-        int totalCount=Integer.parseInt(baskets.get(0).get("totalCount").toString());
+       // int totalCount=Integer.parseInt(baskets.get(0).get("totalCount").toString());
         for(int i=0;i<size;i++){
             Map<String,Object>basket=new HashMap<>();
             productVo prouctVo=(productVo)productService.getProduct(Integer.parseInt(baskets.get(i).get("product_id").toString())).get("message");
@@ -70,7 +73,7 @@ public class basketService {
         }
         JSONObject response=new JSONObject();
         response.put("baskets", baskets);
-        response.put("totalPage", utillService.getTotalPage(totalCount, pageSize));
+       // response.put("totalPage", utillService.getTotalPage(totalCount, pageSize));
         response.put("flag", true);
         return response;    
     }

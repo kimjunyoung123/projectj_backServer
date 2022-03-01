@@ -48,6 +48,9 @@ public class storeService {
     @Autowired
     private storeReviewsDao storeReviewsDao;
 
+    public storeVo getVo(int storeId) {
+        return storeDao.findById(storeId).orElseThrow(()->utillService.makeRuntimeEX("존재하지않는 매장입니다", "getVo"));
+    }
     public JSONObject getReviews(int storeId,int page) {
         List<Map<String,Object>>reviews=storeReviewsDao.findByStoreIdLimit(storeId,storeId, utillService.getStart(page, pageSize)-1, pageSize);
         if(reviews.isEmpty()){

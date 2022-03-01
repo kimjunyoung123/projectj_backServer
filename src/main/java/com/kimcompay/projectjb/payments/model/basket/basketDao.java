@@ -18,4 +18,12 @@ public interface basketDao extends JpaRepository<basketVo,Integer> {
     @Transactional
     @Query(value = "delete from baskets where basket_id=? and user_id=?",nativeQuery = true)
     void deleteIdAndUserId(int basketId,int userId);
+
+    @Query(value = "select *from baskets where user_id=?",nativeQuery = true)
+    List<Map<String,Object>>findByUserId(int userId);
+
+    @Query(value = "select a.*,b.price,b.product_name,b.store_id,b.event_state"
+    +" from baskets a inner join products b on a.product_id=b.product_id where a.user_id=?",nativeQuery = true)
+    List<Map<String,Object>>findByUserIdJoinProduct(int userId);
+
 }

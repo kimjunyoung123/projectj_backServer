@@ -28,7 +28,7 @@ public class paymentAuthRestController {
     public JSONObject confrimCoupon(@PathVariable String couponName) {
         return couponService.checkExist(couponName);
     }
-    //구매시도
+    //구매시도 ,거리 계산
     @RequestMapping(value = "",method = RequestMethod.POST)
     public JSONObject tryPay(@Valid @RequestBody tryOrderDto tryOrderDto) {
         return paymentService.tryOrder(tryOrderDto);

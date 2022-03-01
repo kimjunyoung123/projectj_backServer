@@ -8,7 +8,6 @@ import javax.validation.constraints.Size;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 
 @NoArgsConstructor
 @Data
@@ -19,4 +18,7 @@ public class tryOrderDto {
 
     @NotBlank(message = "결제수단을 선택해주세요")
     private String payKind;    
+
+    @NotBlank(message = "품절시 요청을 선택해주세요")
+    private String soldOut;  
 }
