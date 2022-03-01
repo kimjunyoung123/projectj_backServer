@@ -35,6 +35,9 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 public class utillService {
 
+    public static String getSettleText(String mchtid,String method,String mchtTrdNo,String requestDate,String requestTime,String totalPrice)  {
+        return  String.format("%s%s%s%s%s%s%s",mchtid,method,mchtTrdNo,requestDate,requestTime,totalPrice,"ST1009281328226982205");
+    }
     public  static void checkOwner(int ucId,String errorMessage) {
         if(ucId!=utillService.getLoginId()){
             throw utillService.makeRuntimeEX(errorMessage, "checkOwner");

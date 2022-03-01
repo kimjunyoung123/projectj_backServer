@@ -44,7 +44,9 @@ public enum senums {
     emailNull("이메일값을 입력해 주세요"),
     defaultProvider("no"),
     doneFlag("1"),
-    notFlag("0");
+    notFlag("0"),
+    settleKey("ST1009281328226982205"),
+    settlekey2("pgSettle30y739r82jtd709yOfZ2yK5K");
 
     private String s;
     senums(String s){
