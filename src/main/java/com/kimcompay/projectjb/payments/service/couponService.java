@@ -23,9 +23,9 @@ public class couponService {
     public void confrimCoupon(couponVo couponVo) {
         String message=null;
         if(LocalDateTime.now().isAfter(couponVo.getExpire().toLocalDateTime())){
-            message="유효기간이 지난 쿠폰입니다";
+            message="유효기간이 지난 쿠폰입니다 \n쿠폰이름: "+couponVo.getName();
         }else if(couponVo.getUsed()==1){
-            message="이미 사용된 쿠폰입니다";
+            message="이미 사용된 쿠폰입니다 \n쿠폰이름: "+couponVo.getName();
         }else{
             utillService.writeLog("쿠폰 검사통과", couponService.class);
             return;

@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Map.Entry;
 
 import com.kimcompay.projectjb.utillService;
@@ -28,6 +29,8 @@ public class paymentService {
     private kakaoMapService kakaoMapService;
     @Autowired
     private storeService storeService;
+    @Autowired
+    private couponService couponService;
 
     public JSONObject tryOrder(tryOrderDto tryOrderDto) {
         int userId=utillService.getLoginId();
@@ -36,26 +39,46 @@ public class paymentService {
         //매장별로 나누기
         Map<Integer,List<Map<String,Object>>>divisionByStoreIds=divisionByStoreId(basketAndProducts);
         //매장별 조건검증
-        confrimByStore(divisionByStoreIds);
+        confrimByStore(divisionByStoreIds,tryOrderDto);
         JSONObject respons=new JSONObject();
         respons.put("price", aes256.encrypt( "1000"));
         respons.put("pktHash", sha256.encrypt(utillService.getSettleText("nxca_jt_il", "card", "1234567", "20220301", "153500", "1000")));
         respons.put("flag", true);
         return respons;
     }
-    private void confrimByStore(Map<Integer,List<Map<String,Object>>>divisionByStoreIds) {
+    private void confrimByStore(Map<Integer,List<Map<String,Object>>>divisionByStoreIds,tryOrderDto tryOrderDto) {
+        //쿠폰 중복확인
+        Map<Integer,Object>coupons=confrimCoupone(tryOrderDto.getCoupons());
+        //주문정보 만들기
         for(Entry<Integer, List<Map<String, Object>>> divisionByStoreId:divisionByStoreIds.entrySet()){
             int storeId=divisionByStoreId.getKey();
             storeVo storeVo=storeService.getVo(storeId);
-            System.out.println(storeVo.toString());
             //배달가능 거리 계산 
             if(checkDeliverRadius(storeVo.getSaddress(),storeVo.getDeliverRadius())){
                 throw utillService.makeRuntimeEX("배달 최대반경을 초과합니다\n매장이름:"+storeVo.getSname()+"\n제품이름:"+divisionByStoreId.getValue().get(0).get("product_name")+"\n최대반경:"+storeVo.getDeliverRadius()+"km", "checkDeliverRadius");
             }
-            //해당 매장 결제요청 총액 하기
-            List<Map<String, Object>>basketAndProducts=divisionByStoreId.getValue();            
-           
+            //해당 매장 결제요청 총액확인 및 제품/쿠폰 검증
+            List<Map<String, Object>>basketAndProducts=divisionByStoreId.getValue(); 
+            for(Map<String,Object>basketAndProduct:basketAndProducts){
+                System.out.println(basketAndProduct.get("basket_id"));
+            }
         }
+    }
+    private Map<Integer,Object> confrimCoupone(List<Map<String,Object>>coupons) {
+        Map<Integer,Object>conponNames=new HashMap<>();
+        for(Map<String,Object>coupon:coupons){
+            //null이라면 통과
+            if(Optional.ofNullable(coupon.get("coupon")).orElseGet(()->null)==null){
+                continue;
+            }
+            String couponName=coupon.get("coupon").toString();
+            if(conponNames.containsValue(couponName)){
+                throw utillService.makeRuntimeEX("중복 쿠폰 발견:"+couponName, "confrimByStore");
+            }
+            couponService.checkExist(couponName);
+            conponNames.put(Integer.parseInt(coupon.get("id").toString()),couponName);
+        }
+        return conponNames;
     }
     private Map<Integer,List<Map<String,Object>>> divisionByStoreId(List<Map<String,Object>>basketAndProducts) {
         Map<Integer,List<Map<String,Object>>>divisionByStoreId=new HashMap<>();

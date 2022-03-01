@@ -39,6 +39,9 @@ public class orderVo {
     @Column(name ="mchtTrdNo",nullable = false)
     private String mchtTrdNo;
 
+    @Column(name ="soldout_action",nullable = false)
+    private String soldOurAction;
+
     @Column(name = "user_id",nullable = false)
     private int userId;
 
