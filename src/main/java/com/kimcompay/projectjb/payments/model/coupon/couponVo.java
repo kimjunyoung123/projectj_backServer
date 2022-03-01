@@ -40,7 +40,10 @@ public class couponVo {
 
     @Column(name = "coupon_num",nullable = false)
     private String num;
-
+    
+    @Column(name = "coupon_expire",nullable = false)
+    private Timestamp expire;
+    
     @Column(name = "coupon_created")
     @CreationTimestamp
     private Timestamp created;

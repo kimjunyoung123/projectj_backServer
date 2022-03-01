@@ -15,7 +15,13 @@ public class couponService {
     private couponDao couponDao;
 
     public JSONObject checkExist(String couponName) {
-        couponVo couponVo=couponDao.findByName(couponName).orElseThrow(()->utillService.makeRuntimeEX("존재하지 않는 쿠폰", "checkExist"));
+        confrimCoupon(getVo(couponName));
         return utillService.getJson(true, "사용가능 쿠폰");
+    }
+    public void confrimCoupon(couponVo couponVo) {
+        
+    }
+    private couponVo getVo(String couponName) {
+        return couponDao.findByName(couponName).orElseThrow(()->utillService.makeRuntimeEX("존재하지 않는 쿠폰", "checkExist"));
     }
 }
