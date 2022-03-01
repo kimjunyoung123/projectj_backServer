@@ -50,4 +50,9 @@ public class userAuthRestController {
     public JSONObject tryInsertBaket(@Valid @RequestBody tryInsertDto tryInsertDto) {
         return basketService.tryInsert(tryInsertDto);
     } 
+    //장바구니 불러오기
+    @RequestMapping(value = "/baskets/{page}",method = RequestMethod.GET)
+    public JSONObject tryInsertBaket(@PathVariable int page) {
+        return basketService.getBaskets(page);
+    } 
 }
