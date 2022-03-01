@@ -11,7 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 public interface basketDao extends JpaRepository<basketVo,Integer> {
     
     @Query(value = "select * ,(select count(*) from baskets where user_id=?)totalCount"
-    +" from baskets where user_id=? order by basket_id limit ?,?",nativeQuery = true)
+    +" from baskets where user_id=? order by basket_id desc limit ?,?",nativeQuery = true)
     List<Map<String,Object>>findByUserId(int userId,int sameUserId,int start,int pageSize);
 
     @Modifying
