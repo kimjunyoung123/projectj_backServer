@@ -28,6 +28,7 @@ public class couponService {
             message="이미 사용된 쿠폰입니다";
         }else{
             utillService.writeLog("쿠폰 검사통과", couponService.class);
+            return;
         }
         throw utillService.makeRuntimeEX(message, "confrimCoupon");
     }
