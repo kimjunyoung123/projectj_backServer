@@ -13,8 +13,8 @@ public class paymentService {
 
     public JSONObject tryOrder(tryOrderDto tryOrderDto) {
         JSONObject respons=new JSONObject();
-        respons.put("price", aes256Service.encrypt( "500"));
-        respons.put("pktHash", sha256Service.sha256(utillService.getSettleText("nxca_jt_il", "card", "12345", "20220301", "153500", "500")));
+        respons.put("price", aes256.encrypt( "1000"));
+        respons.put("pktHash", sha256.encrypt(utillService.getSettleText("nxca_jt_il", "card", "1234567", "20220301", "153500", "1000")));
         respons.put("flag", true);
         return respons;
     }

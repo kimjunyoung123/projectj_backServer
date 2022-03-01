@@ -3,8 +3,8 @@ package com.kimcompay.projectjb.payments.service;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-public class sha256Service {
-    public static String sha256(String str){
+public class sha256 {
+    public static String encrypt(String str){
 		StringBuffer sb = new StringBuffer();
 		try {
 			  MessageDigest sh = MessageDigest.getInstance("SHA-256");

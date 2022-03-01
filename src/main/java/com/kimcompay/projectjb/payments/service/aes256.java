@@ -7,19 +7,19 @@ import java.util.Arrays;
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 
-public class aes256Service {
+import com.kimcompay.projectjb.enums.senums;
+
+public class aes256 {
     public static String alg = "AES/CBC/PKCS5Padding";
-    private static final String sKey = "pgSettle30y739r82jtd709yOfZ2yK5K";
     private static final int AES_KEY_SIZE_256 = 256;
 
     public static String encrypt(String price){
-        System.out.println("ace256");
         try {
             byte[] key = null;
             byte[] text = null;
             byte[] encrypted = null;
             // UTF-8
-            key = sKey.getBytes("UTF-8");
+            key = senums.settlekey2.get().getBytes("UTF-8");
     
             // Key size (256bit, 16byte)
             key = Arrays.copyOf(key, AES_KEY_SIZE_256 / 8);
@@ -92,7 +92,7 @@ public class aes256Service {
 		final int AES_KEY_SIZE_256 = 256;
 
 		// UTF-8
-		key = sKey.getBytes("UTF-8");
+		key = senums.settlekey2.get().getBytes("UTF-8");
 
 		// Key size (256bit, 16byte)
 		key = Arrays.copyOf(key, AES_KEY_SIZE_256 / 8);
