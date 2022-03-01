@@ -26,13 +26,23 @@ public class basketService {
     @Autowired
     private productService productService;
 
+    public JSONObject tryDelete(int basketId) {
+        basketDao.deleteIdAndUserId(basketId,utillService.getLoginId());
+        return utillService.getJson(true, "삭제되었습니다");
+    }
     @Transactional
     public JSONObject tryUpadte(int basketId,int count) {
+        checkCount(count);
         basketVo basketVo=basketDao.findById(basketId).orElseThrow(()->utillService.makeRuntimeEX("존재하지 않는 장바구니 품목입니다", "tryUpadte"));
         utillService.checkOwner(basketVo.getUserId(), "상품 주인이아닙니다");
         basketVo.setCount(count);
         return utillService.getJson(true, ((productVo)productService.getProduct(basketVo.getProductId()).get("message")).getPrice()*count);   
         
+    }
+    private void checkCount(int count) {
+        if(count<=0){
+            throw utillService.makeRuntimeEX("수량은 0보다 커야합니다", "tryUpadte");
+        }
     }
     public JSONObject tryInsert(tryInsertDto tryInsertDto) {
         basketVo vo=basketVo.builder().count(tryInsertDto.getCount()).productId(tryInsertDto.getProductId()).userId(utillService.getLoginId()).build();

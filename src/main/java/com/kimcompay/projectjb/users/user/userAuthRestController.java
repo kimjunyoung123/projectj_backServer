@@ -60,4 +60,9 @@ public class userAuthRestController {
     public JSONObject tryInsertBaket(@PathVariable int basketId,@PathVariable int count) {
         return basketService.tryUpadte(basketId, count);
     } 
+    //장바구니 삭제
+    @RequestMapping(value = "/basket/{basketId}",method = RequestMethod.DELETE)
+    public JSONObject tryDeleteBaket(@PathVariable int basketId) {
+        return basketService.tryDelete(basketId);
+    }
 }

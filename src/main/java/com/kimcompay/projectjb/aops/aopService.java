@@ -11,6 +11,8 @@ import javax.servlet.http.HttpSession;
 import com.kimcompay.projectjb.utillService;
 import com.kimcompay.projectjb.apis.aws.services.fileService;
 import com.kimcompay.projectjb.enums.senums;
+import com.kimcompay.projectjb.payments.basket.model.basketDao;
+import com.kimcompay.projectjb.payments.basket.model.basketVo;
 import com.kimcompay.projectjb.users.company.model.flyers.tryInsertFlyerDto;
 import com.kimcompay.projectjb.users.company.model.products.tryProductInsertDto;
 import com.kimcompay.projectjb.users.company.model.stores.tryInsertStoreDto;
@@ -39,6 +41,8 @@ public class aopService {
     private storeService storeService;
     @Value("${aws.bucket.name}")
     private String bucketName;
+    @Autowired
+    private basketDao basketDao;
 
     private HttpSession httpSession;
     
@@ -189,6 +193,23 @@ public class aopService {
         logger.info("response: "+response);
         httpSession.removeAttribute(senums.auth.get()+senums.phonet.get());
         httpSession.removeAttribute(senums.auth.get()+senums.emailt.get());
+    }
+    //-------------------------------------------------------------------------
+    ///장바구니 접근전 주인 확인  
+    @Before("execution(* com.kimcompay.projectjb.payments.basket.service.basketService.tryDelete(..))")
+    public void checkOwner(JoinPoint joinPoint) {
+        logger.info("checkOwner");
+        MethodSignature signature = (MethodSignature)joinPoint.getSignature();
+        int len=signature.getParameterNames().length;
+        String[] names=signature.getParameterNames();
+        Object[] values=joinPoint.getArgs();
+        for(int i=0;i<len;i++){
+            if(names[i].equals("basketId")){
+                basketVo basketVo=basketDao.findById(Integer.parseInt(values[i].toString())).orElseThrow(()->utillService.makeRuntimeEX("존재하지 않는 장바구니 제품입니다", "checkOwner"));
+                utillService.checkOwner(basketVo.getUserId(),"본인 소유의 제품이 아닙니다");
+                break;
+            }
+        }
     }
     
     
