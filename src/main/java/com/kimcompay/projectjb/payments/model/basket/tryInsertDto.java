@@ -1,4 +1,4 @@
-package com.kimcompay.projectjb.payments.basket.model;
+package com.kimcompay.projectjb.payments.model.basket;
 
 import javax.validation.constraints.Min;
 

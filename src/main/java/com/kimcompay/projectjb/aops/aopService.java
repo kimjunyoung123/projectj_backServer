@@ -11,8 +11,8 @@ import javax.servlet.http.HttpSession;
 import com.kimcompay.projectjb.utillService;
 import com.kimcompay.projectjb.apis.aws.services.fileService;
 import com.kimcompay.projectjb.enums.senums;
-import com.kimcompay.projectjb.payments.basket.model.basketDao;
-import com.kimcompay.projectjb.payments.basket.model.basketVo;
+import com.kimcompay.projectjb.payments.model.basket.basketDao;
+import com.kimcompay.projectjb.payments.model.basket.basketVo;
 import com.kimcompay.projectjb.users.company.model.flyers.tryInsertFlyerDto;
 import com.kimcompay.projectjb.users.company.model.products.tryProductInsertDto;
 import com.kimcompay.projectjb.users.company.model.stores.tryInsertStoreDto;
@@ -61,7 +61,7 @@ public class aopService {
     +"||execution(* com.kimcompay.projectjb.utillService.*(..))"
     +"||execution(* com.kimcompay.projectjb.board.service.*.*(..))"
     +"||execution(* com.kimcompay.projectjb.apis.google.ocrService.*(..))"
-    +"||execution(* com.kimcompay.projectjb.payments.basket.service.basketService.*(..))")
+    +"||execution(* com.kimcompay.projectjb.payments.service.*.*(..))")
     public void writeLog(JoinPoint joinPoint) throws Throwable {
         logger.info("writeLog");
         MethodSignature signature = (MethodSignature)joinPoint.getSignature();
@@ -196,7 +196,7 @@ public class aopService {
     }
     //-------------------------------------------------------------------------
     ///장바구니 접근전 주인 확인  
-    @Before("execution(* com.kimcompay.projectjb.payments.basket.service.basketService.tryDelete(..))")
+    @Before("execution(* com.kimcompay.projectjb.payments.service.basketService.tryDelete(..))")
     public void checkOwner(JoinPoint joinPoint) {
         logger.info("checkOwner");
         MethodSignature signature = (MethodSignature)joinPoint.getSignature();

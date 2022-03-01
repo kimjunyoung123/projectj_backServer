@@ -1,4 +1,4 @@
-package com.kimcompay.projectjb.payments.basket.model;
+package com.kimcompay.projectjb.payments.model.coupon;
 
 import java.sql.Timestamp;
 
@@ -20,25 +20,30 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Data
 @Builder
-@Table(name = "baskets")
+@Table(name = "coupons")
 @Entity
-public class basketVo {
+public class couponVo {
     
     @Id
-    @Column(name = "basket_id",nullable = false,unique = true)
+    @Column(name = "coupon_id",nullable = false,unique = true)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(name = "user_id")
-    private int userId;
+    @Column(name = "store_id",nullable = false)
+    private int storeId;
 
-    @Column(name = "product_id")
-    private int productId;
+    @Column(name = "coupon_kind",nullable = false,columnDefinition = "TINYINT")
+    private int kind;
 
-    @Column(name = "basket_count")
-    private int count;
+    @Column(name = "coupon_name",nullable = false)
+    private String name;
 
-    @Column(name = "basket_created")
+    @Column(name = "coupon_num",nullable = false)
+    private String num;
+
+    @Column(name = "coupon_created")
     @CreationTimestamp
     private Timestamp created;
+
+
 }

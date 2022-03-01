@@ -1,4 +1,4 @@
-package com.kimcompay.projectjb.payments.coupon.model;
+package com.kimcompay.projectjb.payments.model.coupon;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 

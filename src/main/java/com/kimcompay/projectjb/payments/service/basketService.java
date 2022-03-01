@@ -1,4 +1,4 @@
-package com.kimcompay.projectjb.payments.basket.service;
+package com.kimcompay.projectjb.payments.service;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -6,9 +6,9 @@ import java.util.List;
 import java.util.Map;
 
 import com.kimcompay.projectjb.utillService;
-import com.kimcompay.projectjb.payments.basket.model.basketDao;
-import com.kimcompay.projectjb.payments.basket.model.basketVo;
-import com.kimcompay.projectjb.payments.basket.model.tryInsertDto;
+import com.kimcompay.projectjb.payments.model.basket.basketDao;
+import com.kimcompay.projectjb.payments.model.basket.basketVo;
+import com.kimcompay.projectjb.payments.model.basket.tryInsertDto;
 import com.kimcompay.projectjb.users.company.model.products.productVo;
 import com.kimcompay.projectjb.users.company.service.productService;
 
