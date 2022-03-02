@@ -15,6 +15,7 @@ import com.kimcompay.projectjb.apis.kakao.kakaoMapService;
 import com.kimcompay.projectjb.enums.senums;
 import com.kimcompay.projectjb.payments.model.basket.basketDao;
 import com.kimcompay.projectjb.payments.model.coupon.couponVo;
+import com.kimcompay.projectjb.payments.model.order.orderVo;
 import com.kimcompay.projectjb.payments.model.pay.tryOrderDto;
 import com.kimcompay.projectjb.users.company.model.products.productVo;
 import com.kimcompay.projectjb.users.company.model.stores.storeVo;
@@ -56,6 +57,7 @@ public class paymentService {
     private void confrimByStore(Map<Integer,List<Map<String,Object>>>divisionByStoreIds,tryOrderDto tryOrderDto) {
         //쿠폰 중복확인
         Map<Integer,couponVo>coupons=confrimCoupone(tryOrderDto.getCoupons());
+        List<Map<String,Object>>orders=new ArrayList<>();
         //주문정보 만들기
         for(Entry<Integer, List<Map<String, Object>>> divisionByStoreId:divisionByStoreIds.entrySet()){
             int storeId=divisionByStoreId.getKey();
