@@ -76,10 +76,10 @@ public class paymentService {
                 int price=0;
                 //이벤트 판별후 금액가져오기
                 productVo productVo=(productVo)productService.getProduct(productId).get("message");
-                price=productVo.getPrice();
+                price=productVo.getPrice()*count;
                 //총액 검사 배달 최소금액 때문에
-                totalPrice+=price*count;
-                //쿠폰적용
+                totalPrice+=price;
+                //쿠폰적용 여러장 받기로 다시 만들어야하나... 나중에 일단 이렇게 만들자 
                 if(coupons.get(basketId)!=null){
                     couponVo couponVo=coupons.get(basketId);
                     //쿠폰 사용 매장 검사
@@ -92,7 +92,9 @@ public class paymentService {
                     if(action==0){
                         price-=discountNum;
                     }else if(action==1){
-                        price-=price*0.01*discountNum;
+                        //너무 개이득 구조아니냐....
+                        int totalDiscount=(int)((int)productVo.getPrice()*(0.01*discountNum));
+                        price-=totalDiscount*count;
                     }
                     //0보다 작으면 결제 최소금액 
                     if(price<=0){
