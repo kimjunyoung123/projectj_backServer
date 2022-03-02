@@ -46,9 +46,6 @@ public class productService {
                 productVo.setPrice(productEventVo.getEventPrice());
             }
         }
-        //일반유저들은 고유번호모르게 select 에서 안가져와도 되는데 그냥 이렇게 하자
-        productVo.setStoreId(0);
-        productVo.setFlyerId(0);
         return utillService.getJson(true, productVo);
     }
     public JSONObject getProducts(int storeId,int page,String keyword,String category) {
