@@ -8,10 +8,13 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Map.Entry;
 
+import javax.print.DocFlavor.STRING;
+
 import com.kimcompay.projectjb.utillService;
 import com.kimcompay.projectjb.apis.kakao.kakaoMapService;
 import com.kimcompay.projectjb.enums.senums;
 import com.kimcompay.projectjb.payments.model.basket.basketDao;
+import com.kimcompay.projectjb.payments.model.coupon.couponVo;
 import com.kimcompay.projectjb.payments.model.pay.tryOrderDto;
 import com.kimcompay.projectjb.users.company.model.products.productVo;
 import com.kimcompay.projectjb.users.company.model.stores.storeVo;
@@ -52,7 +55,7 @@ public class paymentService {
     }
     private void confrimByStore(Map<Integer,List<Map<String,Object>>>divisionByStoreIds,tryOrderDto tryOrderDto) {
         //쿠폰 중복확인
-        Map<Integer,Object>coupons=confrimCoupone(tryOrderDto.getCoupons());
+        Map<Integer,couponVo>coupons=confrimCoupone(tryOrderDto.getCoupons());
         //주문정보 만들기
         for(Entry<Integer, List<Map<String, Object>>> divisionByStoreId:divisionByStoreIds.entrySet()){
             int storeId=divisionByStoreId.getKey();
@@ -63,10 +66,11 @@ public class paymentService {
             if(checkDeliverRadius(storeVo.getSaddress(),storeVo.getDeliverRadius())){
                 throw utillService.makeRuntimeEX("배달 최대반경을 초과합니다\n매장이름:"+storeVo.getSname()+"\n제품이름:"+divisionByStoreId.getValue().get(0).get("product_name")+"\n최대반경:"+storeVo.getDeliverRadius()+"km", "checkDeliverRadius");
             }
-            System.out.println(storeId);
+            System.out.println("storeId"+storeId);
             //해당 매장 결제요청 총액확인 및 제품검증
             List<Map<String, Object>>basketAndProducts=divisionByStoreId.getValue(); 
             for(Map<String,Object>basketAndProduct:basketAndProducts){
+                int basketId=Integer.parseInt(basketAndProduct.get("basket_id").toString());
                 int productId=Integer.parseInt(basketAndProduct.get("product_id").toString());
                 int count=Integer.parseInt(basketAndProduct.get("basket_count").toString());
                 int price=0;
@@ -75,15 +79,39 @@ public class paymentService {
                 price=productVo.getPrice();
                 //총액 검사 배달 최소금액 때문에
                 totalPrice+=price*count;
+                //쿠폰적용
+                if(coupons.get(basketId)!=null){
+                    couponVo couponVo=coupons.get(basketId);
+                    //쿠폰 사용 매장 검사
+                    if(couponVo.getStoreId()!=storeId){
+                        throw utillService.makeRuntimeEX("선택 상품 매장 쿠폰이 아닙니다 \n쿠폰이름:"+couponVo.getName(), "confrimByStore");
+                    }
+                    int action=couponVo.getKind();
+                    int discountNum=couponVo.getNum();
+                    //집가서 enum으로 교체
+                    if(action==0){
+                        price-=discountNum;
+                    }else if(action==1){
+                        price-=price*0.01*discountNum;
+                    }
+                    //0보다 작으면 결제 최소금액 
+                    if(price<=0){
+                        price=100;
+                    }
+                    System.out.println(coupons.get(basketId));
+                }
+                System.out.println("basketId:"+basketId);
+                System.out.println(price);
             }
+            //총액 검사
             if(storeVo.getMinPrice()>totalPrice){
                 throw utillService.makeRuntimeEX("매장 배달 최소금액 미달입니다 \n 매장이름: "+storeVo.getSname(),"confrimByStore");
             }
-            System.out.println(totalPrice);
         }
     }
-    private Map<Integer,Object> confrimCoupone(List<Map<String,Object>>coupons) {
-        Map<Integer,Object>conponNames=new HashMap<>();
+    private Map<Integer,couponVo> confrimCoupone(List<Map<String,Object>>coupons) {
+        Map<Integer,couponVo>couponInfors=new HashMap<>();
+        Map<Integer,String>conponNames=new HashMap<>();
         for(Map<String,Object>coupon:coupons){
             //null이라면 통과
             if(Optional.ofNullable(coupon.get("coupon")).orElseGet(()->null)==null){
@@ -93,11 +121,10 @@ public class paymentService {
             if(conponNames.containsValue(couponName)){
                 throw utillService.makeRuntimeEX("중복 쿠폰 발견:"+couponName, "confrimByStore");
             }
-            couponService.checkExist(couponName);
-            //품절시 행위 로직 추가해야함
-            conponNames.put(Integer.parseInt(coupon.get("id").toString()),couponName);
+            couponVo couponVo=couponService.CheckAndGet(couponName);
+            couponInfors.put(Integer.parseInt(coupon.get("id").toString()),couponVo);
         }
-        return conponNames;
+        return couponInfors;
     }
     private Map<Integer,List<Map<String,Object>>> divisionByStoreId(List<Map<String,Object>>basketAndProducts) {
         Map<Integer,List<Map<String,Object>>>divisionByStoreId=new HashMap<>();

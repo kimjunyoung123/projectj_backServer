@@ -42,7 +42,7 @@ public class couponVo {
     private String name;
 
     @Column(name = "coupon_num",nullable = false)
-    private String num;
+    private int num;
     
     @Column(name = "coupon_expire",nullable = false)
     private Timestamp expire;

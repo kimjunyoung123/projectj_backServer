@@ -16,6 +16,11 @@ public class couponService {
     @Autowired
     private couponDao couponDao;
 
+    public couponVo CheckAndGet(String couponName) {
+        couponVo couponVo=getVo(couponName);
+        confrimCoupon(couponVo);
+        return couponVo;
+    }
     public JSONObject checkExist(String couponName) {
         confrimCoupon(getVo(couponName));
         return utillService.getJson(true, "사용가능 쿠폰");
