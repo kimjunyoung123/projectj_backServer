@@ -18,11 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class settleService {
     
-    @Transactional(rollbackFor = Exception.class)
-    public JSONObject makeRequestPayInfor(Map<String,Object> orderAndproduct) {
-        paymentVo paymentVo=(paymentVo)orderAndproduct.get("payment");
-        List<orderVo>orders=(List<orderVo>)orderAndproduct.get("orders");
-
+    public JSONObject makeRequestPayInfor(String productNames,paymentVo paymentVo,List<orderVo>orders) { 
         //응답 생성
         JSONObject respons=new JSONObject();
         String mchtTrdNo=paymentVo.getMchtTrdNo();
@@ -33,7 +29,7 @@ public class settleService {
         respons.put("date", date);
         respons.put("time", time);
         respons.put("mchtTrdNo", mchtTrdNo);
-        respons.put("productNames",new StringBuffer(orderAndproduct.get("productNames").toString()).deleteCharAt(orderAndproduct.get("productNames").toString().length()-1));
+        respons.put("productNames",new StringBuffer(productNames).deleteCharAt(productNames.length()-1));
         respons.put("price", aes256.encrypt( Integer.toString(paymentVo.getTotalPrice())));
         respons.put("pktHash", sha256.encrypt(utillService.getSettleText("nxca_jt_il",method,mchtTrdNo, date, time, Integer.toString(paymentVo.getTotalPrice()))));
         respons.put("flag", true);

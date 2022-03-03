@@ -16,6 +16,7 @@ import com.kimcompay.projectjb.apis.settle.settleService;
 import com.kimcompay.projectjb.enums.senums;
 import com.kimcompay.projectjb.payments.model.basket.basketDao;
 import com.kimcompay.projectjb.payments.model.coupon.couponVo;
+import com.kimcompay.projectjb.payments.model.order.orderDao;
 import com.kimcompay.projectjb.payments.model.order.orderVo;
 import com.kimcompay.projectjb.payments.model.pay.paymentDao;
 import com.kimcompay.projectjb.payments.model.pay.paymentVo;
@@ -46,7 +47,10 @@ public class paymentService {
     private paymentDao paymentDao;
     @Autowired
     private settleService settleService;
+    @Autowired
+    private orderDao orderDao;
 
+    @org.springframework.transaction.annotation.Transactional(rollbackFor = Exception.class)
     public JSONObject tryOrder(tryOrderDto tryOrderDto) {
         int userId=utillService.getLoginId();
         //장바구니 들고오가
@@ -54,11 +58,18 @@ public class paymentService {
         //매장별로 나누기
         Map<Integer,List<Map<String,Object>>>divisionByStoreIds=divisionByStoreId(basketAndProducts);
         Map<String,Object>ordersAndPayment=confrimByStore(divisionByStoreIds,tryOrderDto);
+        //insert시도
+        paymentVo paymentVo=(paymentVo)ordersAndPayment.get("payment");
+        List<orderVo>orders=(List<orderVo>)ordersAndPayment.get("orders");
+        paymentDao.save(paymentVo);
+        for(orderVo order:orders){
+            orderDao.save(order);
+        }
         //매장별 조건검증 후 값 만들어서 전송
         if(tryOrderDto.getPayKind().equals("kpay")){
             return null;
         }
-        return settleService.makeRequestPayInfor(ordersAndPayment);
+        return settleService.makeRequestPayInfor(ordersAndPayment.get("productNames").toString(),paymentVo,orders);
     }
     private Map<String,Object> confrimByStore(Map<Integer,List<Map<String,Object>>>divisionByStoreIds,tryOrderDto tryOrderDto) {
         int userId=utillService.getLoginId();

@@ -9,6 +9,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.CreationTimestamp;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -54,6 +56,7 @@ public class orderVo {
     private int cancleFlag;
 
     @Column(name = "order_created" )
+    @CreationTimestamp
     private Timestamp created;
 
 }
