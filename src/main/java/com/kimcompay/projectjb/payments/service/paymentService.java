@@ -61,7 +61,7 @@ public class paymentService {
         List<orderVo>orderVos=new ArrayList<>();
         Map<String,Object>orderAndPayment=new HashMap<>();
         //쿠폰 중복확인
-        Map<Integer,couponVo>coupons=confrimCoupone(tryOrderDto.getCoupons());
+        Map<Integer,List<couponVo>>coupons=confrimCoupone(tryOrderDto.getCoupons());
         //할인까지 적용한 전체금액
         int realTotalPrice=0;
         //주문고유번호 생성
@@ -92,8 +92,13 @@ public class paymentService {
                 //쿠폰적용 여러장 받기로 다시 만들어야하나... 나중에 일단 이렇게 만들자 
                 String couponName=null;
                 if(coupons.get(basketId)!=null){
-                    couponVo couponVo=coupons.get(basketId);
-                    //쿠폰 사용 매장 검사
+                    List<couponVo>counponInfors=coupons.get(basketId);
+                    //주문 개수 와 쿠폰 개수 비교
+                    if(counponInfors.size()>count){
+                        throw utillService.makeRuntimeEX("쿠폰개수가 수량을 초과합니다 \n제품이름: "+productVo.getProductName(), "confrimByStore");
+                    }
+                    for(couponVo couponVo:counponInfors){
+                        //쿠폰 사용 매장 검사
                     if(couponVo.getStoreId()!=storeId){
                         throw utillService.makeRuntimeEX("선택 상품 매장 쿠폰이 아닙니다 \n쿠폰이름:"+couponVo.getName(), "confrimByStore");
                     }
@@ -112,6 +117,7 @@ public class paymentService {
                         price=100;
                     }
                     couponName=couponVo.getName();
+                    }
                 }
                 //System.out.println("basketId:"+basketId);
                 //System.out.println(price);
@@ -158,21 +164,29 @@ public class paymentService {
             }
         }
     }
-    private Map<Integer,couponVo> confrimCoupone(List<Map<String,Object>>coupons) {
-        Map<Integer,couponVo>couponInfors=new HashMap<>();
-        Map<Integer,String>conponNames=new HashMap<>();
+    private Map<Integer,List<couponVo>> confrimCoupone(List<Map<String,Object>>coupons) {
+        Map<Integer,List<couponVo>>couponInfors=new HashMap<>();
+        Map<String,String>conponNames=new HashMap<>();
         for(Map<String,Object>coupon:coupons){
             //null이라면 통과
             if(Optional.ofNullable(coupon.get("coupon")).orElseGet(()->null)==null){
                 continue;
             }
-            String couponName=coupon.get("coupon").toString();
-            if(conponNames.containsValue(couponName)){
-                throw utillService.makeRuntimeEX("중복 쿠폰 발견:"+couponName, "confrimByStore");
+            // , 로 나눠 쿠폰 한장한장 검사
+            String[] couponSplit=coupon.get("coupon").toString().split(",");
+            List<couponVo>couponAll=new ArrayList<>();
+            for(String couponName:couponSplit){
+                if(conponNames.containsValue(couponName)){
+                    throw utillService.makeRuntimeEX("중복 쿠폰 발견:"+couponName, "confrimByStore");
+                }
+                couponVo couponVo=couponService.CheckAndGet(couponName);
+                couponAll.add(couponVo);
+                conponNames.put(couponName, couponName);
             }
-            couponVo couponVo=couponService.CheckAndGet(couponName);
-            couponInfors.put(Integer.parseInt(coupon.get("id").toString()),couponVo);
+            couponInfors.put(Integer.parseInt(coupon.get("id").toString()),couponAll);
         }
+        //System.out.println("--------------------");
+        //System.out.println(couponInfors.toString());
         return couponInfors;
     }
     private Map<Integer,List<Map<String,Object>>> divisionByStoreId(List<Map<String,Object>>basketAndProducts) {
