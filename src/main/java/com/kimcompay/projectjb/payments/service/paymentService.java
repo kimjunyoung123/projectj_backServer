@@ -12,6 +12,7 @@ import javax.print.DocFlavor.STRING;
 
 import com.kimcompay.projectjb.utillService;
 import com.kimcompay.projectjb.apis.kakao.kakaoMapService;
+import com.kimcompay.projectjb.apis.settle.settleService;
 import com.kimcompay.projectjb.enums.senums;
 import com.kimcompay.projectjb.payments.model.basket.basketDao;
 import com.kimcompay.projectjb.payments.model.coupon.couponVo;
@@ -43,6 +44,8 @@ public class paymentService {
     private productService productService;
     @Autowired
     private paymentDao paymentDao;
+    @Autowired
+    private settleService settleService;
 
     public JSONObject tryOrder(tryOrderDto tryOrderDto) {
         int userId=utillService.getLoginId();
@@ -50,13 +53,8 @@ public class paymentService {
         List<Map<String,Object>>basketAndProducts=basketService.getBasketsAndProduct(userId);
         //매장별로 나누기
         Map<Integer,List<Map<String,Object>>>divisionByStoreIds=divisionByStoreId(basketAndProducts);
-        //매장별 조건검증
-        confrimByStore(divisionByStoreIds,tryOrderDto);
-        JSONObject respons=new JSONObject();
-        respons.put("price", aes256.encrypt( "1000"));
-        respons.put("pktHash", sha256.encrypt(utillService.getSettleText("nxca_jt_il", "card", "1234567", "20220301", "153500", "1000")));
-        respons.put("flag", true);
-        return respons;
+        //매장별 조건검증 후 값 만들어서 전송
+        return settleService.makeRequestPayInfor(confrimByStore(divisionByStoreIds,tryOrderDto));
     }
     private Map<String,Object> confrimByStore(Map<Integer,List<Map<String,Object>>>divisionByStoreIds,tryOrderDto tryOrderDto) {
         int userId=utillService.getLoginId();
