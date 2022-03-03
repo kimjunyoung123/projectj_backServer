@@ -98,11 +98,9 @@ public class paymentService {
                         throw utillService.makeRuntimeEX("쿠폰개수가 수량을 초과합니다 \n제품이름: "+productVo.getProductName(), "confrimByStore");
                     }
                     List<Integer>discountPrices=new ArrayList<>();
-                    int counponCount=0;
                     couponName="";
                     for(couponVo couponVo:counponInfors){
                         price=productVo.getPrice();
-                        counponCount++;
                         //쿠폰 사용 매장 검사
                         if(couponVo.getStoreId()!=storeId){
                             throw utillService.makeRuntimeEX("선택 상품 매장 쿠폰이 아닙니다 \n쿠폰이름:"+couponVo.getName(), "confrimByStore");
@@ -127,9 +125,13 @@ public class paymentService {
                         discountPrices.add(price);
                     }
                     //가격 계산
-                    price=price*(count-counponCount);//쿠폰 적용 개수만큼 마이너스
+                    price=productVo.getPrice();
+                    //System.out.println("productCount: "+count);
+                    //System.out.println("discountPrices: "+discountPrices);
+                    price=price*(count-discountPrices.size());//쿠폰 적용 개수만큼 마이너스
+                    //System.out.println("originprice: "+price);
                     for(int discountPrice:discountPrices){//쿠폰 적용 가격들 더해주기
-                        //System.out.println("discountPrice"+discountPrice);
+                        System.out.println("discountPrice"+discountPrice);
                         price+=discountPrice;
                     }
                 }else{
