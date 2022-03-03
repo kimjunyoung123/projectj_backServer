@@ -21,4 +21,13 @@ public class tryOrderDto {
 
     @NotBlank(message = "품절시 요청을 선택해주세요")
     private String soldOut;  
+
+    @NotBlank(message = "주소를 기입해주세요")
+    private String address;  
+
+    @NotBlank(message = "우편번호를 기입해주세요")
+    private String postcode; 
+
+    @NotBlank(message = "상세주소를 기입해주세요")
+    private String detailAddress; 
 }

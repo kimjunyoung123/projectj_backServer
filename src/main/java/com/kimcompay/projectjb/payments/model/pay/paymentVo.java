@@ -52,6 +52,15 @@ public class paymentVo {
     @Column(name = "cancle_all_flag",columnDefinition = "TINYINT")
     private int cancleAllFlag;
 
+    @Column(name = "payment_address")
+    private String address;
+
+    @Column(name = "payment_postcode")
+    private String postcode;
+
+    @Column(name = "payment_detail_address")
+    private String detailAddress;
+
     @Column(name = "payment_created" )
     @CreationTimestamp
     private Timestamp created;

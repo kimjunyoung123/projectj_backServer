@@ -26,6 +26,7 @@ public class settleService {
         Map<String,String>dateAndTime=utillService.getSettleTimeAndDate(LocalDateTime.now());
         String date=dateAndTime.get("date");
         String time=dateAndTime.get("time");
+        respons.put("mchtCustId", aes256.encrypt(Integer.toString(utillService.getLoginId())));
         respons.put("date", date);
         respons.put("time", time);
         respons.put("mchtTrdNo", mchtTrdNo);

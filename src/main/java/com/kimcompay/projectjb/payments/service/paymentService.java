@@ -89,7 +89,7 @@ public class paymentService {
             //매장 바뀔때 총액 0원으로 해야함
             int totalPrice=0;
             //배달가능 거리 계산 
-            if(checkDeliverRadius(storeVo.getSaddress(),storeVo.getDeliverRadius())){
+            if(checkDeliverRadius(storeVo.getSaddress(),storeVo.getDeliverRadius(),tryOrderDto.getAddress())){
                 throw utillService.makeRuntimeEX("배달 최대반경을 초과합니다\n매장이름:"+storeVo.getSname()+"\n제품이름:"+divisionByStoreId.getValue().get(0).get("product_name")+"\n최대반경:"+storeVo.getDeliverRadius()+"km", "checkDeliverRadius");
             }
             //System.out.println("storeId"+storeId);
@@ -173,7 +173,7 @@ public class paymentService {
         String soldOutAction=tryOrderDto.getSoldOut();
         checkSoldOutAction(soldOutAction);
         paymentVo vo=paymentVo.builder().cancleAllFlag(0).cnclOrd(0).mchtTrdNo(mchtTrdNo).method(method).soldOurAction(soldOutAction)
-                    .totalPrice(realTotalPrice).userId(userId).build();
+                    .totalPrice(realTotalPrice).userId(userId).address(tryOrderDto.getAddress()).postcode(tryOrderDto.getPostcode()).detailAddress(tryOrderDto.getDetailAddress()).build();
         //System.out.println(vo.toString());
         orderAndPayment.put("orders", orderVos);
         orderAndPayment.put("payment", vo);
@@ -243,16 +243,16 @@ public class paymentService {
         }
         return divisionByStoreId;
     }
-    public boolean checkDeliverRadius(String storeAddress,double storeRadius) {
-        double result=getWay(storeAddress);
+    public boolean checkDeliverRadius(String storeAddress,double storeRadius,String userAddress) {
+        double result=getWay(storeAddress,userAddress);
         System.out.println(result);
         if(storeRadius<result){
             return true;
         }
         return false;
     }
-    private double getWay(String storeAddress) {
-        List<LinkedHashMap<String,Object>> userAddressInfor=kakaoMapService.checkAddress(utillService.getLoginInfor().get("address").toString());
+    private double getWay(String storeAddress,String userAddress) {
+        List<LinkedHashMap<String,Object>> userAddressInfor=kakaoMapService.checkAddress(userAddress);
         List<LinkedHashMap<String,Object>> storeAddressInfor=kakaoMapService.checkAddress(storeAddress);
         double userLat=Double.parseDouble(userAddressInfor.get(0).get("y").toString());
         double userLon=Double.parseDouble(userAddressInfor.get(0).get("x").toString());
