@@ -46,7 +46,7 @@ public class aopService {
 
     private HttpSession httpSession;
     
-    //@Async 흐름 파악위해 비동기 해제
+    //@Async //흐름 파악위해 비동기 해제
     @Before("execution(* com.kimcompay.projectjb.apis.aws.services.*.*(..))"
     +"||execution(* com.kimcompay.projectjb.apis.jungbu.*.*(..))"
     +"||execution(* com.kimcompay.projectjb.apis.kakao.*.*(..))"

@@ -2,6 +2,7 @@ package com.kimcompay.projectjb;
 
 import java.io.IOException;
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -340,5 +341,16 @@ public class utillService {
     // This function converts radians to decimal degrees
     public static double rad2deg(double rad) {
         return (rad * 180 / Math.PI);
+    }
+    public static Map<String,String> getSettleTimeAndDate(LocalDateTime dateAndTime) {
+        String[] dateAndTimes=dateAndTime.toString().split("T");
+        String date=dateAndTimes[0];
+        String time=dateAndTimes[1];
+        date=date.replace("-", "");
+        time=time.replace(":", "").substring(0, 5);
+        Map<String,String>response=new HashMap<>();
+        response.put("date", date);
+        response.put("time", time);
+        return response;
     }
 }

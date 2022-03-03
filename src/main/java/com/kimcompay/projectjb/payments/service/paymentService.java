@@ -53,11 +53,16 @@ public class paymentService {
         List<Map<String,Object>>basketAndProducts=basketService.getBasketsAndProduct(userId);
         //매장별로 나누기
         Map<Integer,List<Map<String,Object>>>divisionByStoreIds=divisionByStoreId(basketAndProducts);
+        Map<String,Object>ordersAndPayment=confrimByStore(divisionByStoreIds,tryOrderDto);
         //매장별 조건검증 후 값 만들어서 전송
-        return settleService.makeRequestPayInfor(confrimByStore(divisionByStoreIds,tryOrderDto));
+        if(tryOrderDto.getPayKind().equals("kpay")){
+            return null;
+        }
+        return settleService.makeRequestPayInfor(ordersAndPayment);
     }
     private Map<String,Object> confrimByStore(Map<Integer,List<Map<String,Object>>>divisionByStoreIds,tryOrderDto tryOrderDto) {
         int userId=utillService.getLoginId();
+        String productNames="";
         List<orderVo>orderVos=new ArrayList<>();
         Map<String,Object>orderAndPayment=new HashMap<>();
         //쿠폰 중복확인
@@ -120,7 +125,7 @@ public class paymentService {
                         if(price<=0){
                             price=100;
                         }
-                        couponName+=couponVo.getName()+",";
+                        couponName=couponName+couponVo.getName()+",";
                         //System.out.println("discountprice: "+price);
                         discountPrices.add(price);
                     }
@@ -141,9 +146,10 @@ public class paymentService {
                 //System.out.println(price);
                 orderVo vo=orderVo.builder().cancleFlag(0).mchtTrdNo(mchtTrdNo).coupon(couponName).price(price).productId(productVo.getId())
                             .basketId(basketId).storeId(storeId).userId(userId).build();
-                System.out.println(vo.toString());
+                //System.out.println(vo.toString());
                 realTotalPrice+=price;
                 orderVos.add(vo);
+                productNames=productNames+productVo.getProductName()+",";
             }
             //총액 검사
             if(storeVo.getMinPrice()>totalPrice){
@@ -157,9 +163,10 @@ public class paymentService {
         checkSoldOutAction(soldOutAction);
         paymentVo vo=paymentVo.builder().cancleAllFlag(0).cnclOrd(0).mchtTrdNo(mchtTrdNo).method(method).soldOurAction(soldOutAction)
                     .totalPrice(realTotalPrice).userId(userId).build();
-        System.out.println(vo.toString());
+        //System.out.println(vo.toString());
         orderAndPayment.put("orders", orderVos);
         orderAndPayment.put("payment", vo);
+        orderAndPayment.put("productNames", productNames);
         //System.out.println(orderAndPayment.toString());
         return orderAndPayment;
     }
