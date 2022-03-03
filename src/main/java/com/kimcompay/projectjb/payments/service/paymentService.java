@@ -86,10 +86,10 @@ public class paymentService {
                 int price=0;
                 //이벤트 판별후 금액가져오기
                 productVo productVo=(productVo)productService.getProduct(productId).get("message");
-                price=productVo.getPrice()*count;
+                price=productVo.getPrice();
                 //총액 검사 배달 최소금액 때문에 원래 가격으로 하고 
-                totalPrice+=price;
-                //쿠폰적용 여러장 받기로 다시 만들어야하나... 나중에 일단 이렇게 만들자 
+                totalPrice+=price*count;
+                //쿠폰적용 여러장 받기
                 String couponName=null;
                 if(coupons.get(basketId)!=null){
                     List<couponVo>counponInfors=coupons.get(basketId);
@@ -97,27 +97,43 @@ public class paymentService {
                     if(counponInfors.size()>count){
                         throw utillService.makeRuntimeEX("쿠폰개수가 수량을 초과합니다 \n제품이름: "+productVo.getProductName(), "confrimByStore");
                     }
+                    List<Integer>discountPrices=new ArrayList<>();
+                    int counponCount=0;
+                    couponName="";
                     for(couponVo couponVo:counponInfors){
+                        price=productVo.getPrice();
+                        counponCount++;
                         //쿠폰 사용 매장 검사
-                    if(couponVo.getStoreId()!=storeId){
-                        throw utillService.makeRuntimeEX("선택 상품 매장 쿠폰이 아닙니다 \n쿠폰이름:"+couponVo.getName(), "confrimByStore");
+                        if(couponVo.getStoreId()!=storeId){
+                            throw utillService.makeRuntimeEX("선택 상품 매장 쿠폰이 아닙니다 \n쿠폰이름:"+couponVo.getName(), "confrimByStore");
+                        }
+                        int action=couponVo.getKind();
+                        int discountNum=couponVo.getNum();
+                        //집가서 enum으로 교체
+                        if(action==0){
+                            price-=discountNum;
+                        }else if(action==1){
+                            System.out.println("discountNum:"+discountNum);
+                            int totalDiscount=(int)((int)productVo.getPrice()*(0.01*discountNum));
+                            System.out.println("discountNum:"+discountNum);
+                            price-=totalDiscount;
+                        }
+                        //0보다 작으면 결제 최소금액 
+                        if(price<=0){
+                            price=100;
+                        }
+                        couponName+=couponVo.getName()+",";
+                        //System.out.println("discountprice: "+price);
+                        discountPrices.add(price);
                     }
-                    int action=couponVo.getKind();
-                    int discountNum=couponVo.getNum();
-                    //집가서 enum으로 교체
-                    if(action==0){
-                        price-=discountNum;
-                    }else if(action==1){
-                        //너무 개이득 구조아니냐....
-                        int totalDiscount=(int)((int)productVo.getPrice()*(0.01*discountNum));
-                        price-=totalDiscount*count;
+                    //가격 계산
+                    price=price*(count-counponCount);//쿠폰 적용 개수만큼 마이너스
+                    for(int discountPrice:discountPrices){//쿠폰 적용 가격들 더해주기
+                        //System.out.println("discountPrice"+discountPrice);
+                        price+=discountPrice;
                     }
-                    //0보다 작으면 결제 최소금액 
-                    if(price<=0){
-                        price=100;
-                    }
-                    couponName=couponVo.getName();
-                    }
+                }else{
+                    price*=count;
                 }
                 //System.out.println("basketId:"+basketId);
                 //System.out.println(price);
@@ -139,7 +155,7 @@ public class paymentService {
         checkSoldOutAction(soldOutAction);
         paymentVo vo=paymentVo.builder().cancleAllFlag(0).cnclOrd(0).mchtTrdNo(mchtTrdNo).method(method).soldOurAction(soldOutAction)
                     .totalPrice(realTotalPrice).userId(userId).build();
-        //System.out.println(vo.toString());
+        System.out.println(vo.toString());
         orderAndPayment.put("orders", orderVos);
         orderAndPayment.put("payment", vo);
         //System.out.println(orderAndPayment.toString());
