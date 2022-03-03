@@ -13,11 +13,13 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
 @Builder
+@ToString
 @Table(name = "orders")
 @Entity
 public class orderVo {
@@ -30,20 +32,26 @@ public class orderVo {
     @Column(name = "product_id",nullable = false)
     private int productId;
 
-    @Column(name = "product_name",nullable = false)
-    private String productName;
-
-    @Column(name ="method",nullable = false)
-    private String method;
-
     @Column(name ="mchtTrdNo",nullable = false)
     private String mchtTrdNo;
 
-    @Column(name ="soldout_action",nullable = false)
-    private String soldOurAction;
+    @Column(name ="order_coupon")
+    private String coupon;
+
+    @Column(name = "order_price",nullable = false)
+    private int price;
+
+    @Column(name = "store_id",nullable = false)
+    private int storeId;
+
+    @Column(name = "basket_id",nullable = false)
+    private int basketId;
 
     @Column(name = "user_id",nullable = false)
     private int userId;
+
+    @Column(name = "oder_cancle_flag",columnDefinition = "TINYINT")
+    private int cancleFlag;
 
     @Column(name = "order_created" )
     private Timestamp created;

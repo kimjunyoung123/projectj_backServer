@@ -16,6 +16,8 @@ import com.kimcompay.projectjb.enums.senums;
 import com.kimcompay.projectjb.payments.model.basket.basketDao;
 import com.kimcompay.projectjb.payments.model.coupon.couponVo;
 import com.kimcompay.projectjb.payments.model.order.orderVo;
+import com.kimcompay.projectjb.payments.model.pay.paymentDao;
+import com.kimcompay.projectjb.payments.model.pay.paymentVo;
 import com.kimcompay.projectjb.payments.model.pay.tryOrderDto;
 import com.kimcompay.projectjb.users.company.model.products.productVo;
 import com.kimcompay.projectjb.users.company.model.stores.storeVo;
@@ -39,6 +41,8 @@ public class paymentService {
     private couponService couponService;
     @Autowired
     private productService productService;
+    @Autowired
+    private paymentDao paymentDao;
 
     public JSONObject tryOrder(tryOrderDto tryOrderDto) {
         int userId=utillService.getLoginId();
@@ -54,10 +58,16 @@ public class paymentService {
         respons.put("flag", true);
         return respons;
     }
-    private void confrimByStore(Map<Integer,List<Map<String,Object>>>divisionByStoreIds,tryOrderDto tryOrderDto) {
+    private Map<String,Object> confrimByStore(Map<Integer,List<Map<String,Object>>>divisionByStoreIds,tryOrderDto tryOrderDto) {
+        int userId=utillService.getLoginId();
+        List<orderVo>orderVos=new ArrayList<>();
+        Map<String,Object>orderAndPayment=new HashMap<>();
         //쿠폰 중복확인
         Map<Integer,couponVo>coupons=confrimCoupone(tryOrderDto.getCoupons());
-        List<Map<String,Object>>orders=new ArrayList<>();
+        //할인까지 적용한 전체금액
+        int realTotalPrice=0;
+        //주문고유번호 생성
+        String mchtTrdNo=getMchtTrdNo();
         //주문정보 만들기
         for(Entry<Integer, List<Map<String, Object>>> divisionByStoreId:divisionByStoreIds.entrySet()){
             int storeId=divisionByStoreId.getKey();
@@ -68,10 +78,10 @@ public class paymentService {
             if(checkDeliverRadius(storeVo.getSaddress(),storeVo.getDeliverRadius())){
                 throw utillService.makeRuntimeEX("배달 최대반경을 초과합니다\n매장이름:"+storeVo.getSname()+"\n제품이름:"+divisionByStoreId.getValue().get(0).get("product_name")+"\n최대반경:"+storeVo.getDeliverRadius()+"km", "checkDeliverRadius");
             }
-            System.out.println("storeId"+storeId);
+            //System.out.println("storeId"+storeId);
             //해당 매장 결제요청 총액확인 및 제품검증
             List<Map<String, Object>>basketAndProducts=divisionByStoreId.getValue(); 
-            for(Map<String,Object>basketAndProduct:basketAndProducts){
+            for(Map<String,Object>basketAndProduct:basketAndProducts){ 
                 int basketId=Integer.parseInt(basketAndProduct.get("basket_id").toString());
                 int productId=Integer.parseInt(basketAndProduct.get("product_id").toString());
                 int count=Integer.parseInt(basketAndProduct.get("basket_count").toString());
@@ -79,9 +89,10 @@ public class paymentService {
                 //이벤트 판별후 금액가져오기
                 productVo productVo=(productVo)productService.getProduct(productId).get("message");
                 price=productVo.getPrice()*count;
-                //총액 검사 배달 최소금액 때문에
+                //총액 검사 배달 최소금액 때문에 원래 가격으로 하고 
                 totalPrice+=price;
                 //쿠폰적용 여러장 받기로 다시 만들어야하나... 나중에 일단 이렇게 만들자 
+                String couponName=null;
                 if(coupons.get(basketId)!=null){
                     couponVo couponVo=coupons.get(basketId);
                     //쿠폰 사용 매장 검사
@@ -102,14 +113,50 @@ public class paymentService {
                     if(price<=0){
                         price=100;
                     }
-                    System.out.println(coupons.get(basketId));
+                    couponName=couponVo.getName();
                 }
-                System.out.println("basketId:"+basketId);
-                System.out.println(price);
+                //System.out.println("basketId:"+basketId);
+                //System.out.println(price);
+                orderVo vo=orderVo.builder().cancleFlag(0).mchtTrdNo(mchtTrdNo).coupon(couponName).price(price).productId(productVo.getId())
+                            .basketId(basketId).storeId(storeId).userId(userId).build();
+                System.out.println(vo.toString());
+                realTotalPrice+=price;
+                orderVos.add(vo);
             }
             //총액 검사
             if(storeVo.getMinPrice()>totalPrice){
                 throw utillService.makeRuntimeEX("매장 배달 최소금액 미달입니다 \n 매장이름: "+storeVo.getSname(),"confrimByStore");
+            }
+        }
+        //결제방식,품절시 대체 행동 검사
+        String method=tryOrderDto.getPayKind();
+        checkPayKind(method);
+        String soldOutAction=tryOrderDto.getSoldOut();
+        checkSoldOutAction(soldOutAction);
+        paymentVo vo=paymentVo.builder().cancleAllFlag(0).cnclOrd(0).mchtTrdNo(mchtTrdNo).method(method).soldOurAction(soldOutAction)
+                    .totalPrice(realTotalPrice).userId(userId).build();
+        //System.out.println(vo.toString());
+        orderAndPayment.put("orders", orderVos);
+        orderAndPayment.put("payment", vo);
+        //System.out.println(orderAndPayment.toString());
+        return orderAndPayment;
+    }
+    private void checkSoldOutAction(String soldOutAction) {
+        if(!soldOutAction.equals("replace")&&!soldOutAction.equals("cancle")&&!soldOutAction.equals("contact")){
+            throw utillService.makeRuntimeEX("지원하지 않는 품절시 요청입니다", "checkSoldOutAction");
+        }
+    }
+    private void checkPayKind(String payKind) {
+        if(!payKind.equals("card")&&!payKind.equals("vbank")&&!payKind.equals("kpay")){
+            throw utillService.makeRuntimeEX("지원하지 않는 결제 방식입니다", "checkPayKind");
+        }
+    }
+    private String getMchtTrdNo() {
+        //같은 고유값이 존재한는지
+        while(true){
+            String mchtTrdNo=utillService.getRandomNum(10);
+            if(!paymentDao.existsByMchtTrdNo(mchtTrdNo)){
+                return  mchtTrdNo;
             }
         }
     }
