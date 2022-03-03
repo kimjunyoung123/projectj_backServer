@@ -22,7 +22,10 @@ public class couponService {
         return couponVo;
     }
     public JSONObject checkExist(String couponName) {
-        confrimCoupon(getVo(couponName));
+        String[] couponNames=couponName.split(",");
+        for(String coupon:couponNames){
+            confrimCoupon(getVo(coupon));
+        }
         return utillService.getJson(true, "사용가능 쿠폰");
     }
     public void confrimCoupon(couponVo couponVo) {
