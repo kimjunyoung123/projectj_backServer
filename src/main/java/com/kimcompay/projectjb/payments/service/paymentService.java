@@ -76,7 +76,7 @@ public class paymentService {
         String expire=null;
         if(paymentVo.getMethod().equals("vbank")){
             mchtId="nx_mid_il";
-            expire=LocalDateTime.now().toString().replaceAll("[:,T,-]", "").substring(0, 14);
+            expire=LocalDateTime.now().plusMinutes(15).toString().replaceAll("[:,T,-]", "").substring(0, 14);
         }
         return settleService.makeRequestPayInfor(ordersAndPayment.get("productNames").toString(),paymentVo,orders,mchtId,expire);
     }

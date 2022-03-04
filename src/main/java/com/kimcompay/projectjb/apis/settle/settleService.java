@@ -30,6 +30,8 @@ public class settleService {
         if(expireIfVank!=null){
             respons.put("expireDt",expireIfVank);
         }
+        respons.put("method", method);
+        respons.put("mchtId", mchtId);
         respons.put("mchtCustId", aes256.encrypt(Integer.toString(utillService.getLoginId())));
         respons.put("date", date);
         respons.put("time", time);
