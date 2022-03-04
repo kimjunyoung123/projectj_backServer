@@ -1,5 +1,7 @@
 package com.kimcompay.projectjb.payments.service;
 
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -69,7 +71,14 @@ public class paymentService {
         if(tryOrderDto.getPayKind().equals("kpay")){
             return null;
         }
-        return settleService.makeRequestPayInfor(ordersAndPayment.get("productNames").toString(),paymentVo,orders);
+        String mchtId="nxca_jt_il";
+        //vbank시 추가
+        String expire=null;
+        if(paymentVo.getMethod().equals("vbank")){
+            mchtId="nx_mid_il";
+            expire=LocalDateTime.now().toString().replaceAll("[:,T,-]", "").substring(0, 14);
+        }
+        return settleService.makeRequestPayInfor(ordersAndPayment.get("productNames").toString(),paymentVo,orders,mchtId,expire);
     }
     private Map<String,Object> confrimByStore(Map<Integer,List<Map<String,Object>>>divisionByStoreIds,tryOrderDto tryOrderDto) {
         int userId=utillService.getLoginId();
