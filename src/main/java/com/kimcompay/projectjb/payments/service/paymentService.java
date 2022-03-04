@@ -72,6 +72,7 @@ public class paymentService {
         }
         //매장별 조건검증 후 값 만들어서 전송
         if(tryOrderDto.getPayKind().equals("kpay")){
+            kakaoPayService.tryInsert(paymentVo.getId(), paymentVo.getMchtTrdNo());
             int totalCount=Integer.parseInt(ordersAndPayment.get("totalCount").toString());
             return kakaoPayService.requestPay(ordersAndPayment.get("productNames").toString(), paymentVo, orders, totalCount);
         }

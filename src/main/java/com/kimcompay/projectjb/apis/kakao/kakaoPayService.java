@@ -4,6 +4,8 @@ import java.util.List;
 
 import com.kimcompay.projectjb.utillService;
 import com.kimcompay.projectjb.apis.requestTo;
+import com.kimcompay.projectjb.payments.model.kpay.kpayDao;
+import com.kimcompay.projectjb.payments.model.kpay.kpayVo;
 import com.kimcompay.projectjb.payments.model.order.orderVo;
 import com.kimcompay.projectjb.payments.model.pay.paymentVo;
 
@@ -21,6 +23,8 @@ public class kakaoPayService {
     
     @Autowired
     private requestTo requestTo;
+    @Autowired
+    private kpayDao kpayDao;
     
     @Value("${kakao.admin.key}")
     private String kakaoAdminKey;
@@ -33,6 +37,10 @@ public class kakaoPayService {
     @Value("${kakao.pay.fail_url}")
     private String failUrl;
 
+    public void tryInsert(int paymentId,String mchtTrdNo) {
+        kpayVo vo=kpayVo.builder().mchtTrdNo(mchtTrdNo).paymentId(paymentId).build();
+        kpayDao.save(vo);
+    }
     public JSONObject requestPay(String productNames,paymentVo paymentVo,List<orderVo>orders,int totalCount) {
         //header만들기
         HttpHeaders httpHeaders=new HttpHeaders();
