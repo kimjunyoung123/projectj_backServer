@@ -217,28 +217,33 @@ public class userService {
         return userdao.findEmailByPhone(phone, phone);
     }
     private JSONObject checkLogin(HttpServletRequest request,String detail) {
+        JSONObject jsonObject=new JSONObject();
         try {
              //시큐리티 세션 꺼내기
             principalDetails principalDetails=(principalDetails)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            Map<Object,Object>map=principalDetails.getPrinci();
+            //System.out.println("detial:"+detail);
             //요청분류
             if(detail.equals("email")){
                 return utillService.getJson(true, principalDetails.getUsername()+","+principalDetails.getRole()+","+principalDetails.getPrinci().get("id"));
             }else if(detail.equals(senums.allt.get())){
-                Map<Object,Object>map=principalDetails.getPrinci();
                 map.put(refreshTokenCookieName, null);//refresh token제거 비밀번호는 로그인시 애초에 redis에 저장하지 않음
-                JSONObject jsonObject=new JSONObject();
                 jsonObject.put("message", map);
-                jsonObject.put("flag", true);
                 return jsonObject;
             }else if(detail.equals("role")){
-                Map<Object,Object>map=principalDetails.getPrinci();
                 return utillService.getJson(true, map.get("role").toString());
+            }else if(detail.equals("address")){
+                jsonObject.put("detailAddress", map.get("detail_address"));
+                jsonObject.put("postcode", map.get("post_code"));
+                jsonObject.put("address", map.get("address"));
             }else{
                 return utillService.getJson(false, "잘못된 요청");
             }
         } catch (NullPointerException |ClassCastException e) {
             throw utillService.makeRuntimeEX("로그인 정보없음", "checkLogin");
         }
+        jsonObject.put("flag", true);
+        return jsonObject;
     }
     @Transactional(rollbackFor = Exception.class)
     public JSONObject checkLogin(HttpServletRequest request,HttpServletResponse response) {
