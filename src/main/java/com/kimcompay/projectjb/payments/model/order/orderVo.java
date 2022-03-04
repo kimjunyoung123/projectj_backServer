@@ -52,6 +52,9 @@ public class orderVo {
     @Column(name = "user_id",nullable = false)
     private int userId;
 
+    @Column(name = "order_count",nullable = false)
+    private int count;
+
     @Column(name = "oder_cancle_flag",columnDefinition = "TINYINT")
     private int cancleFlag;
 

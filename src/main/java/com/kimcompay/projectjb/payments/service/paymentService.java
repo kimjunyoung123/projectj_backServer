@@ -14,6 +14,7 @@ import javax.print.DocFlavor.STRING;
 
 import com.kimcompay.projectjb.utillService;
 import com.kimcompay.projectjb.apis.kakao.kakaoMapService;
+import com.kimcompay.projectjb.apis.kakao.kakaoPayService;
 import com.kimcompay.projectjb.apis.settle.settleService;
 import com.kimcompay.projectjb.enums.senums;
 import com.kimcompay.projectjb.payments.model.basket.basketDao;
@@ -51,6 +52,8 @@ public class paymentService {
     private settleService settleService;
     @Autowired
     private orderDao orderDao;
+    @Autowired
+    private kakaoPayService kakaoPayService;
 
     @org.springframework.transaction.annotation.Transactional(rollbackFor = Exception.class)
     public JSONObject tryOrder(tryOrderDto tryOrderDto) {
@@ -69,7 +72,8 @@ public class paymentService {
         }
         //매장별 조건검증 후 값 만들어서 전송
         if(tryOrderDto.getPayKind().equals("kpay")){
-            return null;
+            int totalCount=Integer.parseInt(ordersAndPayment.get("totalCount").toString());
+            return kakaoPayService.requestPay(ordersAndPayment.get("productNames").toString(), paymentVo, orders, totalCount);
         }
         String mchtId="nxca_jt_il";
         //vbank시 추가
@@ -89,6 +93,7 @@ public class paymentService {
         Map<Integer,List<couponVo>>coupons=confrimCoupone(tryOrderDto.getCoupons());
         //할인까지 적용한 전체금액
         int realTotalPrice=0;
+        int totalCount=0;
         //주문고유번호 생성
         String mchtTrdNo=getMchtTrdNo();
         //주문정보 만들기
@@ -114,6 +119,7 @@ public class paymentService {
                 price=productVo.getPrice();
                 //총액 검사 배달 최소금액 때문에 원래 가격으로 하고 
                 totalPrice+=price*count;
+                totalCount+=count;
                 //쿠폰적용 여러장 받기
                 String couponName=null;
                 if(coupons.get(basketId)!=null){
@@ -165,7 +171,7 @@ public class paymentService {
                 //System.out.println("basketId:"+basketId);
                 //System.out.println(price);
                 orderVo vo=orderVo.builder().cancleFlag(0).mchtTrdNo(mchtTrdNo).coupon(couponName).price(price).productId(productVo.getId())
-                            .basketId(basketId).storeId(storeId).userId(userId).build();
+                            .basketId(basketId).count(count).storeId(storeId).userId(userId).build();
                 //System.out.println(vo.toString());
                 realTotalPrice+=price;
                 orderVos.add(vo);
@@ -184,6 +190,7 @@ public class paymentService {
         paymentVo vo=paymentVo.builder().cancleAllFlag(0).cnclOrd(0).mchtTrdNo(mchtTrdNo).method(method).soldOurAction(soldOutAction)
                     .totalPrice(realTotalPrice).userId(userId).address(tryOrderDto.getAddress()).postcode(tryOrderDto.getPostcode()).detailAddress(tryOrderDto.getDetailAddress()).build();
         //System.out.println(vo.toString());
+        orderAndPayment.put("totalCount", totalCount);
         orderAndPayment.put("orders", orderVos);
         orderAndPayment.put("payment", vo);
         orderAndPayment.put("productNames", productNames);
