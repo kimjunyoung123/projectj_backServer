@@ -26,4 +26,7 @@ public interface basketDao extends JpaRepository<basketVo,Integer> {
     +" from baskets a inner join products b on a.product_id=b.product_id where a.user_id=?",nativeQuery = true)
     List<Map<String,Object>>findByUserIdJoinProduct(int userId);
 
+    @Query(value = "select a.*,b.price,b.product_name,b.store_id,b.event_state"
+    +" from baskets a inner join products b on a.product_id=b.product_id where a.basket_id=?",nativeQuery = true)
+    Map<String,Object>findByIdJoinProducts(int basketId);
 }

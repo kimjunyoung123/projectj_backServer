@@ -26,6 +26,9 @@ public class basketService {
     @Autowired
     private productService productService;
 
+    public Map<String,Object> getBasketAndProductByBasketId(int basketId) {
+        return basketDao.findByIdJoinProducts(basketId);
+    }
     public List<Map<String,Object>> getBasketsAndProduct(int userId) {
         return basketDao.findByUserIdJoinProduct(userId);
     }

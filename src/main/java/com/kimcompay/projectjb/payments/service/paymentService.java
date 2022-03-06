@@ -56,12 +56,30 @@ public class paymentService {
     private kakaoPayService kakaoPayService;
 
     @org.springframework.transaction.annotation.Transactional(rollbackFor = Exception.class)
-    public JSONObject tryOrder(tryOrderDto tryOrderDto) {
+    public JSONObject tryOrder(tryOrderDto tryOrderDto,String action) {
         int userId=utillService.getLoginId();
         //장바구니 들고오가
-        List<Map<String,Object>>basketAndProducts=basketService.getBasketsAndProduct(userId);
+        List<Map<String,Object>>basketAndProducts=new ArrayList<>();
+        if(action.equals("all")){
+            basketAndProducts=basketService.getBasketsAndProduct(userId);
+        }else if(action.equals("choice")){
+            List<Map<String,Object>>baskets=tryOrderDto.getCoupons();
+            for(Map<String,Object>basket:baskets){
+                int basketId=Integer.parseInt(basket.get("id").toString());
+                Map<String,Object>basketVo=basketService.getBasketAndProductByBasketId(basketId);
+                if(basketVo.isEmpty()){
+                    throw utillService.makeRuntimeEX("존재하지 않는 장바구니입니다 \n번호: "+basketId, "tryOrder");
+                }else if(Integer.parseInt(basketVo.get("user_id").toString())!=userId){
+                    throw utillService.makeRuntimeEX("본인의 장바구니가 아닙니다 \n번호: "+basketId, "tryOrder");
+                }
+                basketAndProducts.add(basketVo);
+            }
+        }else{
+            throw utillService.makeRuntimeEX("잘못된 장바구니 선택옵션입니다 \n관리자에게 문의 해주세요", "tryOrder");
+        }
         //매장별로 나누기
         Map<Integer,List<Map<String,Object>>>divisionByStoreIds=divisionByStoreId(basketAndProducts);
+        //요청 검증하기
         Map<String,Object>ordersAndPayment=confrimByStore(divisionByStoreIds,tryOrderDto);
         //insert시도
         paymentVo paymentVo=(paymentVo)ordersAndPayment.get("payment");

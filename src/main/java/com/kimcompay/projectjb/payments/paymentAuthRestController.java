@@ -29,9 +29,11 @@ public class paymentAuthRestController {
         return couponService.checkExist(couponName);
     }
     //구매시도 ,거리 계산
-    @RequestMapping(value = "",method = RequestMethod.POST)
-    public JSONObject tryPay(@Valid @RequestBody tryOrderDto tryOrderDto) {
-        return paymentService.tryOrder(tryOrderDto);
+    @RequestMapping(value = "/{action}",method = RequestMethod.POST)
+    public JSONObject tryPay(@Valid @RequestBody tryOrderDto tryOrderDto,@PathVariable String action) {
+        return paymentService.tryOrder(tryOrderDto,action);
     }
+   
+
     
 }
