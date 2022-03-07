@@ -12,6 +12,7 @@ import java.util.Map.Entry;
 
 import javax.print.DocFlavor.STRING;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kimcompay.projectjb.utillService;
 import com.kimcompay.projectjb.apis.kakao.kakaoMapService;
 import com.kimcompay.projectjb.apis.kakao.kakaoPayService;
@@ -31,6 +32,8 @@ import com.kimcompay.projectjb.users.company.service.storeService;
 
 import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.HashOperations;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -54,6 +57,8 @@ public class paymentService {
     private orderDao orderDao;
     @Autowired
     private kakaoPayService kakaoPayService;
+    @Autowired
+    private RedisTemplate<String,Object>redisTemplate;
 
     @org.springframework.transaction.annotation.Transactional(rollbackFor = Exception.class)
     public JSONObject tryOrder(tryOrderDto tryOrderDto,String action) {
@@ -84,9 +89,11 @@ public class paymentService {
         //insert시도
         paymentVo paymentVo=(paymentVo)ordersAndPayment.get("payment");
         List<orderVo>orders=(List<orderVo>)ordersAndPayment.get("orders");
-        paymentDao.save(paymentVo);
+        redisTemplate.opsForHash().put("redisKey", "redisHashKey", paymentVo);
+        LinkedHashMap<String,Object> paymentVo2=(LinkedHashMap)redisTemplate.opsForHash().entries("redisKey");
+
         for(orderVo order:orders){
-            orderDao.save(order);
+            //orderDao.save(order);
         }
         //매장별 조건검증 후 값 만들어서 전송
         if(tryOrderDto.getPayKind().equals("kpay")){
