@@ -54,7 +54,8 @@ public class authorizationFilter extends BasicAuthenticationFilter  {
             //시큐리티 인증세션 주입
             System.out.println(redisTemplate.opsForHash().entries(id+senums.loginTextRedis.get()));
             Map<Object, Object>loginInfor=redisTemplate.opsForHash().entries(id+senums.loginTextRedis.get());
-            principalDetails principalDetails=new principalDetails(redisTemplate.opsForHash().entries(id+senums.loginTextRedis.get()));
+            System.out.println(loginInfor.get("3login").toString());
+            principalDetails principalDetails=new principalDetails((Map<Object, Object>) redisTemplate.opsForHash().entries(id+senums.loginTextRedis.get()).get("3login"),false);
             SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(principalDetails,null,principalDetails.getAuthorities()));
 
         } catch (TokenExpiredException e) {

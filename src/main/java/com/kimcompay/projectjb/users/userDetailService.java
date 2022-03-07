@@ -43,6 +43,6 @@ public class userDetailService implements UserDetailsService {
             userAdapter.adapterUser(userVo);
             princi=userAdapter.getMap();
         }
-        return new principalDetails(princi);
+        return new principalDetails(princi,true);
     }
 }

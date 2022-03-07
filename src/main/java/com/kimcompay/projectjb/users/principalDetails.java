@@ -21,10 +21,11 @@ public class principalDetails implements UserDetails {
     private Map<Object,Object>princi=new HashMap<>();
     private boolean is_can=false;
 
-
-    public principalDetails(Map<Object,Object>map){
+    public principalDetails(Map<Object,Object>map,boolean checkLoginDate){
         this.princi=map;
-        is_can=check_lock(Integer.parseInt(map.get("sleep").toString()),map.get("login_date").toString());
+        if(checkLoginDate){
+            is_can=check_lock(Integer.parseInt(map.get("sleep").toString()),map.get("login_date").toString());
+        }
     }
 
 
