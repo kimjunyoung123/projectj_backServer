@@ -31,7 +31,7 @@ public class securityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private jwtService jwtService;
     @Autowired
-    private RedisTemplate<String,String>redisTemplate;
+    private RedisTemplate<String,Object>redisTemplate;
 
     @Bean
     @Override

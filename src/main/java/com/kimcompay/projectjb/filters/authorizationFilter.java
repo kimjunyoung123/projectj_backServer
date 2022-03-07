@@ -2,6 +2,7 @@ package com.kimcompay.projectjb.filters;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -12,6 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.kimcompay.projectjb.utillService;
+import com.kimcompay.projectjb.enums.senums;
 import com.kimcompay.projectjb.jwt.jwtService;
 import com.kimcompay.projectjb.users.principalDetails;
 
@@ -26,11 +28,11 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationFi
 public class authorizationFilter extends BasicAuthenticationFilter  {
     private Logger logger=LoggerFactory.getLogger(authorizationFilter.class);
     private jwtService jwtService;
-    private RedisTemplate<String,String>redisTemplate;
+    private RedisTemplate<String,Object>redisTemplate;
     private String access_cookie_name;
     private String refreshTokenCookieName;
 
-    public authorizationFilter(AuthenticationManager authenticationManager,jwtService jwtService,RedisTemplate<String,String>redisTemplate,String access_cookie_name,String refreshTokenCookieName) {
+    public authorizationFilter(AuthenticationManager authenticationManager,jwtService jwtService,RedisTemplate<String,Object>redisTemplate,String access_cookie_name,String refreshTokenCookieName) {
         super(authenticationManager);
         this.jwtService=jwtService;
         this.redisTemplate=redisTemplate;
@@ -50,7 +52,9 @@ public class authorizationFilter extends BasicAuthenticationFilter  {
             logger.info("검증시도 회원번호: "+id);
             //redis에서 꺼내기
             //시큐리티 인증세션 주입
-            principalDetails principalDetails=new principalDetails(redisTemplate.opsForHash().entries(id));
+            System.out.println(redisTemplate.opsForHash().entries(id+senums.loginTextRedis.get()));
+            Map<Object, Object>loginInfor=redisTemplate.opsForHash().entries(id+senums.loginTextRedis.get());
+            principalDetails principalDetails=new principalDetails(redisTemplate.opsForHash().entries(id+senums.loginTextRedis.get()));
             SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(principalDetails,null,principalDetails.getAuthorities()));
 
         } catch (TokenExpiredException e) {
@@ -59,7 +63,7 @@ public class authorizationFilter extends BasicAuthenticationFilter  {
             String refreshToken=Optional.ofNullable(utillService.getCookieValue(request,refreshTokenCookieName)).orElseGet(()->null);
             logger.info("리프레시토큰: "+refreshToken);
             //레디스에서 이메일 가져오기
-            String id=Optional.ofNullable(redisTemplate.opsForValue().get(refreshToken)).orElseGet(()->null);
+            String id=(String) Optional.ofNullable(redisTemplate.opsForValue().get(refreshToken)).orElseGet(()->null);
             logger.info("redis에 서 찾은 고유번호: "+id);
             if(refreshToken==null||id==null){
                 utillService.goFoward("/tokenExpire/x", request, response);

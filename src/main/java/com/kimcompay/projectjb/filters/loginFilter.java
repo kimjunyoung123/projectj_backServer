@@ -15,6 +15,7 @@ import com.fasterxml.jackson.core.exc.StreamReadException;
 import com.fasterxml.jackson.databind.DatabindException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kimcompay.projectjb.utillService;
+import com.kimcompay.projectjb.enums.senums;
 import com.kimcompay.projectjb.jwt.jwtService;
 import com.kimcompay.projectjb.users.principalDetails;
 import org.json.simple.JSONObject;
@@ -38,12 +39,12 @@ public class loginFilter extends UsernamePasswordAuthenticationFilter {
     private final Logger logger=LoggerFactory.getLogger(loginFilter.class);
     private jwtService jwtService;
     private AuthenticationManager authenticationManager;
-    private RedisTemplate<String,String>redisTemplate;
+    private RedisTemplate<String,Object>redisTemplate;
 
     private String access_cookie_name;
     private String refresh_cookie_name;
 
-    public loginFilter(jwtService jwtService,AuthenticationManager authenticationManager,RedisTemplate<String,String>redisTemplate,String access_cookie_name,String refresh_cookie_name){
+    public loginFilter(jwtService jwtService,AuthenticationManager authenticationManager,RedisTemplate<String,Object>redisTemplate,String access_cookie_name,String refresh_cookie_name){
         this.jwtService=jwtService;
         this.authenticationManager=authenticationManager;
         this.redisTemplate=redisTemplate;
@@ -94,14 +95,12 @@ public class loginFilter extends UsernamePasswordAuthenticationFilter {
         logger.info("리프레시토큰: "+refresh_token);
         //토큰 쿠키로 발급
         utillService.makeLoginCookie(access_token, refresh_token,access_cookie_name,refresh_cookie_name);
-        //redis구격에 맞게 int/timestamp등값 ->string
-        utillService.makeAllToString(result);
         //redis 유저정보 밀어넣기
-        HashOperations<String, Object, Object> hashOperations = redisTemplate.opsForHash();
-        result.put(refresh_cookie_name, refresh_token);//리프레시토큰 찾기위해 넣는것
-        hashOperations.putAll(id,result);
-        //redis refresh 토큰 /이메일 밀어넣기
-        redisTemplate.opsForValue().set(refresh_token,id);//리프레시토큰을 넣는것
+        //리프레시토큰 찾기위해 넣는것
+        redisTemplate.opsForHash().put(refresh_cookie_name, refresh_cookie_name, refresh_token);
+        redisTemplate.opsForHash().put(id+senums.loginTextRedis.get(), id+senums.loginTextRedis.get(),result);
+        //리프레시토큰을 넣는것
+        redisTemplate.opsForValue().set(refresh_token,id);
         logger.info("로그인 과정완료");
         utillService.goFoward("/login?flag=true&date="+loginDate+"&kind="+result.get("kind") , request, response);
     }
