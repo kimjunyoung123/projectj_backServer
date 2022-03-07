@@ -89,12 +89,16 @@ public class paymentService {
         //insert시도
         paymentVo paymentVo=(paymentVo)ordersAndPayment.get("payment");
         List<orderVo>orders=(List<orderVo>)ordersAndPayment.get("orders");
-        redisTemplate.opsForHash().put("redisKey", "redisHashKey", paymentVo);
-        LinkedHashMap<String,Object> paymentVo2=(LinkedHashMap)redisTemplate.opsForHash().entries("redisKey");
-
-        for(orderVo order:orders){
-            //orderDao.save(order);
-        }
+        redisTemplate.opsForHash().put(paymentVo.getMchtTrdNo(),paymentVo.getMchtTrdNo(), paymentVo);
+        redisTemplate.opsForHash().put(paymentVo.getMchtTrdNo()+senums.basketsTextReids.get(),paymentVo.getMchtTrdNo()+senums.basketsTextReids.get(), orders);
+       /* LinkedHashMap<String,Object> paymentVo2=(LinkedHashMap)redisTemplate.opsForHash().entries(paymentVo.getMchtTrdNo());
+        LinkedHashMap<String,Object> orders2=(LinkedHashMap)redisTemplate.opsForHash().entries(paymentVo.getMchtTrdNo()+senums.basketsTextReids.get());
+        System.out.println(paymentVo2.toString());
+        System.out.println(orders2.toString());
+        /*for(orderVo order:orders){
+            String basketId=Integer.toString(order.getBasketId());
+            redisTemplate.opsForHash().put(basketId,basketId, order);
+        }*/
         //매장별 조건검증 후 값 만들어서 전송
         if(tryOrderDto.getPayKind().equals("kpay")){
             int totalCount=Integer.parseInt(ordersAndPayment.get("totalCount").toString());
