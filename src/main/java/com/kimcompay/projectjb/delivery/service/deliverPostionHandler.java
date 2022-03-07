@@ -36,7 +36,7 @@ public class deliverPostionHandler extends TextWebSocketHandler {
       JSONObject xAndYAndRoom=utillService.stringToJson(message.getPayload());
       int roomId=Integer.parseInt(xAndYAndRoom.get("roomId").toString());
       System.out.println(xAndYAndRoom);
-      //배달방번호 조회
+      //배달방번호 조회 검증 로직 추가해야함
       try {
             for(Map<String,Object>room:roomList.get(roomId)){
                try {
