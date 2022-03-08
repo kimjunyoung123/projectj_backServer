@@ -52,12 +52,11 @@ public class authorizationFilter extends BasicAuthenticationFilter  {
             logger.info("검증시도 회원번호: "+id);
             //redis에서 꺼내기
             //시큐리티 인증세션 주입
-            System.out.println(redisTemplate.opsForHash().entries(id+senums.loginTextRedis.get()));
-            Map<Object, Object>loginInfor=redisTemplate.opsForHash().entries(id+senums.loginTextRedis.get());
-            System.out.println(loginInfor.get("3login").toString());
-            principalDetails principalDetails=new principalDetails((Map<Object, Object>) redisTemplate.opsForHash().entries(id+senums.loginTextRedis.get()).get("3login"),false);
+            String loginText=senums.loginTextRedis.get();
+            Map<Object, Object>loginInfor=redisTemplate.opsForHash().entries(id+loginText);
+            logger.info("로그인정보: "+loginInfor.toString());
+            principalDetails principalDetails=new principalDetails((Map<Object, Object>)loginInfor.get(loginText),false);
             SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(principalDetails,null,principalDetails.getAuthorities()));
-
         } catch (TokenExpiredException e) {
             logger.info("만료된 토큰: "+access_token);
             //리프레쉬토큰 꺼내기

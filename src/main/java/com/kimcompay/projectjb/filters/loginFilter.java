@@ -98,7 +98,7 @@ public class loginFilter extends UsernamePasswordAuthenticationFilter {
         //redis 유저정보 밀어넣기
         //리프레시토큰 찾기위해 넣는것
         redisTemplate.opsForHash().put(refresh_cookie_name, refresh_cookie_name, refresh_token);
-        redisTemplate.opsForHash().put(id+senums.loginTextRedis.get(), id+senums.loginTextRedis.get(),result);
+        redisTemplate.opsForHash().put(id+senums.loginTextRedis.get(), senums.loginTextRedis.get(),result);
         //리프레시토큰을 넣는것
         redisTemplate.opsForValue().set(refresh_token,id);
         logger.info("로그인 과정완료");
