@@ -103,14 +103,14 @@ public class utillService {
     }
     public static void makeCookie(Map<String,Object>infor,HttpServletResponse response) {
         for(Entry<String, Object> key:infor.entrySet()){
-           /* ResponseCookie cookie = ResponseCookie.from(key.getKey(),key.getValue().toString()) 
+            ResponseCookie cookie = ResponseCookie.from(key.getKey(),key.getValue().toString()) 
             .sameSite("None") 
             .secure(true)
             .path("/")
             .build(); 
-            response.addHeader("Set-Cookie", cookie.toString()+";HttpOnly");  */
-            Cookie c=new Cookie(key.getKey(), key.getValue().toString());
-            response.addCookie(c); //테스트용
+            response.addHeader("Set-Cookie", cookie.toString()+";HttpOnly");  
+           /* Cookie c=new Cookie(key.getKey(), key.getValue().toString());
+            response.addCookie(c); //테스트용*/
         }
     }
     public static String getCookieValue(HttpServletRequest request,String cookieName) {
@@ -192,6 +192,10 @@ public class utillService {
         }
     }
     public static void makeLoginCookie(String accessToken,String refreshToken,String accessTokenCookieName,String refreshTokenCookieName) {
+        System.out.println("cookie:"+accessToken);
+        System.out.println("cookie:"+refreshToken);
+        System.out.println("cookie:"+accessTokenCookieName);
+        System.out.println("cookie:"+refreshTokenCookieName);
         Map<String,Object>cookies=new HashMap<>();
         cookies.put(accessTokenCookieName, accessToken);
         cookies.put(refreshTokenCookieName, refreshToken);
