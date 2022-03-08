@@ -62,7 +62,7 @@ public class userService {
     @Autowired
     private sqsService sqsService;
     @Autowired
-    private RedisTemplate<String,String>redisTemplate;
+    private RedisTemplate<String,Object>redisTemplate;
     @Autowired
     private userAdapter userAdapter;
     @Autowired
@@ -83,22 +83,20 @@ public class userService {
         throw utillService.makeRuntimeEX("잘못된 요청", "getActionHub");
     }
     public void oauthLogin(String email,userVo userVo) {
-        //로그인처리
-        String accessToken=jwtService.get_access_token(email);
-        String refreshToken=jwtService.get_refresh_token();
         try {
-            oauthLogin(userVo,refreshToken);
+            oauthLogin(userVo);
         } catch (RuntimeException e) {
+            e.printStackTrace();
             String message=e.getMessage();
             if(!message.startsWith("메")){
                 message=senums.defaultFailMessage.get();
             }
             throw utillService.makeRuntimeEX(message, "oauthLogin");
         }
-        //토큰 쿠키발급
-        utillService.makeLoginCookie(accessToken,refreshToken,accessTokenCookieName,refreshTokenCookieName);
+        //로그인시간갱신
+        updateLoginDate(senums.persnal.get(),email);
     }
-    private void oauthLogin(userVo userVo,String refreshToken) {
+    private void oauthLogin(userVo userVo) {
         String email=userVo.getEmail();
         String phone=userVo.getUphone();
         Map<String,Object>map=userdao.findByPhoneAndEmailJoinCompany(phone, phone, email, email);
@@ -120,16 +118,21 @@ public class userService {
         //vo->map
         userVo.setUlogin_date(Timestamp.valueOf(LocalDateTime.now()));//로그인시간 넣어주기
         Map<Object,Object>result=voToMap(userVo);
+        String userId=Integer.toString(userVo.getUid());
         //redis에 유저정보 담기
-        //redis에 맞게 형변환 
-        utillService.makeAllToString(result);
-        result.put(refreshTokenCookieName, refreshToken);//리프레시토큰 함께 넣어주기
         result.put("provider",userVo.getProvider());//naver/kakao다양한 소셜로그인시 대응 
         result.put("pwd", null);//비밀번호 지우기
-        redisTemplate.opsForHash().putAll(email,result);
-        redisTemplate.opsForValue().set(refreshToken,email);//리프레시토큰 넣어주기
-        //로그인시간갱신
-        updateLoginDate(senums.persnal.get(),email);
+        redisTemplate.opsForHash().put(userId+senums.loginTextRedis.get(), senums.loginTextRedis.get(),result);
+        Map<Object, Object>loginInfor=redisTemplate.opsForHash().entries(userId+senums.loginTextRedis.get());
+        System.out.println("로그인정보: "+loginInfor.toString());
+        //로그인처리
+        String accessToken=jwtService.get_access_token(userId);
+        String refreshToken=jwtService.get_refresh_token();
+        //리프레시토큰넣어주기
+        redisTemplate.opsForValue().set(refreshToken,userId);
+        redisTemplate.opsForHash().put(refreshTokenCookieName, refreshTokenCookieName, refreshToken);
+        utillService.makeLoginCookie(accessToken,refreshToken,accessTokenCookieName,refreshTokenCookieName);
+
     }
     private Map<Object, Object> voToMap(userVo userVo) {
         userAdapter.adapterUser(userVo);
