@@ -24,11 +24,14 @@ public class kpayVo {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(name = "kpay_mchtTrdNo")
+    @Column(name = "kpay_mchtTrdNo",nullable = false)
     private String mchtTrdNo;
 
     @Column(name = "kpay_payment_id")
     private int paymentId;
+
+    @Column(name = "tid",nullable = false)
+    private String tid;
 
     
 }
