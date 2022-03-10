@@ -33,6 +33,7 @@ public class paymentAuthRestController {
     public JSONObject tryPay(@Valid @RequestBody tryOrderDto tryOrderDto,@PathVariable String action) {
         return paymentService.tryOrder(tryOrderDto,action);
     }
+    
    
 
     

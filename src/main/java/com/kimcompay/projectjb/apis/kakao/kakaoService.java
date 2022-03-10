@@ -16,9 +16,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Service
-public class kakaoService {
-    private Logger logger=LoggerFactory.getLogger(kakaoService.class);
-    
+public class kakaoService {    
     @Value("${kakao.app.key}")
     private String app_key;
     @Value("${kakao.rest.key}")
@@ -38,11 +36,8 @@ public class kakaoService {
     private kakaoLoginService kakaoLoginService;
 
     public JSONObject callPage(String action) {
-        logger.info("callPage");
         String url=null;
         if(action.equals(kenum.loginPage.get())){
-            logger.info("k로그인요청");
-            logger.info("콜백 url: "+kLoginCallbackUrl);
             url="https://kauth.kakao.com/oauth/authorize?response_type=code&client_id="+rest_key+"&redirect_uri="+kLoginCallbackUrl;
         }else{
             throw utillService.makeRuntimeEX("지원하지 않는 카카오페이지 입니다", "callPage");
@@ -50,16 +45,15 @@ public class kakaoService {
         return utillService.getJson(true, url);
     }
     public void catchCallBack(String action,HttpServletRequest request) {
-        logger.info("catchCallBack");
         JSONObject result=new JSONObject();
         if(action.equals(kenum.loginPage.get())){
-            logger.info("k로그인 콜백");
             result=kakaoLoginService.doLogin(request.getParameter("code"),rest_key,kLoginCallbackUrl);
+        }else if(action.equals("kpay")){
+            System.out.println("카카오페이 콜백");
         }else{
             result.put("flag", false);
             result.put("message", senums.defaultDetailAddress.get());
         }
-        logger.info("처리결과"+result);
         String url=frontDomain+resultLink+"?kind=kakao&action="+action+"&result="+result.get("flag")+"&message="+result.get("message");
         utillService.doRedirect(utillService.getHttpSerResponse(), url);
     }
