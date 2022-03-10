@@ -34,6 +34,8 @@ public class kakaoService {
 
     @Autowired
     private kakaoLoginService kakaoLoginService;
+    @Autowired
+    private kakaoPayService kakaoPayService;
 
     public JSONObject callPage(String action) {
         String url=null;
@@ -50,6 +52,7 @@ public class kakaoService {
             result=kakaoLoginService.doLogin(request.getParameter("code"),rest_key,kLoginCallbackUrl);
         }else if(action.equals("kpay")){
             System.out.println("카카오페이 콜백");
+            result=kakaoPayService.confirmPayment(request);
         }else{
             result.put("flag", false);
             result.put("message", senums.defaultDetailAddress.get());
