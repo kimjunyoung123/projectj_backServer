@@ -10,8 +10,10 @@ import javax.servlet.http.HttpSession;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kimcompay.projectjb.utillService;
 import com.kimcompay.projectjb.apis.requestTo;
+import com.kimcompay.projectjb.enums.senums;
 import com.kimcompay.projectjb.payments.model.kpay.kpayDao;
 import com.kimcompay.projectjb.payments.model.kpay.kpayVo;
+import com.kimcompay.projectjb.payments.model.order.orderDao;
 import com.kimcompay.projectjb.payments.model.order.orderVo;
 import com.kimcompay.projectjb.payments.model.pay.paymentDao;
 import com.kimcompay.projectjb.payments.model.pay.paymentVo;
@@ -36,6 +38,8 @@ public class kakaoPayService {
     private kpayDao kpayDao;
     @Autowired
     private paymentDao paymentDao;
+    @Autowired
+    private orderDao orderDao;
     @Autowired
     private RedisTemplate<String,Object>redisTemplate;
     
@@ -116,9 +120,15 @@ public class kakaoPayService {
             if(vo2.getTotalPrice()!=Integer.parseInt(amount.get("total").toString())){
                 throw utillService.makeRuntimeEX("카카오페이 총액 불일치", "confirmPayment");
             }
+            //main db insert
+            List<orderVo>orders=(List<orderVo>)objectMapper.convertValue(redisTemplate.opsForHash().entries(mchtTrdNo+senums.basketsTextReids.get()).get(mchtTrdNo+senums.basketsTextReids.get()) ,List.class);
+            System.out.println(orders.toString());
             kpayVo vo=kpayVo.builder().mchtTrdNo(mchtTrdNo).paymentId(utillService.getLoginId()).tid(tid).build();
             paymentDao.save(vo2);
             kpayDao.save(vo);
+            for(orderVo order:orders){
+                orderDao.save(order);
+            }
             return utillService.getJson(true, "결제가 완료 되었습니다");
         } catch (Exception e) {
             utillService.writeLog("카카오페이 결제 실패", kakaoPayService.class);
