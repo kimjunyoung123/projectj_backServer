@@ -131,9 +131,16 @@ public class paymentService {
             storeVo storeVo=storeService.getVo(storeId);
             //매장 바뀔때 총액 0원으로 해야함
             int totalPrice=0;
-            //배달가능 거리 계산 
+            LocalDateTime now=LocalDateTime.now();
+            String nows=now.toString().split("T")[0];
+            Timestamp openTime=Timestamp.valueOf(nows+" "+storeVo.getOpenTime()+":00");
+            Timestamp closeTime=Timestamp.valueOf(nows+" "+storeVo.getCloseTime()+":00");
+            System.out.println("오픈타임: "+openTime);
+            //배달가능 거리 계산,영업시간 검증   
             if(checkDeliverRadius(storeVo.getSaddress(),storeVo.getDeliverRadius(),tryOrderDto.getAddress())){
                 throw utillService.makeRuntimeEX("배달 최대반경을 초과합니다\n매장이름:"+storeVo.getSname()+"\n제품이름:"+divisionByStoreId.getValue().get(0).get("product_name")+"\n최대반경:"+storeVo.getDeliverRadius()+"km", "checkDeliverRadius");
+            }else if(LocalDateTime.now().isAfter(closeTime.toLocalDateTime())||LocalDateTime.now().isBefore(openTime.toLocalDateTime())){
+                throw utillService.makeRuntimeEX("매장엽업 시간이 아닙니다\n매장이름:"+storeVo.getSname()+"\n제품이름:"+divisionByStoreId.getValue().get(0).get("product_name")+"\n최대반경:"+storeVo.getDeliverRadius()+"km", "checkDeliverRadius");
             }
             //System.out.println("storeId"+storeId);
             //해당 매장 결제요청 총액확인 및 제품검증
