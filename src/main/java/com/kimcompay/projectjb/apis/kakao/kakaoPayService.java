@@ -121,16 +121,17 @@ public class kakaoPayService {
                 throw utillService.makeRuntimeEX("카카오페이 총액 불일치", "confirmPayment");
             }
             //main db insert
-            List<orderVo>orders=(List<orderVo>)objectMapper.convertValue(redisTemplate.opsForHash().entries(mchtTrdNo+senums.basketsTextReids.get()).get(mchtTrdNo+senums.basketsTextReids.get()) ,List.class);
+            List<Object>orders=objectMapper.convertValue(redisTemplate.opsForHash().entries(mchtTrdNo+senums.basketsTextReids.get()).get(mchtTrdNo+senums.basketsTextReids.get()) ,List.class);
             System.out.println(orders.toString());
             kpayVo vo=kpayVo.builder().mchtTrdNo(mchtTrdNo).paymentId(utillService.getLoginId()).tid(tid).build();
             paymentDao.save(vo2);
             kpayDao.save(vo);
-            for(orderVo order:orders){
-                orderDao.save(order);
+            for(Object order:orders){
+                orderDao.save(objectMapper.convertValue(order, orderVo.class));
             }
             return utillService.getJson(true, "결제가 완료 되었습니다");
         } catch (Exception e) {
+            e.printStackTrace();
             utillService.writeLog("카카오페이 결제 실패", kakaoPayService.class);
             throw utillService.makeRuntimeEX("카카오 페이 결제에 실패하였습니다", "confirmPayment");
         }finally{
