@@ -122,7 +122,6 @@ public class kakaoPayService {
             }
             //main db insert
             List<Object>orders=objectMapper.convertValue(redisTemplate.opsForHash().entries(mchtTrdNo+senums.basketsTextReids.get()).get(mchtTrdNo+senums.basketsTextReids.get()) ,List.class);
-            System.out.println(orders.toString());
             kpayVo vo=kpayVo.builder().mchtTrdNo(mchtTrdNo).paymentId(utillService.getLoginId()).tid(tid).build();
             paymentDao.save(vo2);
             kpayDao.save(vo);
@@ -137,6 +136,7 @@ public class kakaoPayService {
         }finally{
             //실패하든 성공하든 지워주기
             httpSession.removeAttribute("orderIdAndTid");
+            redisTemplate.delete(mchtTrdNo);
         }
     }
 }
