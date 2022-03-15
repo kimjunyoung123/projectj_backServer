@@ -15,12 +15,19 @@ import com.kimcompay.projectjb.payments.service.sha256;
 import com.kimcompay.projectjb.users.company.model.products.productVo;
 
 import org.json.simple.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class settleService {
     
+    @Autowired
+    private cardService cardService;
+
+    public void confrimPayment(String status,settleDto settleDto) {
+        cardService.confrimPayment(settleDto);
+    }
     public JSONObject makeRequestPayInfor(String productNames,paymentVo paymentVo,List<orderVo>orders,String mchtId,String expireIfVank) { 
         //응답 생성
         JSONObject respons=new JSONObject();

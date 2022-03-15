@@ -86,7 +86,7 @@ public class restController {
     @RequestMapping(value = "/settle/{status}",method = RequestMethod.POST)
     public void settleBankCallback(@PathVariable String status,HttpServletRequest request) {
         System.out.println(status);
-        System.out.println(utillService.requestToSettleDto(request).toString());
+        settleService.confrimPayment(status, utillService.requestToSettleDto(request));  
     }
     //----------------------------------------------------------------------------------------------------
     @RequestMapping(value = "/pitest")
