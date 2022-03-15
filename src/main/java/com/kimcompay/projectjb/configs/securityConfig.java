@@ -47,8 +47,9 @@ public class securityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             .and()
-            .csrf().csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-            .and()
+             .csrf().disable()
+            //.csrf().csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+            //.and()
             .addFilter(corsFilter.crosfilter())
             .addFilter(new loginFilter(jwtService,authenticationManager(),redisTemplate,access_token_cookie_name,refresh_token_cookie_name))
             .addFilter(new authorizationFilter(authenticationManager(),jwtService,redisTemplate,access_token_cookie_name,refresh_token_cookie_name))

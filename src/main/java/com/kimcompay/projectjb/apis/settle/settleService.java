@@ -4,9 +4,12 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+
 import com.kimcompay.projectjb.utillService;
 import com.kimcompay.projectjb.payments.model.order.orderVo;
 import com.kimcompay.projectjb.payments.model.pay.paymentVo;
+import com.kimcompay.projectjb.payments.model.pay.settleDto;
 import com.kimcompay.projectjb.payments.service.aes256;
 import com.kimcompay.projectjb.payments.service.sha256;
 import com.kimcompay.projectjb.users.company.model.products.productVo;
@@ -17,7 +20,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class settleService {
-    
     
     public JSONObject makeRequestPayInfor(String productNames,paymentVo paymentVo,List<orderVo>orders,String mchtId,String expireIfVank) { 
         //응답 생성

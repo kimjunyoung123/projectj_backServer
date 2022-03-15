@@ -11,8 +11,10 @@ import com.kimcompay.projectjb.checkPageService;
 import com.kimcompay.projectjb.utillService;
 import com.kimcompay.projectjb.apis.requestTo;
 import com.kimcompay.projectjb.apis.aws.services.fileService;
+import com.kimcompay.projectjb.apis.settle.settleService;
 import com.kimcompay.projectjb.apis.sns.snsService;
 import com.kimcompay.projectjb.enums.senums;
+import com.kimcompay.projectjb.payments.model.pay.settleDto;
 import com.kimcompay.projectjb.users.user.userService;
 
 import org.json.simple.JSONObject;
@@ -39,6 +41,8 @@ public class restController {
     private fileService fileService;
     @Autowired
     private requestTo requestTo;
+    @Autowired
+    private settleService settleService;
 
     
     @RequestMapping(value = "/sns/**",method = RequestMethod.POST)
@@ -78,6 +82,11 @@ public class restController {
     @RequestMapping(value = "/auth/file/{action}",method = RequestMethod.POST)
     public JSONObject imgController(@PathVariable String action,MultipartHttpServletRequest request) {
         return fileService.upload(request);
+    }
+    @RequestMapping(value = "/settle/{status}",method = RequestMethod.POST)
+    public void settleBankCallback(@PathVariable String status,HttpServletRequest request) {
+        System.out.println(status);
+        System.out.println(utillService.requestToSettleDto(request).toString());
     }
     //----------------------------------------------------------------------------------------------------
     @RequestMapping(value = "/pitest")
