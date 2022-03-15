@@ -26,6 +26,9 @@ public class basketService {
     @Autowired
     private productService productService;
 
+    public void deleteById(int basketId) {
+        basketDao.deleteById(basketId);
+    }
     public Map<String,Object> getBasketAndProductByBasketId(int basketId) {
         return basketDao.findByIdJoinProducts(basketId);
     }

@@ -19,6 +19,7 @@ import com.kimcompay.projectjb.payments.model.order.orderDao;
 import com.kimcompay.projectjb.payments.model.order.orderVo;
 import com.kimcompay.projectjb.payments.model.pay.paymentDao;
 import com.kimcompay.projectjb.payments.model.pay.paymentVo;
+import com.kimcompay.projectjb.payments.service.basketService;
 import com.kimcompay.projectjb.payments.service.couponService;
 
 import org.json.simple.JSONObject;
@@ -47,6 +48,8 @@ public class kakaoPayService {
     private RedisTemplate<String,Object>redisTemplate;
     @Autowired
     private couponService couponService;
+    @Autowired
+    private basketService basketService;
     
     @Value("${kakao.admin.key}")
     private String kakaoAdminKey;
@@ -142,6 +145,7 @@ public class kakaoPayService {
                     }
                 }               
                 orderDao.save(orderVo);
+                basketService.deleteById(orderVo.getBasketId());
             }
             return utillService.getJson(true, "결제가 완료 되었습니다");
             //throw new RuntimeException("test");
