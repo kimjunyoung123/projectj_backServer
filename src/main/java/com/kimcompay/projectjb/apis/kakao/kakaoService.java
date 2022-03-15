@@ -53,6 +53,7 @@ public class kakaoService {
         }else if(action.equals("kpay")){
             System.out.println("카카오페이 콜백");
             result=kakaoPayService.confirmPayment(request);
+            System.out.println(result.toString());
         }else{
             result.put("flag", false);
             result.put("message", senums.defaultDetailAddress.get());

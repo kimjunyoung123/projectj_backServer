@@ -13,6 +13,7 @@ import com.kimcompay.projectjb.utillService;
 import com.kimcompay.projectjb.apis.requestTo;
 import com.kimcompay.projectjb.enums.kenum;
 import com.kimcompay.projectjb.enums.senums;
+import com.kimcompay.projectjb.payments.helpPaymentService;
 import com.kimcompay.projectjb.payments.model.kpay.kpayDao;
 import com.kimcompay.projectjb.payments.model.kpay.kpayVo;
 import com.kimcompay.projectjb.payments.model.order.orderDao;
@@ -41,15 +42,8 @@ public class kakaoPayService {
     @Autowired
     private kpayDao kpayDao;
     @Autowired
-    private paymentDao paymentDao;
-    @Autowired
-    private orderDao orderDao;
-    @Autowired
-    private RedisTemplate<String,Object>redisTemplate;
-    @Autowired
-    private couponService couponService;
-    @Autowired
-    private basketService basketService;
+    private helpPaymentService helpPaymentService;
+
     
     @Value("${kakao.admin.key}")
     private String kakaoAdminKey;
@@ -105,62 +99,34 @@ public class kakaoPayService {
         String[] orderIdAndTid=httpSession.getAttribute("orderIdAndTid").toString().split(",");
         String mchtTrdNo=orderIdAndTid[0];
         String tid= orderIdAndTid[1];
-        //결제 요청시 저장했던 정보 꺼내기
-        LinkedHashMap<String,Object> tempPaymentInfor=(LinkedHashMap)redisTemplate.opsForHash().entries(mchtTrdNo);
-        utillService.writeLog("임시 결제 요청정보: "+tempPaymentInfor.toString(), kakaoPayService.class);
-        ObjectMapper objectMapper = new ObjectMapper();
-        paymentVo vo2=objectMapper.convertValue(tempPaymentInfor.get(mchtTrdNo) ,paymentVo.class);
-        try {
-            String pgToken=request.getParameter("pg_token").toString();
-            HttpHeaders httpHeaders=new HttpHeaders();
-            httpHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-            httpHeaders.add("Authorization", "KakaoAK "+kakaoAdminKey);
-            MultiValueMap<String,Object> multiValueBody=new LinkedMultiValueMap<>();
-            multiValueBody.add("cid", cid);
-            multiValueBody.add("partner_order_id", mchtTrdNo);
-            multiValueBody.add("partner_user_id", utillService.getLoginId());
-            multiValueBody.add("tid", tid);
-            multiValueBody.add("pg_token", pgToken);
-            JSONObject  respon=requestTo.requestPost(multiValueBody, "https://kapi.kakao.com/v1/payment/approve ", httpHeaders);
-            utillService.writeLog("카카오페이 통신결과: "+respon.toString(), kakaoPayService.class);
-            //결제금액 비교
-            Map<String,Object>amount=(Map<String, Object>) respon.get("amount");
-            if(vo2.getTotalPrice()!=Integer.parseInt(amount.get("total").toString())){
-                throw utillService.makeRuntimeEX("카카오페이 총액 불일치", "confirmPayment");
-            }
-            //main db insert
-            List<Object>orders=objectMapper.convertValue(redisTemplate.opsForHash().entries(mchtTrdNo+senums.basketsTextReids.get()).get(mchtTrdNo+senums.basketsTextReids.get()) ,List.class);
+        //카카오 통신하기
+        String pgToken=request.getParameter("pg_token").toString();
+        HttpHeaders httpHeaders=new HttpHeaders();
+        httpHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        httpHeaders.add("Authorization", "KakaoAK "+kakaoAdminKey);
+        MultiValueMap<String,Object> multiValueBody=new LinkedMultiValueMap<>();
+        multiValueBody.add("cid", cid);
+        multiValueBody.add("partner_order_id", mchtTrdNo);
+        multiValueBody.add("partner_user_id", utillService.getLoginId());
+        multiValueBody.add("tid", tid);
+        multiValueBody.add("pg_token", pgToken);
+        JSONObject  respon=requestTo.requestPost(multiValueBody, "https://kapi.kakao.com/v1/payment/approve ", httpHeaders);            
+        utillService.writeLog("카카오페이 통신결과: "+respon.toString(), kakaoPayService.class);
+        //검증하기
+        Map<String,Object>amount=(Map<String, Object>) respon.get("amount");
+        int paymentPrice=Integer.parseInt(amount.get("total").toString());
+        if(helpPaymentService.confrimPaymentAndInsert(mchtTrdNo, paymentPrice)){
+            //여기서 에러가 터지면 큰일나는건데 ㅋㅋ throw로 위임 해서 처리하는게 좋을듯
             kpayVo vo=kpayVo.builder().mchtTrdNo(mchtTrdNo).paymentId(utillService.getLoginId()).tid(tid).build();
-            paymentDao.save(vo2);
             kpayDao.save(vo);
-            for(Object order:orders){
-                orderVo orderVo=objectMapper.convertValue(order, orderVo.class);
-                //쿠폰 사용처리
-                String coupons=orderVo.getCoupon();
-                System.out.println(coupons);
-                if(coupons!=null){
-                    String[] couponArr=orderVo.getCoupon().split(",");
-                    for(String coupon:couponArr){
-                        couponService.changeState(1, coupon, mchtTrdNo);
-                    }
-                }               
-                orderDao.save(orderVo);
-                basketService.deleteById(orderVo.getBasketId());
-            }
             return utillService.getJson(true, "결제가 완료 되었습니다");
-            //throw new RuntimeException("test");
-        } catch (Exception e) {
-            e.printStackTrace();
+        }else{
             utillService.writeLog("카카오페이 결제 실패", kakaoPayService.class);
-            String message="카카오 페이 결제에 실패하였습니다  \n전액 환불되었습니다";
-            if(!cancleKpay(tid, vo2.getTotalPrice(),0)){
-                message="카카오 페이 결제에 실패하였습니다\n 환불에 실패하였습니다\n 관리자에게 문의주세요";
+            String message="카카오 페이 결제에 실패하였습니다$전액 환불되었습니다";
+            if(!cancleKpay(tid,paymentPrice,0)){
+                message="카카오 페이 결제에 실패하였습니다$환불에 실패하였습니다$관리자에게 문의주세요";
             }
-            throw utillService.makeRuntimeEX(message,message);
-        }finally{
-            //실패하든 성공하든 지워주기
-            httpSession.removeAttribute("orderIdAndTid");
-            redisTemplate.delete(mchtTrdNo);
+            return utillService.getJson(false, message);
         }
     }
     private boolean cancleKpay(String tid,int cancleAmount,int taxFree) {

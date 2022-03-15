@@ -83,10 +83,10 @@ public class restController {
     public JSONObject imgController(@PathVariable String action,MultipartHttpServletRequest request) {
         return fileService.upload(request);
     }
-    @RequestMapping(value = "/settle/{status}",method = RequestMethod.POST)
-    public void settleBankCallback(@PathVariable String status,HttpServletRequest request) {
+    @RequestMapping(value = "/settle/{kind}/{status}",method = RequestMethod.POST)
+    public void settleBankCallback(@PathVariable String kind,@PathVariable String status,HttpServletRequest request) {
         System.out.println(status);
-        settleService.confrimPayment(status, utillService.requestToSettleDto(request));  
+        settleService.confrimPayment(kind,status, utillService.requestToSettleDto(request));  
     }
     //----------------------------------------------------------------------------------------------------
     @RequestMapping(value = "/pitest")

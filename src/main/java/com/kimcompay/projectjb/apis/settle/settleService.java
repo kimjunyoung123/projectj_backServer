@@ -6,7 +6,10 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kimcompay.projectjb.utillService;
+import com.kimcompay.projectjb.enums.senums;
+import com.kimcompay.projectjb.payments.helpPaymentService;
 import com.kimcompay.projectjb.payments.model.order.orderVo;
 import com.kimcompay.projectjb.payments.model.pay.paymentVo;
 import com.kimcompay.projectjb.payments.model.pay.settleDto;
@@ -16,6 +19,7 @@ import com.kimcompay.projectjb.users.company.model.products.productVo;
 
 import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,9 +28,27 @@ public class settleService {
     
     @Autowired
     private cardService cardService;
+    @Autowired
+    private helpPaymentService helpPaymentService;
+    
+    @Transactional(rollbackFor = Exception.class)
+    public void confrimPayment(String kind,String status,settleDto settleDto) {
+        //결제 성공/실패 판단
+        if(senums.paySuc.get().equals(settleDto.getOutStatCd())){
+            String mchtTrdNo=settleDto.getMchtTrdNo();
+            int paymentPrice=Integer.parseInt(utillService.aesToNomal(settleDto.getTrdAmt()));
+            if(helpPaymentService.confrimPaymentAndInsert(mchtTrdNo, paymentPrice)){
+                cardService.insert(settleDto);
+            }else{
+                //환불로직
+            }
 
-    public void confrimPayment(String status,settleDto settleDto) {
-        cardService.confrimPayment(settleDto);
+        }else{
+            String outRsltCd=settleDto.getOutRsltCd();
+        }
+    }
+    private void tryInsert(String kind,settleDto settleDto) {
+        
     }
     public JSONObject makeRequestPayInfor(String productNames,paymentVo paymentVo,List<orderVo>orders,String mchtId,String expireIfVank) { 
         //응답 생성

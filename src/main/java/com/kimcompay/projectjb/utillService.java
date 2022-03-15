@@ -23,6 +23,7 @@ import javax.servlet.http.HttpSession;
 
 import com.kimcompay.projectjb.enums.senums;
 import com.kimcompay.projectjb.payments.model.pay.settleDto;
+import com.kimcompay.projectjb.payments.service.aes256;
 import com.kimcompay.projectjb.users.principalDetails;
 
 import org.json.simple.JSONObject;
@@ -385,5 +386,13 @@ public class utillService {
         response.put("date", date);
         response.put("time", time);
         return response;
+    }
+    public static String aesToNomal(String hash) {
+        try {
+            byte[] aesCipherRaw2=aes256.decodeBase64(hash);
+            return new String(aes256.aes256DecryptEcb(aesCipherRaw2),"UTF-8");
+        } catch (Exception e) {
+            throw new RuntimeException("복호화 실패");
+        }
     }
 }

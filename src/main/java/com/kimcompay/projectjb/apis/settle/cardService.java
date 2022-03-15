@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class cardService {
     
-    public void confrimPayment(settleDto settleDto) {
+    public void insert(settleDto settleDto) {
         
     }
 }

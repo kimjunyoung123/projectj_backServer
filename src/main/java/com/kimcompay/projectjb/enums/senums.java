@@ -48,7 +48,8 @@ public enum senums {
     settleKey("ST1009281328226982205"),
     settlekey2("pgSettle30y739r82jtd709yOfZ2yK5K"),
     basketsTextReids("basket"),
-    loginTextRedis("login");
+    loginTextRedis("login"),
+    paySuc("0021");
     private String s;
     senums(String s){
         this.s=s;
