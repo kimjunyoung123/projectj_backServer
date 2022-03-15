@@ -7,6 +7,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.api.client.util.Value;
 import com.kimcompay.projectjb.utillService;
 import com.kimcompay.projectjb.enums.senums;
 import com.kimcompay.projectjb.payments.helpPaymentService;
@@ -30,22 +31,38 @@ public class settleService {
     private cardService cardService;
     @Autowired
     private helpPaymentService helpPaymentService;
+    @Value("${front.domain}")
+    private String frontDomain;
+    @Value("${front.result.page}")
+    private String resultLink;
     
     @Transactional(rollbackFor = Exception.class)
     public void confrimPayment(String kind,String status,settleDto settleDto) {
         //결제 성공/실패 판단
+        String mchtTrdNo=settleDto.getMchtTrdNo();
+        boolean result=false;
+        String message=null;
         if(senums.paySuc.get().equals(settleDto.getOutStatCd())){
-            String mchtTrdNo=settleDto.getMchtTrdNo();
             int paymentPrice=Integer.parseInt(utillService.aesToNomal(settleDto.getTrdAmt()));
             if(helpPaymentService.confrimPaymentAndInsert(mchtTrdNo, paymentPrice)){
-                cardService.insert(settleDto);
+                String method=settleDto.getMethod();
+                if(method.equals("card")){
+                    cardService.insert(settleDto);
+                }else if(method.equals("vbank")){
+
+                }
+                message="결제가 완료 되었습니다";
+                result=true;
             }else{
                 //환불로직
             }
-
         }else{
             String outRsltCd=settleDto.getOutRsltCd();
+            utillService.writeLog("세틀뱅크 결제 실패 이유: "+outRsltCd+" 결제번호: "+mchtTrdNo, settleService.class);
+            message="결제에 실패하였습니다";//나중에 메세지 붙혀주면됨
         }
+        String url=frontDomain+resultLink+"?kind=settle&action=payment&result="+result+"&message="+message;
+        utillService.doRedirect(utillService.getHttpSerResponse(), url);
     }
     private void tryInsert(String kind,settleDto settleDto) {
         
