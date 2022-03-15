@@ -9,6 +9,7 @@ import com.kimcompay.projectjb.payments.model.coupon.couponVo;
 import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class couponService {
@@ -16,6 +17,12 @@ public class couponService {
     @Autowired
     private couponDao couponDao;
 
+    //상위에 트랜잭셔널 있음
+    public void changeState(int usedFlag,String couponName,String mchtTrdNo) {
+        couponVo couponVo=CheckAndGet(couponName);
+        couponVo.setUsed(usedFlag);
+        couponVo.setMchtTrdNo(mchtTrdNo);
+    }
     public couponVo CheckAndGet(String couponName) {
         couponVo couponVo=getVo(couponName);
         confrimCoupon(couponVo);

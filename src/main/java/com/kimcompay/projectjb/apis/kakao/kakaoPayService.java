@@ -1,5 +1,6 @@
 package com.kimcompay.projectjb.apis.kakao;
 
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -10,6 +11,7 @@ import javax.servlet.http.HttpSession;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kimcompay.projectjb.utillService;
 import com.kimcompay.projectjb.apis.requestTo;
+import com.kimcompay.projectjb.enums.kenum;
 import com.kimcompay.projectjb.enums.senums;
 import com.kimcompay.projectjb.payments.model.kpay.kpayDao;
 import com.kimcompay.projectjb.payments.model.kpay.kpayVo;
@@ -17,6 +19,7 @@ import com.kimcompay.projectjb.payments.model.order.orderDao;
 import com.kimcompay.projectjb.payments.model.order.orderVo;
 import com.kimcompay.projectjb.payments.model.pay.paymentDao;
 import com.kimcompay.projectjb.payments.model.pay.paymentVo;
+import com.kimcompay.projectjb.payments.service.couponService;
 
 import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +45,8 @@ public class kakaoPayService {
     private orderDao orderDao;
     @Autowired
     private RedisTemplate<String,Object>redisTemplate;
+    @Autowired
+    private couponService couponService;
     
     @Value("${kakao.admin.key}")
     private String kakaoAdminKey;
@@ -97,6 +102,11 @@ public class kakaoPayService {
         String[] orderIdAndTid=httpSession.getAttribute("orderIdAndTid").toString().split(",");
         String mchtTrdNo=orderIdAndTid[0];
         String tid= orderIdAndTid[1];
+        //결제 요청시 저장했던 정보 꺼내기
+        LinkedHashMap<String,Object> tempPaymentInfor=(LinkedHashMap)redisTemplate.opsForHash().entries(mchtTrdNo);
+        utillService.writeLog("임시 결제 요청정보: "+tempPaymentInfor.toString(), kakaoPayService.class);
+        ObjectMapper objectMapper = new ObjectMapper();
+        paymentVo vo2=objectMapper.convertValue(tempPaymentInfor.get(mchtTrdNo) ,paymentVo.class);
         try {
             String pgToken=request.getParameter("pg_token").toString();
             HttpHeaders httpHeaders=new HttpHeaders();
@@ -110,11 +120,6 @@ public class kakaoPayService {
             multiValueBody.add("pg_token", pgToken);
             JSONObject  respon=requestTo.requestPost(multiValueBody, "https://kapi.kakao.com/v1/payment/approve ", httpHeaders);
             utillService.writeLog("카카오페이 통신결과: "+respon.toString(), kakaoPayService.class);
-            LinkedHashMap<String,Object> tempPaymentInfor=(LinkedHashMap)redisTemplate.opsForHash().entries(mchtTrdNo);
-            utillService.writeLog("임시 결제 요청정보: "+tempPaymentInfor.toString(), kakaoPayService.class);
-            //결제 요청시 저장했던 정보 꺼내기
-            ObjectMapper objectMapper = new ObjectMapper();
-            paymentVo vo2=objectMapper.convertValue(tempPaymentInfor.get(mchtTrdNo) ,paymentVo.class);
             //결제금액 비교
             Map<String,Object>amount=(Map<String, Object>) respon.get("amount");
             if(vo2.getTotalPrice()!=Integer.parseInt(amount.get("total").toString())){
@@ -126,17 +131,51 @@ public class kakaoPayService {
             paymentDao.save(vo2);
             kpayDao.save(vo);
             for(Object order:orders){
-                orderDao.save(objectMapper.convertValue(order, orderVo.class));
+                orderVo orderVo=objectMapper.convertValue(order, orderVo.class);
+                //쿠폰 사용처리
+                String coupons=orderVo.getCoupon();
+                System.out.println(coupons);
+                if(coupons!=null){
+                    String[] couponArr=orderVo.getCoupon().split(",");
+                    for(String coupon:couponArr){
+                        couponService.changeState(1, coupon, mchtTrdNo);
+                    }
+                }               
+                orderDao.save(orderVo);
             }
             return utillService.getJson(true, "결제가 완료 되었습니다");
+            //throw new RuntimeException("test");
         } catch (Exception e) {
             e.printStackTrace();
             utillService.writeLog("카카오페이 결제 실패", kakaoPayService.class);
-            throw utillService.makeRuntimeEX("카카오 페이 결제에 실패하였습니다", "confirmPayment");
+            String message="카카오 페이 결제에 실패하였습니다  \n전액 환불되었습니다";
+            if(!cancleKpay(tid, vo2.getTotalPrice(),0)){
+                message="카카오 페이 결제에 실패하였습니다\n 환불에 실패하였습니다\n 관리자에게 문의주세요";
+            }
+            throw utillService.makeRuntimeEX(message,message);
         }finally{
             //실패하든 성공하든 지워주기
             httpSession.removeAttribute("orderIdAndTid");
             redisTemplate.delete(mchtTrdNo);
         }
+    }
+    private boolean cancleKpay(String tid,int cancleAmount,int taxFree) {
+        HttpHeaders httpHeaders=new HttpHeaders();
+        httpHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        httpHeaders.add("Authorization", "KakaoAK "+kakaoAdminKey);
+        MultiValueMap<String,Object> multiValueBody=new LinkedMultiValueMap<>();
+        multiValueBody.add("cid", cid);
+        multiValueBody.add("cancel_amount", cancleAmount);
+        multiValueBody.add("partner_user_id", utillService.getLoginId());
+        multiValueBody.add("tid", tid);
+        multiValueBody.add("cancel_tax_free_amount", taxFree);
+        try {
+            JSONObject  respon=requestTo.requestPost(multiValueBody, "https://kapi.kakao.com/v1/payment/cancel ", httpHeaders);
+            utillService.writeLog("카카오페이 통신결과: "+respon.toString(), kakaoPayService.class);
+            return true;
+        } catch (Exception e) {
+            utillService.writeLog("카카오페이 환불실패 사유: "+e.getMessage(), kakaoPayService.class);
+        }
+        return false;
     }
 }

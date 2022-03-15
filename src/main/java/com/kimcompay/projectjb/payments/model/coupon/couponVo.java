@@ -41,6 +41,9 @@ public class couponVo {
     @Column(name = "coupon_name",nullable = false)
     private String name;
 
+    @Column(name = "used_mchtTrdNo")
+    private String mchtTrdNo;
+
     @Column(name = "coupon_num",nullable = false)
     private int num;
     
