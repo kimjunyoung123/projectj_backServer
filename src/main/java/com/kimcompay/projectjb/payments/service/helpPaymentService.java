@@ -1,4 +1,4 @@
-package com.kimcompay.projectjb.payments;
+package com.kimcompay.projectjb.payments.service;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -9,8 +9,6 @@ import com.kimcompay.projectjb.enums.senums;
 import com.kimcompay.projectjb.payments.model.order.orderDao;
 import com.kimcompay.projectjb.payments.model.order.orderVo;
 import com.kimcompay.projectjb.payments.model.pay.paymentVo;
-import com.kimcompay.projectjb.payments.service.basketService;
-import com.kimcompay.projectjb.payments.service.couponService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
