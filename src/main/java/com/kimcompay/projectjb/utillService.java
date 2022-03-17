@@ -33,6 +33,8 @@ import org.json.simple.parser.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -404,5 +406,11 @@ public class utillService {
         ObjectMapper objectMapper = new ObjectMapper();
         return  (T) objectMapper.convertValue(object,clazz);
  
+    }
+    public static HttpHeaders getSettleHeader() {
+        HttpHeaders headers=new HttpHeaders();
+        headers.add(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE);
+        headers.set("charset", "UTF-8");
+        return headers;
     }
 }
