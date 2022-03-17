@@ -37,6 +37,20 @@ public class settleService {
     @Value("${front.result.page}")
     private String resultLink;
     
+    public String canclePay(settleDto settleDto) {
+        String method=settleDto.getMethod();
+        String message="결제실패$환불실패";
+        if(method.equals("card")){
+            if(cardService.cancle(settleDto)){
+                method="결제실패$환불성공";
+            }   
+        }else if(method.equals("vbank")){
+            if(cardService.cancle(settleDto)){
+                method="결제실패$채번이취소되었습니다";
+            } 
+        }
+        return message;
+    }
     @Transactional(rollbackFor = Exception.class)
     public void confrimPayment(String kind,String status,settleDto settleDto) throws paymentFailException{
         //결제 성공/실패 판단

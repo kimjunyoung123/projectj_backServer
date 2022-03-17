@@ -6,6 +6,7 @@ import java.util.List;
 import com.kimcompay.projectjb.utillService;
 import com.kimcompay.projectjb.apis.kakao.kakaoPayService;
 import com.kimcompay.projectjb.apis.kakao.kakaoService;
+import com.kimcompay.projectjb.apis.settle.settleService;
 import com.kimcompay.projectjb.enums.senums;
 import com.kimcompay.projectjb.exceptions.paymentFailException;
 import com.kimcompay.projectjb.exceptions.socialFailException;
@@ -34,6 +35,8 @@ public class restAdvice {
     private kakaoService kakaoService;
     @Autowired
     private helpPaymentService helpPaymentService;
+    @Autowired
+    private settleService settleService;
 
     @ExceptionHandler(socialFailException.class)
     public void socialFailException(socialFailException exception) {
@@ -42,8 +45,11 @@ public class restAdvice {
         String company=exception.getCompany();
         String action= exception.getAction();
         if(company.equals(senums.kakao.get())){
+            //결제정보 다시 꺼내기
             JSONObject reponse=utillService.changeClass(exception.getBody(), JSONObject.class);
+            //실패이유 있다면 알려주기
             message=kakaoService.failToAction(reponse,action);
+            //redis비우기
             helpPaymentService.removeInRedis(reponse.get("partner_order_id").toString());
         }
         String url=frontDomain+resultLink+"?kind="+company+"&action="+action+"&result="+false+"&message="+checkMessage(message, exception);
@@ -57,6 +63,7 @@ public class restAdvice {
             message="알수 없는 오류발생";
             exception.printStackTrace();
         }
+        settleService.canclePay(exception.getDto());
         return utillService.getJson(false, message);
     }
 

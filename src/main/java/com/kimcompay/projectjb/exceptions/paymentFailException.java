@@ -10,9 +10,9 @@ public class paymentFailException extends Exception {
     //private settleDto settleDto=new settleDto();
     //private JSONObject kakaoPayDto= new JSONObject();
     private String message=null;
-    private Object dto=new Object(); 
+    private settleDto dto=new settleDto();
 
-    public paymentFailException(Object dto,String kind,String message){
+    public paymentFailException(settleDto dto,String kind,String message){
         System.out.println();
         this.dto=dto;
         this.kind=kind;
@@ -25,7 +25,7 @@ public class paymentFailException extends Exception {
     public String getKind() {
         return this.kind;
     }
-    public Object getDto() {
+    public settleDto getDto() {
         return this.dto;
     }
     /*public void setDto(JSONObject kpayDto) {

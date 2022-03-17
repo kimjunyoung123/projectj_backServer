@@ -13,6 +13,9 @@ public class cardService {
     @Autowired
     private cardDao cardDao;
 
+    public boolean cancle(settleDto settleDto) {
+        
+    }
     public void insert(settleDto settleDto) {
         cardDao.save(dtoToVo(settleDto));   
     }
@@ -21,4 +24,5 @@ public class cardService {
                                     .mchtTrdNo(settleDto.getMchtTrdNo()).orgTrdNo(settleDto.getTrdNo()).paymentId(settleDto.getMchtTrdNo()).build();
                                     return vo;
     }
+
 }
