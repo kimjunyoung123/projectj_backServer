@@ -10,6 +10,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.api.client.util.Value;
 import com.kimcompay.projectjb.utillService;
 import com.kimcompay.projectjb.enums.senums;
+import com.kimcompay.projectjb.exceptions.paymentFailException;
 import com.kimcompay.projectjb.payments.model.order.orderVo;
 import com.kimcompay.projectjb.payments.model.pay.paymentVo;
 import com.kimcompay.projectjb.payments.model.pay.settleDto;
@@ -37,25 +38,19 @@ public class settleService {
     private String resultLink;
     
     @Transactional(rollbackFor = Exception.class)
-    public void confrimPayment(String kind,String status,settleDto settleDto) {
+    public void confrimPayment(String kind,String status,settleDto settleDto) throws paymentFailException{
         //결제 성공/실패 판단
         String mchtTrdNo=settleDto.getMchtTrdNo();
         boolean result=false;
         String message=null;
         if(senums.paySuc.get().equals(settleDto.getOutStatCd())){
             int paymentPrice=Integer.parseInt(utillService.aesToNomal(settleDto.getTrdAmt()));
-            if(helpPaymentService.confrimPaymentAndInsert(mchtTrdNo, paymentPrice)){
-                String method=settleDto.getMethod();
-                if(method.equals("card")){
-                    cardService.insert(settleDto);
-                }else if(method.equals("vbank")){
-
-                }
-                message="결제가 완료 되었습니다";
-                result=true;
-            }else{
-                //환불로직
+            try {
+                helpPaymentService.confrimPaymentAndInsert(mchtTrdNo, paymentPrice);
+            } catch (Exception e) {
+                //TODO: handle exception
             }
+            
         }else{
             String outRsltCd=settleDto.getOutRsltCd();
             utillService.writeLog("세틀뱅크 결제 실패 이유: "+outRsltCd+" 결제번호: "+mchtTrdNo, settleService.class);
