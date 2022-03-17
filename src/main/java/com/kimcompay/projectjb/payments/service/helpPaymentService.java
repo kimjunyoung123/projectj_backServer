@@ -34,7 +34,7 @@ public class helpPaymentService {
 
     //@Transactional(rollbackFor = Exception.class)//최상위 함수에 있음
     public void confrimPaymentAndInsert(String mchtTrdNo,int paymentPrice) {
-       
+
             paymentVo vo2=getPaymentVoInRedis(mchtTrdNo);
             if(vo2.getTotalPrice()!=paymentPrice){
                 throw utillService.makeRuntimeEX("총액 불일치", "confirmPayment");
@@ -55,7 +55,9 @@ public class helpPaymentService {
                 paymentDao.save(vo2);
                 //basketService.deleteById(order.getBasketId());//테스트시 꺼놓기
             }
-       // throw new RuntimeException("test");
+            removeInRedis(mchtTrdNo);
+            utillService.getHttpServletRequest().getSession().removeAttribute("orderIdAndTid");
+        throw new RuntimeException("test");
   
     }
     public paymentVo getPaymentVoInRedis(String mchtTrdNo) {
@@ -68,4 +70,8 @@ public class helpPaymentService {
         ObjectMapper objectMapper = new ObjectMapper();
         return objectMapper.convertValue(redisTemplate.opsForHash().entries(mchtTrdNo+senums.basketsTextReids.get()).get(mchtTrdNo+senums.basketsTextReids.get()) ,List.class);
     }
+    public void removeInRedis(String mchtTrdNo) {
+        redisTemplate.delete(mchtTrdNo);
+    }
+
 }

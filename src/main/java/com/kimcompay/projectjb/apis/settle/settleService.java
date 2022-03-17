@@ -46,6 +46,7 @@ public class settleService {
             int paymentPrice=Integer.parseInt(utillService.aesToNomal(settleDto.getTrdAmt()));
             try {
                 helpPaymentService.confrimPaymentAndInsert(mchtTrdNo, paymentPrice);
+                tryInsert(kind, settleDto);
             } catch (Exception e) {
                 throw new paymentFailException(settleDto, kind, e.getMessage());
             }
@@ -56,6 +57,7 @@ public class settleService {
             utillService.writeLog(message, settleService.class);
             message="결제에 실패하였습니다";//나중에 메세지 붙혀주면됨
         }
+        //redirect함수 
     }
     private void tryInsert(String kind,settleDto settleDto) {
         

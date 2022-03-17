@@ -64,10 +64,9 @@ public class kakaoService {
         String url=frontDomain+resultLink+"?kind=kakao&action="+action+"&result="+result.get("flag")+"&message="+result.get("message");
         utillService.doRedirect(utillService.getHttpSerResponse(), url);
     }
-    public String failToAction(Object body,String action) {
+    public String failToAction(JSONObject reponse,String action) {
         try {
             if(action.equals(senums.paymentText.get())){
-                JSONObject reponse=utillService.changeClass(body, JSONObject.class);
                 Map<String,Object>amount=(Map<String, Object>) reponse.get("amount");
                 Boolean result=kakaoPayService.cancleKpay(reponse.get("tid").toString(), Integer.parseInt(amount.get("total").toString()),Integer.parseInt(amount.get("tax_free").toString()));
                 if(result){

@@ -9,6 +9,7 @@ import com.kimcompay.projectjb.apis.kakao.kakaoService;
 import com.kimcompay.projectjb.enums.senums;
 import com.kimcompay.projectjb.exceptions.paymentFailException;
 import com.kimcompay.projectjb.exceptions.socialFailException;
+import com.kimcompay.projectjb.payments.service.helpPaymentService;
 
 import org.json.simple.JSONObject;
 
@@ -31,6 +32,8 @@ public class restAdvice {
     private  String resultLink;
     @Autowired
     private kakaoService kakaoService;
+    @Autowired
+    private helpPaymentService helpPaymentService;
 
     @ExceptionHandler(socialFailException.class)
     public void socialFailException(socialFailException exception) {
@@ -39,14 +42,11 @@ public class restAdvice {
         String company=exception.getCompany();
         String action= exception.getAction();
         if(company.equals(senums.kakao.get())){
-            message=kakaoService.failToAction(exception.getBody(),action);
+            JSONObject reponse=utillService.changeClass(exception.getBody(), JSONObject.class);
+            message=kakaoService.failToAction(reponse,action);
+            helpPaymentService.removeInRedis(reponse.get("partner_order_id").toString());
         }
-        if(!message.startsWith("메")){
-            message="알수 없는 오류발생";
-            exception.printStackTrace();
-        }
-        String url=frontDomain+resultLink+"?kind="+company+"&action="+action+"&result="+false+"&message="+message;
-        
+        String url=frontDomain+resultLink+"?kind="+company+"&action="+action+"&result="+false+"&message="+checkMessage(message, exception);
         utillService.doRedirect(utillService.getHttpSerResponse(),url);
     }
     @ExceptionHandler(paymentFailException.class)
@@ -63,13 +63,7 @@ public class restAdvice {
     @ExceptionHandler(RuntimeException.class)
     public JSONObject runtimeException(RuntimeException exception) {
         logger.info("runtimeException");
-        String message=exception.getMessage();
-        if(!message.startsWith("메")){
-            message="알수 없는 오류발생";
-            exception.printStackTrace();
-        }
-        //exception.printStackTrace();
-        return utillService.getJson(false, message);
+        return utillService.getJson(false, checkMessage(exception.getMessage(), exception));
     }
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public JSONObject processValidationError(MethodArgumentNotValidException exception) {
@@ -82,6 +76,13 @@ public class restAdvice {
             list.add(fieldError.getField());
         }
         return utillService.getJson(false, builder.toString());
+    }
+    private String checkMessage(String message,Exception exception) {
+        if(!message.startsWith("메")){
+            message="알수 없는 오류발생";
+            exception.printStackTrace();
+        }
+        return message;
     }
     
 }
