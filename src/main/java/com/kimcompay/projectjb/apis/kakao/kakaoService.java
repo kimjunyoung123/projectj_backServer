@@ -53,7 +53,7 @@ public class kakaoService {
         JSONObject result=new JSONObject();
         if(action.equals(kenum.loginPage.get())){
             result=kakaoLoginService.doLogin(request.getParameter("code"),rest_key,kLoginCallbackUrl);
-        }else if(action.equals("kpay")){
+        }else if(action.equals(senums.paymentText.get())){
             System.out.println("카카오페이 콜백");
             result=kakaoPayService.confirmPayment(request);
             System.out.println(result.toString());

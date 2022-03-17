@@ -55,7 +55,7 @@ public class helpPaymentService {
                 paymentDao.save(vo2);
                 //basketService.deleteById(order.getBasketId());//테스트시 꺼놓기
             }
-        throw new RuntimeException("test");
+       // throw new RuntimeException("test");
   
     }
     public paymentVo getPaymentVoInRedis(String mchtTrdNo) {
