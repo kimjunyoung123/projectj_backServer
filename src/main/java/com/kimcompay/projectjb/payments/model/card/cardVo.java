@@ -33,7 +33,7 @@ public class cardVo {
     private String mchtTrdNo;
 
     @Column(name = "card_payment_id")
-    private int paymentId;
+    private String paymentId;
 
     @Column(name = "card_orgTrdNo",nullable = false)
     private String orgTrdNo;
@@ -42,13 +42,13 @@ public class cardVo {
     private String authNo;
 
     @Column(name = "card_intMon")
-    private int intMon;
+    private String intMon;
 
     @Column(name = "card_fnNm")
     private String fnNm;
 
     @Column(name="card_fnCd")
-    private int fnCd;
+    private String fnCd;
 
     @Column(name = "card_cancle_flag",columnDefinition = "TINYINT")
     private int cancleFlag;
