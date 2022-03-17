@@ -41,7 +41,6 @@ public class settleService {
     public void confrimPayment(String kind,String status,settleDto settleDto) throws paymentFailException{
         //결제 성공/실패 판단
         String mchtTrdNo=settleDto.getMchtTrdNo();
-        boolean result=false;
         String message=null;
         if(senums.paySuc.get().equals(settleDto.getOutStatCd())){
             int paymentPrice=Integer.parseInt(utillService.aesToNomal(settleDto.getTrdAmt()));
@@ -56,9 +55,7 @@ public class settleService {
             message="세틀뱅크 결제 실패 이유: "+outRsltCd+" 결제번호: "+mchtTrdNo;
             utillService.writeLog(message, settleService.class);
             message="결제에 실패하였습니다";//나중에 메세지 붙혀주면됨
-            throw new paymentFailException(settleDto, kind, message);
         }
-        utillService.redirectToResultPage("settle", "payment", result, message);
     }
     private void tryInsert(String kind,settleDto settleDto) {
         
