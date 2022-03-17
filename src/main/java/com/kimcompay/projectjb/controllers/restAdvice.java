@@ -34,7 +34,7 @@ public class restAdvice {
         String comapany=exception.getCompany();
         String action= exception.getAction();
         if(comapany.equals(senums.kakao.get())){
-            message=kakaoService.failToAction(exception.getBody(), exception.getAction());
+            message=kakaoService.failToAction(exception.getBody(),action);
         }
         if(!message.startsWith("메")){
             message="알수 없는 오류발생";

@@ -67,9 +67,7 @@ public class aopService {
         logger.info("writeLog");
         MethodSignature signature = (MethodSignature)joinPoint.getSignature();
         Method method=signature.getMethod();
-        logger.info("pakage: "+signature.getDeclaringTypeName());
-        logger.info("method: "+method.getName());
-        logger.info("요청변수: "+utillService.arrToLogString(signature.getParameterNames())+" 요청값: "+utillService.arrToLogString(joinPoint.getArgs()));
+        logger.info("pakage: "+signature.getDeclaringTypeName()+" method: "+method.getName()+" 요청변수: "+utillService.arrToLogString(signature.getParameterNames())+" 요청값: "+utillService.arrToLogString(joinPoint.getArgs()));
     }
     //-----------------------------------------------------------------------------------------------------
     //매장정보 접근전 주인인지 확인 select
