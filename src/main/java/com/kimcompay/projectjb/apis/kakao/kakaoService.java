@@ -2,6 +2,8 @@ package com.kimcompay.projectjb.apis.kakao;
 
 
 
+import java.util.Map;
+
 import javax.servlet.http.HttpServletRequest;
 
 import com.kimcompay.projectjb.utillService;
@@ -61,5 +63,17 @@ public class kakaoService {
         }
         String url=frontDomain+resultLink+"?kind=kakao&action="+action+"&result="+result.get("flag")+"&message="+result.get("message");
         utillService.doRedirect(utillService.getHttpSerResponse(), url);
+    }
+    public String failToAction(Object body,String action) {
+        if(action.equals(senums.paymentText.get())){
+            JSONObject reponse=utillService.changeClass(body, JSONObject.class);
+            Map<String,Object>amount=(Map<String, Object>) reponse.get("amount");
+            Boolean result=kakaoPayService.cancleKpay(reponse.get("tid").toString(), Integer.parseInt(amount.get("total").toString()),Integer.parseInt(amount.get("tax_free").toString()));
+            if(result){
+                return "메세지:카카오 페이 결제에 실패하였습니다$전액 환불되었습니다";
+            }
+            return "메세지:카카오 페이 결제에 실패하였습니다$환불에 실패하였습니다$관리자에게 문의주세요";
+        }
+        return "메세지:카카오 예외처리에 실패했습니다$관리자에게 문의해주세요";
     }
 }

@@ -21,6 +21,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kimcompay.projectjb.enums.senums;
 import com.kimcompay.projectjb.payments.model.pay.settleDto;
 import com.kimcompay.projectjb.payments.service.aes256;
@@ -410,5 +411,10 @@ public class utillService {
     public static void redirectToResultPage(String company,String action,Boolean result,String message) {
         String url=frontDomain+resultLink+"?kind="+company+"&action="+action+"&result="+result+"&message="+message;
         doRedirect(utillService.getHttpSerResponse(), url);
+    }
+    public static <T> T changeClass(Object object,Class<T>clazz) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        return  (T) objectMapper.convertValue(object,clazz);
+ 
     }
 }
