@@ -48,16 +48,17 @@ public class settleService {
             try {
                 helpPaymentService.confrimPaymentAndInsert(mchtTrdNo, paymentPrice);
             } catch (Exception e) {
-                //TODO: handle exception
+                throw new paymentFailException(settleDto, kind, e.getMessage());
             }
-            
         }else{
+            //애초에 결제가 안됐으므로 환불 불필요
             String outRsltCd=settleDto.getOutRsltCd();
-            utillService.writeLog("세틀뱅크 결제 실패 이유: "+outRsltCd+" 결제번호: "+mchtTrdNo, settleService.class);
+            message="세틀뱅크 결제 실패 이유: "+outRsltCd+" 결제번호: "+mchtTrdNo;
+            utillService.writeLog(message, settleService.class);
             message="결제에 실패하였습니다";//나중에 메세지 붙혀주면됨
+            throw new paymentFailException(settleDto, kind, message);
         }
-        String url=frontDomain+resultLink+"?kind=settle&action=payment&result="+result+"&message="+message;
-        utillService.doRedirect(utillService.getHttpSerResponse(), url);
+        utillService.redirectToResultPage("settle", "payment", result, message);
     }
     private void tryInsert(String kind,settleDto settleDto) {
         

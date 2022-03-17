@@ -13,6 +13,7 @@ import com.kimcompay.projectjb.utillService;
 import com.kimcompay.projectjb.apis.requestTo;
 import com.kimcompay.projectjb.enums.kenum;
 import com.kimcompay.projectjb.enums.senums;
+import com.kimcompay.projectjb.exceptions.socialFailException;
 import com.kimcompay.projectjb.payments.model.kpay.kpayDao;
 import com.kimcompay.projectjb.payments.model.kpay.kpayVo;
 import com.kimcompay.projectjb.payments.model.order.orderDao;
@@ -91,7 +92,7 @@ public class kakaoPayService {
         return urls;
     }
     @Transactional(rollbackFor = Exception.class)
-    public JSONObject confirmPayment(HttpServletRequest request) {
+    public JSONObject confirmPayment(HttpServletRequest request) throws socialFailException {
         if(request.getParameter("state").equals("fail")){
             return utillService.getJson(false, "결제에 실패했습니다");
         }
@@ -115,21 +116,21 @@ public class kakaoPayService {
         //검증하기
         Map<String,Object>amount=(Map<String, Object>) respon.get("amount");
         int paymentPrice=Integer.parseInt(amount.get("total").toString());
-        if(helpPaymentService.confrimPaymentAndInsert(mchtTrdNo, paymentPrice)){
-            //여기서 에러가 터지면 큰일나는건데 ㅋㅋ throw로 위임 해서 처리하는게 좋을듯
+        try {
+            helpPaymentService.confrimPaymentAndInsert(mchtTrdNo, paymentPrice);
             kpayVo vo=kpayVo.builder().mchtTrdNo(mchtTrdNo).paymentId(utillService.getLoginId()).tid(tid).build();
             kpayDao.save(vo);
-            return utillService.getJson(true, "결제가 완료 되었습니다");
-        }else{
+        } catch (Exception e) {
             utillService.writeLog("카카오페이 결제 실패", kakaoPayService.class);
             String message="카카오 페이 결제에 실패하였습니다$전액 환불되었습니다";
-            if(!cancleKpay(tid,paymentPrice,0)){
-                message="카카오 페이 결제에 실패하였습니다$환불에 실패하였습니다$관리자에게 문의주세요";
-            }
-            return utillService.getJson(false, message);
+            throw new socialFailException(respon,senums.kakao.get(), senums.paymentText.get(), message);
         }
+        return utillService.getJson(true, "결제가 완료 되었습니다");
+
+           
+        
     }
-    private boolean cancleKpay(String tid,int cancleAmount,int taxFree) {
+    public boolean cancleKpay(String tid,int cancleAmount,int taxFree) {
         HttpHeaders httpHeaders=new HttpHeaders();
         httpHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
         httpHeaders.add("Authorization", "KakaoAK "+kakaoAdminKey);

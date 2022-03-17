@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 import com.kimcompay.projectjb.utillService;
 import com.kimcompay.projectjb.enums.kenum;
 import com.kimcompay.projectjb.enums.senums;
+import com.kimcompay.projectjb.exceptions.socialFailException;
 
 import org.json.simple.JSONObject;
 import org.slf4j.Logger;
@@ -46,7 +47,7 @@ public class kakaoService {
         }
         return utillService.getJson(true, url);
     }
-    public void catchCallBack(String action,HttpServletRequest request) {
+    public void catchCallBack(String action,HttpServletRequest request) throws socialFailException {
         JSONObject result=new JSONObject();
         if(action.equals(kenum.loginPage.get())){
             result=kakaoLoginService.doLogin(request.getParameter("code"),rest_key,kLoginCallbackUrl);

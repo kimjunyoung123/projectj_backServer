@@ -4,12 +4,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.kimcompay.projectjb.utillService;
+import com.kimcompay.projectjb.apis.kakao.kakaoPayService;
+import com.kimcompay.projectjb.apis.kakao.kakaoService;
 import com.kimcompay.projectjb.exceptions.paymentFailException;
+import com.kimcompay.projectjb.exceptions.socialFailException;
 
 import org.json.simple.JSONObject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.support.MethodArgumentNotValidException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -18,10 +22,21 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
 public class restAdvice {
-    
     private final static Logger logger=LoggerFactory.getLogger(restAdvice.class);
+    @Autowired
+    private kakaoPayService kakaoPayService;
 
-    @ExceptionHandler(RuntimeException.class)
+    @ExceptionHandler(socialFailException.class)
+    public void socialFailException(socialFailException exception) {
+        logger.info("socialFailException");
+        String message=exception.getMessage();
+        if(!message.startsWith("메")){
+            message="알수 없는 오류발생";
+            exception.printStackTrace();
+        }
+        kakaoPayService.cancleKpay(tid, cancleAmount, taxFree);
+    }
+    @ExceptionHandler(paymentFailException.class)
     public JSONObject paymentFailException(paymentFailException exception) {
         logger.info("paymentFailException");
         String message=exception.getMessage();

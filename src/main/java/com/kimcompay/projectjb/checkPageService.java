@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 import com.kimcompay.projectjb.apis.kakao.kakaoService;
 import com.kimcompay.projectjb.apis.naver.naverService;
 import com.kimcompay.projectjb.enums.senums;
+import com.kimcompay.projectjb.exceptions.socialFailException;
 
 import org.json.simple.JSONObject;
 import org.slf4j.Logger;
@@ -58,7 +59,7 @@ public class checkPageService {
         }
         throw utillService.makeRuntimeEX("지원하지 않는 소셜서비스입니다", "selectPage");
     }
-    public void selectCallback(String kind,String action,HttpServletRequest request) {
+    public void selectCallback(String kind,String action,HttpServletRequest request) throws socialFailException {
         logger.info("selectCallback");
         logger.info("콜백 소셜: "+kind);
         logger.info("콜백 액션: "+action);

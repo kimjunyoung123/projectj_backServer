@@ -15,6 +15,7 @@ import com.kimcompay.projectjb.apis.settle.settleService;
 import com.kimcompay.projectjb.apis.sns.snsService;
 import com.kimcompay.projectjb.enums.senums;
 import com.kimcompay.projectjb.exceptions.paymentFailException;
+import com.kimcompay.projectjb.exceptions.socialFailException;
 import com.kimcompay.projectjb.payments.model.pay.settleDto;
 import com.kimcompay.projectjb.users.user.userService;
 
@@ -68,7 +69,7 @@ public class restController {
         return checkPageService.selectPage(kind,action);
     }
     @RequestMapping(value = "/callback/{kind}/{action}",method = RequestMethod.GET)
-    public void socialCallback(@PathVariable String kind,@PathVariable String action,HttpServletRequest request) {
+    public void socialCallback(@PathVariable String kind,@PathVariable String action,HttpServletRequest request) throws socialFailException {
         checkPageService.selectCallback(kind,action,request);
     }
     @RequestMapping("/tokenExpire/{result}")

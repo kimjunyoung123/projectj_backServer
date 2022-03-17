@@ -31,13 +31,25 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 public class utillService {
+    private static String frontDomain;
+    private static String resultLink;
 
+    @Value("${front.domain}")
+    public void setFrontDomain(String frontDomain) {
+        utillService.frontDomain=frontDomain;
+    }
+    @Value("${front.domain}")
+    public void setResultLink(String resultLink) {
+        utillService.resultLink=resultLink;
+    }
+    
     public static settleDto requestToSettleDto(HttpServletRequest request) {
         settleDto dto=settleDto.builder()
          .mchtId(request.getParameter("mchtId"))//상점아이디
@@ -394,5 +406,9 @@ public class utillService {
         } catch (Exception e) {
             throw new RuntimeException("복호화 실패");
         }
+    }
+    public static void redirectToResultPage(String company,String action,Boolean result,String message) {
+        String url=frontDomain+resultLink+"?kind="+company+"&action="+action+"&result="+result+"&message="+message;
+        doRedirect(utillService.getHttpSerResponse(), url);
     }
 }

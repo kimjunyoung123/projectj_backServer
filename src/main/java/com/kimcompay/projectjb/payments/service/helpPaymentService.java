@@ -9,6 +9,7 @@ import com.kimcompay.projectjb.enums.senums;
 import com.kimcompay.projectjb.exceptions.paymentFailException;
 import com.kimcompay.projectjb.payments.model.order.orderDao;
 import com.kimcompay.projectjb.payments.model.order.orderVo;
+import com.kimcompay.projectjb.payments.model.pay.paymentDao;
 import com.kimcompay.projectjb.payments.model.pay.paymentVo;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,10 +28,12 @@ public class helpPaymentService {
     @Autowired
     private orderDao orderDao;
     @Autowired
+    private paymentDao paymentDao;
+    @Autowired
     private basketService basketService;
 
     //@Transactional(rollbackFor = Exception.class)//최상위 함수에 있음
-    public void confrimPaymentAndInsert(String mchtTrdNo,int paymentPrice) throws paymentFailException  {
+    public void confrimPaymentAndInsert(String mchtTrdNo,int paymentPrice) {
        
             paymentVo vo2=getPaymentVoInRedis(mchtTrdNo);
             if(vo2.getTotalPrice()!=paymentPrice){
@@ -40,8 +43,7 @@ public class helpPaymentService {
             //쿠폰 사용처리
             for(Object order:orders){
                 //쿠폰 사용처리
-                ObjectMapper objectMapper = new ObjectMapper();
-                orderVo orderVo=objectMapper.convertValue(order ,orderVo.class);
+                orderVo orderVo=new ObjectMapper().convertValue(order ,orderVo.class);
                 String coupons=orderVo.getCoupon();
                 if(coupons!=null){
                     String[] couponArr=orderVo.getCoupon().split(",");
@@ -50,8 +52,10 @@ public class helpPaymentService {
                     }
                 }               
                 orderDao.save(orderVo);
+                paymentDao.save(vo2);
                 //basketService.deleteById(order.getBasketId());//테스트시 꺼놓기
             }
+        throw new RuntimeException("test");
   
     }
     public paymentVo getPaymentVoInRedis(String mchtTrdNo) {
