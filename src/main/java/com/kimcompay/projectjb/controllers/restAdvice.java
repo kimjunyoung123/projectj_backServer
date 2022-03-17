@@ -15,6 +15,7 @@ import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.messaging.handler.annotation.support.MethodArgumentNotValidException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -24,6 +25,10 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class restAdvice {
     private final static Logger logger=LoggerFactory.getLogger(restAdvice.class);
+    @Value("${front.domain}")
+    private  String frontDomain;
+    @Value("${front.result.page}")
+    private  String resultLink;
     @Autowired
     private kakaoService kakaoService;
 
@@ -31,16 +36,18 @@ public class restAdvice {
     public void socialFailException(socialFailException exception) {
         logger.info("socialFailException");
         String message=exception.getMessage();
-        String comapany=exception.getCompany();
+        String company=exception.getCompany();
         String action= exception.getAction();
-        if(comapany.equals(senums.kakao.get())){
+        if(company.equals(senums.kakao.get())){
             message=kakaoService.failToAction(exception.getBody(),action);
         }
         if(!message.startsWith("메")){
             message="알수 없는 오류발생";
             exception.printStackTrace();
         }
-        utillService.redirectToResultPage(senums.kakao.get(),action, false, message);
+        String url=frontDomain+resultLink+"?kind="+company+"&action="+action+"&result="+false+"&message="+message;
+        
+        utillService.doRedirect(utillService.getHttpSerResponse(),url);
     }
     @ExceptionHandler(paymentFailException.class)
     public JSONObject paymentFailException(paymentFailException exception) {
@@ -76,4 +83,5 @@ public class restAdvice {
         }
         return utillService.getJson(false, builder.toString());
     }
+    
 }

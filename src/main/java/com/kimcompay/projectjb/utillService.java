@@ -39,17 +39,8 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 public class utillService {
-    private static String frontDomain;
-    private static String resultLink;
 
-    @Value("${front.domain}")
-    public void setFrontDomain(String frontDomain) {
-        utillService.frontDomain=frontDomain;
-    }
-    @Value("${front.domain}")
-    public void setResultLink(String resultLink) {
-        utillService.resultLink=resultLink;
-    }
+
     
     public static settleDto requestToSettleDto(HttpServletRequest request) {
         settleDto dto=settleDto.builder()
@@ -167,6 +158,7 @@ public class utillService {
     }
     public static void doRedirect(HttpServletResponse response,String url) {
         try {
+            writeLog("리다이렏트 url: "+url, utillService.class);
             response.sendRedirect(url);
         } catch (IOException e) {
             e.printStackTrace();
@@ -407,10 +399,6 @@ public class utillService {
         } catch (Exception e) {
             throw new RuntimeException("복호화 실패");
         }
-    }
-    public static void redirectToResultPage(String company,String action,Boolean result,String message) {
-        String url=frontDomain+resultLink+"?kind="+company+"&action="+action+"&result="+result+"&message="+message;
-        doRedirect(utillService.getHttpSerResponse(), url);
     }
     public static <T> T changeClass(Object object,Class<T>clazz) {
         ObjectMapper objectMapper = new ObjectMapper();
