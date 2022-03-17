@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.kimcompay.projectjb.utillService;
+import com.kimcompay.projectjb.exceptions.paymentFailException;
+
 import org.json.simple.JSONObject;
 
 import org.slf4j.Logger;
@@ -16,8 +18,19 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
 public class restAdvice {
-
+    
     private final static Logger logger=LoggerFactory.getLogger(restAdvice.class);
+
+    @ExceptionHandler(RuntimeException.class)
+    public JSONObject paymentFailException(paymentFailException exception) {
+        logger.info("paymentFailException");
+        String message=exception.getMessage();
+        if(!message.startsWith("메")){
+            message="알수 없는 오류발생";
+            exception.printStackTrace();
+        }
+        return utillService.getJson(false, message);
+    }
 
     @ExceptionHandler(RuntimeException.class)
     public JSONObject runtimeException(RuntimeException exception) {

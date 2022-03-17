@@ -14,6 +14,7 @@ import com.kimcompay.projectjb.apis.aws.services.fileService;
 import com.kimcompay.projectjb.apis.settle.settleService;
 import com.kimcompay.projectjb.apis.sns.snsService;
 import com.kimcompay.projectjb.enums.senums;
+import com.kimcompay.projectjb.exceptions.paymentFailException;
 import com.kimcompay.projectjb.payments.model.pay.settleDto;
 import com.kimcompay.projectjb.users.user.userService;
 
@@ -84,7 +85,7 @@ public class restController {
         return fileService.upload(request);
     }
     @RequestMapping(value = "/settle/{kind}/{status}",method = RequestMethod.POST)
-    public void settleBankCallback(@PathVariable String kind,@PathVariable String status,HttpServletRequest request) {
+    public void settleBankCallback(@PathVariable String kind,@PathVariable String status,HttpServletRequest request) throws paymentFailException {
         System.out.println(status);
         settleService.confrimPayment(kind,status, utillService.requestToSettleDto(request));  
     }
