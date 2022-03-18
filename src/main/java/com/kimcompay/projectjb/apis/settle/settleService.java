@@ -60,10 +60,15 @@ public class settleService {
         //결제 성공/실패 판단
         String mchtTrdNo=settleDto.getMchtTrdNo();
         String message=null;
-        if(senums.paySuc.get().equals(settleDto.getOutStatCd())){
+        String state=settleDto.getOutStatCd();
+        if(senums.paySuc.get().equals(state)||"0051".equals(state)){
             int paymentPrice=Integer.parseInt(utillService.aesToNomal(settleDto.getTrdAmt()));
             //예외발생시 대처 위해
             settleDto.setTrdAmt(Integer.toString(paymentPrice));
+            //가상계좌라면 계좌 복호화
+            if(settleDto.getMethod().equals("vbank")){
+                settleDto.setVtlAcntNo(utillService.aesToNomal(settleDto.getVtlAcntNo()));
+            }
             try {
                 helpPaymentService.confrimPaymentAndInsert(mchtTrdNo, paymentPrice);
                 tryInsert(kind, settleDto);
