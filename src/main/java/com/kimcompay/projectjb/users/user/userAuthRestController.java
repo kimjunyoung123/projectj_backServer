@@ -6,6 +6,7 @@ import javax.validation.Valid;
 import com.kimcompay.projectjb.utillService;
 import com.kimcompay.projectjb.payments.model.basket.tryInsertDto;
 import com.kimcompay.projectjb.payments.service.basketService;
+import com.kimcompay.projectjb.payments.service.paymentService;
 import com.kimcompay.projectjb.users.user.service.reviewService;
 
 import org.json.simple.JSONObject;
@@ -27,6 +28,8 @@ public class userAuthRestController {
     private userService userService;
     @Autowired
     private basketService basketService;
+    @Autowired
+    private paymentService paymentService;
 
     @RequestMapping(value = "/{action}",method = RequestMethod.GET)//매 페이지 이동 마다 로그인정보 조회
     public JSONObject userAction(@PathVariable String action,HttpServletRequest request) {
@@ -64,5 +67,10 @@ public class userAuthRestController {
     @RequestMapping(value = "/basket/{basketId}",method = RequestMethod.DELETE)
     public JSONObject tryDeleteBaket(@PathVariable int basketId) {
         return basketService.tryDelete(basketId);
+    }
+    //주문조회
+    @RequestMapping(value = "/payments/{page}/{start}/{end}",method = RequestMethod.GET)
+    public JSONObject getPaymentList(@PathVariable int page,@PathVariable String start,@PathVariable String end) {
+        return paymentService.getPayments(page,start,end);
     }
 }

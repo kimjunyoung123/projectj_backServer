@@ -60,6 +60,12 @@ public class paymentService {
     @Autowired
     private RedisTemplate<String,Object>redisTemplate;
 
+    public JSONObject getPayments(int page,String start,String end) {
+        return utillService.getJson(true, getDtosByUserId(page, start, end));
+    }
+    private List<Map<String,Object>> getDtosByUserId(int page,String start,String end) {
+        return paymentDao.findJoinCardVbankKpayOrder(utillService.getLoginId());
+    }
     @org.springframework.transaction.annotation.Transactional(rollbackFor = Exception.class)
     public JSONObject tryOrder(tryOrderDto tryOrderDto,String action) {
         int userId=utillService.getLoginId();

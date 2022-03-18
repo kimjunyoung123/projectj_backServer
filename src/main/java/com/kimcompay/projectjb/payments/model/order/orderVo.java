@@ -34,7 +34,7 @@ public class orderVo {
     @Column(name = "product_id",nullable = false)
     private int productId;
 
-    @Column(name ="mchtTrdNo",nullable = false)
+    @Column(name ="order_mchtTrdNo",nullable = false)
     private String mchtTrdNo;
 
     @Column(name ="order_coupon")
