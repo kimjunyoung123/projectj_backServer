@@ -388,7 +388,7 @@ public class utillService {
         String date=dateAndTimes[0];
         String time=dateAndTimes[1];
         date=date.replace("-", "");
-        time=time.replace(":", "").substring(0, 5);
+        time=time.replace(":", "").substring(0, 6);
         Map<String,String>response=new HashMap<>();
         response.put("date", date);
         response.put("time", time);

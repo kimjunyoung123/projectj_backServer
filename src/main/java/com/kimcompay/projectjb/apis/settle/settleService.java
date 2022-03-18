@@ -58,10 +58,14 @@ public class settleService {
         String message=null;
         if(senums.paySuc.get().equals(settleDto.getOutStatCd())){
             int paymentPrice=Integer.parseInt(utillService.aesToNomal(settleDto.getTrdAmt()));
+            //예외발생시 대처 위해
+            settleDto.setTrdAmt(Integer.toString(paymentPrice));
             try {
                 helpPaymentService.confrimPaymentAndInsert(mchtTrdNo, paymentPrice);
                 tryInsert(kind, settleDto);
             } catch (Exception e) {
+                //환불시 취소 회차 올려줘야함
+                settleDto.setCnclOrd(1);
                 throw new paymentFailException(settleDto, kind, e.getMessage());
             }
         }else{
