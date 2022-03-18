@@ -29,6 +29,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class settleService {
     
     @Autowired
+    private vbankService vbankService;
+    @Autowired
     private cardService cardService;
     @Autowired
     private helpPaymentService helpPaymentService;
@@ -45,7 +47,7 @@ public class settleService {
                 method="결제실패$환불성공";
             }   
         }else if(method.equals("vbank")){
-            if(cardService.cancle(settleDto)){
+            if(vbankService.cancleNotPayment(settleDto)){
                 method="결제실패$채번이취소되었습니다";
             }else{
                 message="다시시도 해주세요";
