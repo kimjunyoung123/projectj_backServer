@@ -47,6 +47,8 @@ public class settleService {
         }else if(method.equals("vbank")){
             if(cardService.cancle(settleDto)){
                 method="결제실패$채번이취소되었습니다";
+            }else{
+                message="다시시도 해주세요";
             } 
         }
         return message;

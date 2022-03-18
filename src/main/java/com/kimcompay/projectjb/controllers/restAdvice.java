@@ -56,15 +56,12 @@ public class restAdvice {
         utillService.doRedirect(utillService.getHttpSerResponse(),url);
     }
     @ExceptionHandler(paymentFailException.class)
-    public JSONObject paymentFailException(paymentFailException exception) {
+    public void paymentFailException(paymentFailException exception) {
         logger.info("paymentFailException");
         String message=exception.getMessage();
-        if(!message.startsWith("메")){
-            message="알수 없는 오류발생";
-            exception.printStackTrace();
-        }
-        settleService.canclePay(exception.getDto());
-        return utillService.getJson(false, message);
+        message=settleService.canclePay(exception.getDto());
+        String url=frontDomain+resultLink+"?kind=settle&action=payment&result="+false+"&message="+checkMessage(message, exception);
+        utillService.doRedirect(utillService.getHttpSerResponse(),url);
     }
 
     @ExceptionHandler(RuntimeException.class)

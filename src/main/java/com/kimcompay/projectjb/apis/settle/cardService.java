@@ -1,6 +1,7 @@
 package com.kimcompay.projectjb.apis.settle;
 
 import java.time.LocalDateTime;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import com.kimcompay.projectjb.utillService;
@@ -30,7 +31,15 @@ public class cardService {
     public boolean cancle(settleDto settleDto) {
         JSONObject response=requestTo.requestPost(makecancelBody(settleDto), cancleUrl, utillService.getSettleHeader());
         utillService.writeLog("세틀뱅크 통신결과: "+response.toString(), cardService.class);
-        return true;
+        LinkedHashMap<String,Object> params=(LinkedHashMap<String,Object>)response.get("params");
+        if(params.get("outStatCd").toString().equals(senums.paySuc.get())){
+            return true;
+        }else{
+            String outRsltCd=(String)params.get("outRsltCd");
+            String message="세틀뱅크 환불실패 이유: "+outRsltCd+" 결제번호: "+settleDto.getMchtTrdNo();
+            utillService.writeLog(message, cardService.class);
+        }
+        return false;
     }
     public void insert(settleDto settleDto) {
         cardDao.save(dtoToVo(settleDto));   
