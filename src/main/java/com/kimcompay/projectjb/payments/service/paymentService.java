@@ -73,11 +73,20 @@ public class paymentService {
         return response;
     }
     private List<Map<String,Object>> getDtosByUserId(int page,String start,String end) {
-        if(!utillService.checkBlank(start)&&!utillService.checkBlank(end)){
+        System.out.println(start);
+        boolean startFlag=utillService.checkBlank(start);
+        boolean endFlag=utillService.checkBlank(end);
+        if(startFlag&&endFlag){
             return paymentDao.findJoinCardVbankKpayOrder(utillService.getLoginId(),utillService.getStart(page, pageSize)-1,pageSize);
+        }else if((startFlag&&endFlag==false)||(startFlag==false&&endFlag)){
+            throw utillService.makeRuntimeEX("일자를 제대로 선택해 주세요", "getDtosByUserId");
         }
-        
-        return paymentDao.findJoinCardVbankKpayOrder(utillService.getLoginId(),Timestamp.valueOf(start),Timestamp.valueOf(end),utillService.getStart(page, pageSize)-1,pageSize);
+        Timestamp startDate=Timestamp.valueOf(start);
+        Timestamp endDate=Timestamp.valueOf(end);
+        if(startDate.toLocalDateTime().isAfter(endDate.toLocalDateTime())){
+            throw utillService.makeRuntimeEX("날짜 범위가 유효하지 않습니다", "getDtosByUserId");
+        }
+        return paymentDao.findJoinCardVbankKpayOrder(utillService.getLoginId(),startDate,endDate,utillService.getStart(page, pageSize)-1,pageSize);
     }
     @org.springframework.transaction.annotation.Transactional(rollbackFor = Exception.class)
     public JSONObject tryOrder(tryOrderDto tryOrderDto,String action) {
