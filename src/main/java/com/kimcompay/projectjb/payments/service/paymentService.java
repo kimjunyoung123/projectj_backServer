@@ -39,6 +39,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class paymentService {
 
+    private final int pageSize=2;
     @Autowired
     private basketService basketService;
     @Autowired
@@ -61,10 +62,22 @@ public class paymentService {
     private RedisTemplate<String,Object>redisTemplate;
 
     public JSONObject getPayments(int page,String start,String end) {
-        return utillService.getJson(true, getDtosByUserId(page, start, end));
+        List<Map<String,Object>>dtos=getDtosByUserId(page, start, end);
+        if(dtos.isEmpty()){
+            throw utillService.makeRuntimeEX("내역을 찾을 수 없습니다", "getPayments");
+        }
+        JSONObject response=new JSONObject();
+        response.put("message", dtos);
+        response.put("totalPage", 1);
+        response.put("flag", true);
+        return response;
     }
     private List<Map<String,Object>> getDtosByUserId(int page,String start,String end) {
-        return paymentDao.findJoinCardVbankKpayOrder(utillService.getLoginId());
+        if(!utillService.checkBlank(start)&&!utillService.checkBlank(end)){
+            return paymentDao.findJoinCardVbankKpayOrder(utillService.getLoginId(),utillService.getStart(page, pageSize)-1,pageSize);
+        }
+        
+        return paymentDao.findJoinCardVbankKpayOrder(utillService.getLoginId(),Timestamp.valueOf(start),Timestamp.valueOf(end),utillService.getStart(page, pageSize)-1,pageSize);
     }
     @org.springframework.transaction.annotation.Transactional(rollbackFor = Exception.class)
     public JSONObject tryOrder(tryOrderDto tryOrderDto,String action) {

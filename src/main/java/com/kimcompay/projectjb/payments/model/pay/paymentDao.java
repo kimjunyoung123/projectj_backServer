@@ -1,5 +1,6 @@
 package com.kimcompay.projectjb.payments.model.pay;
 
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
 
@@ -11,6 +12,11 @@ public interface paymentDao extends JpaRepository<paymentVo,Integer> {
     
     @Query(value = "select a.*,b.*,c.*,d.*,e.order_id,e.order_price,e.order_count"
     +" from payments a left join vbanks b on a.mcht_trd_no=b.vbank_mcht_trd_no left join cards c on a.mcht_trd_no=c.card_mcht_trd_no left join kpays d on a.mcht_trd_no=kpay_mcht_trd_no left join orders e on a.mcht_trd_no=e.order_mcht_trd_no"
-    +" where a.user_id=?",nativeQuery = true)
-    List<Map<String,Object>>findJoinCardVbankKpayOrder(int userId);
+    +" where a.user_id=? order by a.payment_id desc limit ?,?",nativeQuery = true)
+    List<Map<String,Object>>findJoinCardVbankKpayOrder(int userId,int start,int pageSize);
+
+    @Query(value = "select a.*,b.*,c.*,d.*,e.order_id,e.order_price,e.order_count"
+    +" from payments a left join vbanks b on a.mcht_trd_no=b.vbank_mcht_trd_no left join cards c on a.mcht_trd_no=c.card_mcht_trd_no left join kpays d on a.mcht_trd_no=kpay_mcht_trd_no left join orders e on a.mcht_trd_no=e.order_mcht_trd_no"
+    +" where a.user_id=? and a.payment_created between ? and ? order by a.payment_id desc limit ?,?",nativeQuery = true)
+    List<Map<String,Object>>findJoinCardVbankKpayOrder(int userId,Timestamp startDate,Timestamp endDate,int start,int pageSize);
 }
