@@ -70,7 +70,7 @@ public class userAuthRestController {
         return basketService.tryDelete(basketId);
     }
     //주문조회
-    @RequestMapping(value = "/payments/{page}/{start}/{end}",method = RequestMethod.GET)
+    @RequestMapping(value = "/orders/{page}/{start}/{end}",method = RequestMethod.GET)
     public JSONObject getPaymentList(@PathVariable int page,@PathVariable String start,@PathVariable String end) {
         return orderService.getOrders(page,start,end);
     }
