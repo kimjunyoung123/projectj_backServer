@@ -65,7 +65,7 @@ public class paymentService {
         int totalPage=utillService.getTotalPage(Integer.parseInt(paymentVos.get(0).get("totalCount").toString()), pageSize);
         JSONObject response=new JSONObject();
         response.put("flag", true);
-        response.put("payments", paymentVos);
+        response.put("message", paymentVos);
         response.put("totalPage", totalPage);
         return response;
     }
