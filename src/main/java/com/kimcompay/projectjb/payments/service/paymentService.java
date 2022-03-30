@@ -59,10 +59,18 @@ public class paymentService {
     private RedisTemplate<String,Object>redisTemplate;
 
     public JSONObject getPaymentsByStoreId(int page,String start,String end,int storeId) {
-        List<paymentVo>paymentVos=paymentDao.findJoinByStoreId(storeId,utillService.getStart(page, pageSize)-1, pageSize);
+        List<Map<String,Object>>paymentVos=getVos(page, start, end, storeId);
         utillService.checkDaoResult(paymentVos, "내역이 존재하지 않습니다", "getPaymentsByStoreId");
         System.out.println(paymentVos.toString());
-        return null;
+        int totalPage=utillService.getTotalPage(Integer.parseInt(paymentVos.get(0).get("totalCount").toString()), pageSize);
+        JSONObject response=new JSONObject();
+        response.put("flag", true);
+        response.put("payments", paymentVos);
+        response.put("totalPage", totalPage);
+        return response;
+    }
+    private List<Map<String,Object>> getVos(int page,String start,String end,int storeId) {
+        return paymentDao.findJoinByStoreId(storeId,storeId,utillService.getStart(page, pageSize)-1, pageSize);
     }
     public JSONObject getPayments(int page,String start,String end) {
         return utillService.getJson(true, getDtosByUserId(page, start, end));
