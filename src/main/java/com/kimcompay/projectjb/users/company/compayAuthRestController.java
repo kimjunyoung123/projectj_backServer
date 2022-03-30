@@ -13,6 +13,9 @@ import com.kimcompay.projectjb.users.company.model.stores.tryInsertStoreDto;
 import com.kimcompay.projectjb.users.company.model.stores.tryUpdateStoreDto;
 import com.kimcompay.projectjb.utillService;
 import com.kimcompay.projectjb.delivery.service.deliveryService;
+import com.kimcompay.projectjb.payments.model.order.orderDao;
+import com.kimcompay.projectjb.payments.service.orderService;
+import com.kimcompay.projectjb.payments.service.paymentService;
 import com.kimcompay.projectjb.users.company.service.flyerService;
 import com.kimcompay.projectjb.users.company.service.productService;
 import com.kimcompay.projectjb.users.company.service.storeService;
@@ -38,6 +41,8 @@ public class compayAuthRestController {
     private flyerService flyerService;
     @Autowired
     private productService productService;
+    @Autowired
+    private paymentService paymentService;
 
 
 
@@ -127,7 +132,9 @@ public class compayAuthRestController {
         return utillService.getJson(true, message);
     }
     //주문내역 조회
-    @RequestMapping(value = "/orders/{storeId}/{page}/{keyword}",method = RequestMethod.GET   )
-    public void getOrders(@PathVariable int storeId,@PathVariable int page,@PathVariable String keyword) {
+    @RequestMapping(value = "/orders/{storeId}/{page}/{keyword}",method = RequestMethod.GET )
+    public JSONObject getOrders(@PathVariable int storeId,@PathVariable int page,@PathVariable String keyword) {
+        return paymentService.getPaymentsByStoreId(page, keyword, keyword, storeId);
     }
+
 }

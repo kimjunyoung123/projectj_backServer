@@ -38,7 +38,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class paymentService {
-
+    private final int pageSize=2;
     @Autowired
     private basketService basketService;
     @Autowired
@@ -54,12 +54,16 @@ public class paymentService {
     @Autowired
     private settleService settleService;
     @Autowired
-    private orderDao orderDao;
-    @Autowired
     private kakaoPayService kakaoPayService;
     @Autowired
     private RedisTemplate<String,Object>redisTemplate;
 
+    public JSONObject getPaymentsByStoreId(int page,String start,String end,int storeId) {
+        List<paymentVo>paymentVos=paymentDao.findJoinByStoreId(storeId,utillService.getStart(page, pageSize)-1, pageSize);
+        utillService.checkDaoResult(paymentVos, "내역이 존재하지 않습니다", "getPaymentsByStoreId");
+        System.out.println(paymentVos.toString());
+        return null;
+    }
     public JSONObject getPayments(int page,String start,String end) {
         return utillService.getJson(true, getDtosByUserId(page, start, end));
     }
