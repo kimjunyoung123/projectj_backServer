@@ -57,7 +57,7 @@ public class helpPaymentService {
             }
             removeInRedis(mchtTrdNo);
             utillService.getHttpServletRequest().getSession().removeAttribute("orderIdAndTid");
-        throw new RuntimeException("test");
+       // throw new RuntimeException("test");
   
     }
     public paymentVo getPaymentVoInRedis(String mchtTrdNo) {

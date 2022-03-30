@@ -56,8 +56,8 @@ public class vbankVo {
     @Column(name = "vbank_trdDtm")
     private Timestamp vtrdDtm;
 
-    @Column(name = "vbank_status",nullable = false)
-    private String status;
+    @Column(name = "vbank_status",nullable = false,columnDefinition = "TINYINT")
+    private int status;
 
     @Column(name = "vbank_created")
     @CreationTimestamp

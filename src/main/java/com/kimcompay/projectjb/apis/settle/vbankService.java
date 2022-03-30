@@ -1,5 +1,6 @@
 package com.kimcompay.projectjb.apis.settle;
 
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.Map;
 
@@ -7,6 +8,8 @@ import com.kimcompay.projectjb.utillService;
 import com.kimcompay.projectjb.apis.requestTo;
 import com.kimcompay.projectjb.enums.senums;
 import com.kimcompay.projectjb.payments.model.pay.settleDto;
+import com.kimcompay.projectjb.payments.model.vbank.vbankDao;
+import com.kimcompay.projectjb.payments.model.vbank.vbankVo;
 import com.kimcompay.projectjb.payments.service.aes256;
 import com.kimcompay.projectjb.payments.service.sha256;
 
@@ -22,7 +25,23 @@ public class vbankService {
     private requestTo requestTo;
     @Value("${settle.vbank.cancle.account.url}")
     private String cancleAccountUrl;
+    @Autowired
+    private vbankDao vbankDao;
 
+    public void insert(settleDto settleDto) {
+        Timestamp expireDate=StringToTimestamp(settleDto.getExpireDt());
+        vbankDao.save(dtoToVo(settleDto, expireDate));
+    }
+    private vbankVo dtoToVo(settleDto settleDto,Timestamp expireDate) {
+       
+        return vbankVo.builder().cnclOrd(settleDto.getCnclOrd()).expireDt(expireDate).fnCd(settleDto.getFnCd()).fnNm(settleDto.getFnNm()).mchtId(settleDto.getMchtId()).mchtTrdNo(settleDto.getMchtTrdNo())
+                        .status(0).trdNo(settleDto.getTrdNo()).vtlAcntNo(settleDto.getVtlAcntNo()).vtrdDtm(Timestamp.valueOf(LocalDateTime.now())).build();
+    }
+    private Timestamp StringToTimestamp(String expireDate) { 
+        System.out.println("time: "+expireDate);
+        System.out.println("time2: "+expireDate.substring(0, 4)+"-"+expireDate.substring(5, 6)+"-"+expireDate.substring(7, 8)+" "+expireDate.substring(9,10)+":"+expireDate.substring(11, 12)+":"+expireDate.substring(13, 14));
+        return Timestamp.valueOf(expireDate.substring(0, 4)+"-"+expireDate.substring(4, 6)+"-"+expireDate.substring(6, 7)+" "+expireDate.substring(8, 9)+":"+expireDate.substring(10, 11)+":"+expireDate.substring(12, 13));
+    }
     public boolean cancleNotPayment(settleDto settleDto) {
         JSONObject reponse=requestTo.requestPost(makeCancleAccountBody(settleDto), cancleAccountUrl, utillService.getSettleHeader());
         utillService.writeLog("세틀뱅크 가상계좌 채번취소 통신결과: "+reponse.toString(), vbankService.class);

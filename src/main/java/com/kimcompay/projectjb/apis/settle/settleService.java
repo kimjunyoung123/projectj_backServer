@@ -87,7 +87,11 @@ public class settleService {
         //redirect함수 
     }
     private void tryInsert(String kind,settleDto settleDto) {
-        
+        if(kind.equals(senums.cardText.get())){
+            cardService.insert(settleDto);
+        }else if(kind.equals(senums.vbankText.get())){
+            vbankService.insert(settleDto);
+        }
     }
     public JSONObject makeRequestPayInfor(String productNames,paymentVo paymentVo,List<orderVo>orders,String mchtId,String expireIfVank) { 
         //응답 생성

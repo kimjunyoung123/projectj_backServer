@@ -50,7 +50,11 @@ public enum senums {
     basketsTextReids("basket"),
     loginTextRedis("login"),
     paySuc("0021"),
-    paymentText("payment");
+    paymentText("payment"),
+    cardText("card"),
+    kpayText("kpay"),
+    vbankText("vbank");
+    
     private String s;
     senums(String s){
         this.s=s;
