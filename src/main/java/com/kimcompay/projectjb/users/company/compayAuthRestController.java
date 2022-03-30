@@ -126,4 +126,8 @@ public class compayAuthRestController {
         }
         return utillService.getJson(true, message);
     }
+    //주문내역 조회
+    @RequestMapping(value = "/orders/{storeId}/{page}/{keyword}",method = RequestMethod.GET   )
+    public void getOrders(@PathVariable int storeId,@PathVariable int page,@PathVariable String keyword) {
+    }
 }
