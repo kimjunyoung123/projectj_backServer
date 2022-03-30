@@ -4,7 +4,7 @@ package com.kimcompay.projectjb.users.user;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -68,6 +68,22 @@ public class userService {
     @Autowired
     private jwtService jwtService;
 
+    public Map<String,Object> getUserInfor(int userId,List<String>scopes) {
+        Map<String,Object>userInfor=new HashMap<>();
+        userVo userVo=userdao.findById(userId).orElseThrow(()->utillService.makeRuntimeEX("존재하지 않는 유저 아이디입니다", "getUserInfor"));
+        for(String scope:scopes){
+            if(scope.equals("all")){
+                userInfor.put("infor",userVo);
+                return userInfor;
+            }else if(scope.equals("phone")){
+                userInfor.put("phone", userVo.getUphone());
+            }else if(scope.equals("email")){
+                userInfor.put("email", userVo.getEmail());
+            }
+        }
+
+        return userInfor;
+    }
     public JSONObject getAuthActionHub(String action,HttpServletRequest request) {
         if(action.equals(senums.checkt.get())){
             return checkLogin(request, request.getParameter("detail"));

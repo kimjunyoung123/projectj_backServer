@@ -143,5 +143,10 @@ public class compayAuthRestController {
     public JSONObject getOrder(@PathVariable int storeId,@PathVariable String mcht_trd_no) {
         return orderService.getOrders(mcht_trd_no, storeId);
     }
+    //장보기 상태변환
+    @RequestMapping(value = "/order/state/{storeId}/{mcht_trd_no}/{state}",method = RequestMethod.PUT )
+    public JSONObject changeOrderState(@PathVariable int storeId,@PathVariable String mcht_trd_no,@PathVariable int state) {
+        return orderService.changeOrderState(mcht_trd_no, storeId, state);
+    }
 
 }
