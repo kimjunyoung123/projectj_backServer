@@ -14,8 +14,8 @@ public interface paymentDao extends JpaRepository<paymentVo,Integer> {
     +" where a.user_id=?",nativeQuery = true)
     List<Map<String,Object>>findJoinCardVbankKpayOrder(int userId);
 
-    @Query(value ="select a.*,c.user_email,(select count(a.payment_id) from payments a left join orders b on a.mcht_trd_no = b.order_mcht_trd_no and b.store_id=?)totalCount"
-    +" from payments a left join orders b on a.mcht_trd_no = b.order_mcht_trd_no and b.store_id=? left join users c on a.user_id = c.uid"
-    +"  order by a.payment_id desc limit ?,?" ,nativeQuery =true)
+    @Query(value ="SELECT DISTINCT a.mcht_trd_no as ad,  a.*,(select count(DISTINCT a.payment_id) "
+    +" FROM payments a left join orders b on a.mcht_trd_no = b.order_mcht_trd_no and b.store_id=?)totalCount"
+    +" FROM payments a left join orders b on a.mcht_trd_no = b.order_mcht_trd_no and b.store_id=? order by a.payment_id desc limit ?,?" ,nativeQuery =true)
     List<Map<String,Object>>findJoinByStoreId(int storeId,int sameStoreId,int start,int pageSize);
 }

@@ -62,7 +62,7 @@ public class paymentService {
         List<Map<String,Object>>paymentVos=getVos(page, start, end, storeId);
         utillService.checkDaoResult(paymentVos, "내역이 존재하지 않습니다", "getPaymentsByStoreId");
         System.out.println(paymentVos.toString());
-        int totalPage=utillService.getTotalPage(Integer.parseInt(paymentVos.get(0).get("totalCount").toString()), pageSize);
+        int totalPage=utillService.getTotalPage(Integer.parseInt(paymentVos.get(0).get("totalCount").toString()), pageSize); 
         JSONObject response=new JSONObject();
         response.put("flag", true);
         response.put("message", paymentVos);
