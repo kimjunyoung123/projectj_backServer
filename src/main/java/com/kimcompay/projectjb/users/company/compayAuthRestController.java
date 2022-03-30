@@ -43,6 +43,8 @@ public class compayAuthRestController {
     private productService productService;
     @Autowired
     private paymentService paymentService;
+    @Autowired
+    private orderService orderService;
 
 
 
@@ -135,6 +137,11 @@ public class compayAuthRestController {
     @RequestMapping(value = "/orders/{storeId}/{page}/{keyword}",method = RequestMethod.GET )
     public JSONObject getOrders(@PathVariable int storeId,@PathVariable int page,@PathVariable String keyword) {
         return paymentService.getPaymentsByStoreId(page, keyword, keyword, storeId);
+    }
+    //주문내역 상세 조회 
+    @RequestMapping(value = "/order/{storeId}/{mcht_trd_no}",method = RequestMethod.GET )
+    public JSONObject getOrder(@PathVariable int storeId,@PathVariable String mcht_trd_no) {
+        return orderService.getOrders(mcht_trd_no, storeId);
     }
 
 }
