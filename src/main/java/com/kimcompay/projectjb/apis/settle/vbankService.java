@@ -17,6 +17,7 @@ import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class vbankService {
@@ -28,14 +29,28 @@ public class vbankService {
     @Autowired
     private vbankDao vbankDao;
 
+   
     public void cancleDivision(Map<String,Object>orderAndPayments) {
         int state=Integer.parseInt(orderAndPayments.get("vbank_status").toString());
-        System.out.println(state);
         if(state==0){
-
+            cancleAndGetReAccount(orderAndPayments);
         }else{
-
+            
         }
+    }
+    public void cancleAndGetReAccount(Map<String,Object>orderAndPayments){
+        int totalPrice=Integer.parseInt(orderAndPayments.get("payment_total_price").toString());
+        int minusPrice=Integer.parseInt(orderAndPayments.get("order_price").toString());
+        totalPrice=totalPrice-minusPrice;
+        if(totalPrice>0){
+            //변경 후
+            
+            //재채번 후
+
+        }else if(totalPrice==0){
+            //전부 취소됨 db
+        }
+        //채번취소
     }
     public void insert(settleDto settleDto) {
         Timestamp expireDate=StringToTimestamp(settleDto.getExpireDt());
@@ -89,4 +104,6 @@ public class vbankService {
         System.out.println("requestcancleString zero");
         return String.format("%s%s%s%s%s%s",trdDt,trdTm,mchtId,mchtTrdNo,zero,senums.settleKey.get()); 
     }
+
+    
 }

@@ -35,6 +35,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class paymentService {
@@ -57,16 +58,29 @@ public class paymentService {
     private kakaoPayService kakaoPayService;
     @Autowired
     private RedisTemplate<String,Object>redisTemplate;
+    @Autowired
+    private orderService orderService;
 
+    @Transactional(rollbackFor = Exception.class)
     public void cancleByStore(int orderId,int storeId) {
         Map<String,Object>orderAndPayments=paymentDao.findByJoinCardVbankKpayAndPayment(orderId, storeId);
         int cancleAllFlag=Integer.parseInt(orderAndPayments.get("cancle_all_flag").toString());
         int totalPrice=Integer.parseInt(orderAndPayments.get("payment_total_price").toString());
+        int minusPrice=Integer.parseInt(orderAndPayments.get("order_price").toString());
+        totalPrice=totalPrice-minusPrice;
         if(orderAndPayments.isEmpty()){
             throw utillService.makeRuntimeEX("내역이 존재하지 않습니다", "cancleByStore");
         }else if(cancleAllFlag==1||totalPrice<=0){
             throw utillService.makeRuntimeEX("이미 전액 환불된 제품입니다", "cancleByStore");
+        }else if(totalPrice<0){
+            throw utillService.makeRuntimeEX("남은 금액보다 요청금액이 큽니다 \n남은금액: "+(totalPrice+minusPrice)+"\n요청금액: "+minusPrice, "cancleByStore");
         }
+        //db수정
+        int cancleTime=Integer.parseInt(orderAndPayments.get("cncl_ord").toString())+1;
+        String mchtTrdNo=orderAndPayments.get("order_mcht_trd_no").toString();
+        updatePirceAndCancleTime(totalPrice, cancleTime, mchtTrdNo);
+        orderService.changeStateById(orderId, 1);
+        //pg사대응
         String method=orderAndPayments.get("method").toString();
         if(method.equals(senums.cardText.get())||method.equals(senums.vbankText.get())){
             settleService.cancleByStore(orderAndPayments, method);
@@ -74,6 +88,13 @@ public class paymentService {
 
         }else{
             throw utillService.makeRuntimeEX("지원하지 않는 결제 수단입니다", "cancleByStore");
+        }
+    }
+    public void updatePirceAndCancleTime(int price,int cancleTime,String mchtTrdNo) {
+        if(price<=0){
+            paymentDao.updatePriceAndCancleTimeZero(cancleTime, price, mchtTrdNo, 1);
+        }else{
+            paymentDao.updatePriceAndCancleTime(cancleTime, price, mchtTrdNo);
         }
     }
     public JSONObject getPaymentsByStoreId(int page,String start,String end,int storeId) {

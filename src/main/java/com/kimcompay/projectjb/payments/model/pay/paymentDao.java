@@ -4,7 +4,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.transaction.annotation.Transactional;
 
 public interface paymentDao extends JpaRepository<paymentVo,Integer> {
     boolean existsByMchtTrdNo(String mchtTrdNo);
@@ -28,4 +30,14 @@ public interface paymentDao extends JpaRepository<paymentVo,Integer> {
     +" left join kpays e on a.order_mcht_trd_no=e.kpay_mcht_trd_no"
     +" where a.order_id=? and a.store_id=?",nativeQuery = true)
     Map<String,Object>findByJoinCardVbankKpayAndPayment(int orderId,int storeId);
+
+    @Modifying
+    @Transactional
+    @Query(value = "update payments set cncl_ord=?,payment_total_price=? where mcht_trd_no=?",nativeQuery = true)
+    void updatePriceAndCancleTime(int cancleTime,int totalPrice,String mchtTrdNo);
+
+    @Modifying
+    @Transactional
+    @Query(value = "update payments set cncl_ord=?,payment_total_price=?,cancle_all_flag=? where mcht_trd_no=?",nativeQuery = true)
+    void updatePriceAndCancleTimeZero(int cancleTime,int totalPrice,String mchtTrdNo,int one);
 }

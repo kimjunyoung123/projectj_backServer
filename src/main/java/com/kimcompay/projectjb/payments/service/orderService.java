@@ -26,6 +26,9 @@ public class orderService {
     @Autowired
     private userService userService;
 
+    public void changeStateById(int orderId,int state) {
+        orderDao.updateStateById(state, orderId);
+    }
     public JSONObject getOrders(String mchtTrdNo,int storeId) {
         List<Map<String,Object>>paymentAndOrders=orderDao.findByJoinProductMchtTrdNo(mchtTrdNo,storeId);
         utillService.checkDaoResult(paymentAndOrders, "내역이 존재 하지 않습니다", "getJoinOrders");
@@ -46,7 +49,9 @@ public class orderService {
         utillService.checkDaoResult(orderVos, "내역이 존재하지 않습니다", "changeOrderState");
         boolean flag=false;
         for(orderVo vo:orderVos){
-            if(vo.getCancleFlag()!=state){
+            if(vo.getCancleFlag()==1){
+                continue;
+            }else if(vo.getCancleFlag()!=state){
                 flag=true;
             }
             vo.setCancleFlag(state);
