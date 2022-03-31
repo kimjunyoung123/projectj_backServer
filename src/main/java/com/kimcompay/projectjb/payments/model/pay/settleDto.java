@@ -34,7 +34,8 @@ public class settleDto {
         String vtlAcntNo;          //가상계좌번호
         String expireDt;                     //입금기한
         String cphoneNo;                     //휴대폰번호
-        String billKey;      
+        String billKey;    
+        String dpstrNm;  
         
         //결제완료시 가맹점 포인트 여부
         int point;

@@ -69,8 +69,8 @@ public class utillService {
          .expireDt(          request.getParameter("expireDt"))           //입금기한
          .cphoneNo(          request.getParameter("cphoneNo"))           //휴대폰번호
          .billKey(           request.getParameter("billKey"))
-                                .build();
-                                return dto;
+         .dpstrNm(request.getParameter("dpstrNm")).build();
+        return dto;
     }
     public static String getSettleText(String mchtid,String method,String mchtTrdNo,String requestDate,String requestTime,String totalPrice)  {
         return  String.format("%s%s%s%s%s%s%s",mchtid,method,mchtTrdNo,requestDate,requestTime,totalPrice,senums.settleKey.get());
