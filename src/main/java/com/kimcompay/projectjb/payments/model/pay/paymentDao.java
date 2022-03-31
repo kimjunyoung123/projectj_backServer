@@ -39,5 +39,5 @@ public interface paymentDao extends JpaRepository<paymentVo,Integer> {
     @Modifying
     @Transactional
     @Query(value = "update payments set cncl_ord=?,payment_total_price=?,cancle_all_flag=? where mcht_trd_no=?",nativeQuery = true)
-    void updatePriceAndCancleTimeZero(int cancleTime,int totalPrice,String mchtTrdNo,int one);
+    void updatePriceAndCancleTimeZero(int cancleTime,int totalPrice,int one,String mchtTrdNo);
 }

@@ -63,7 +63,8 @@ public class paymentService {
 
     @Transactional(rollbackFor = Exception.class)
     public void cancleByStore(int orderId,int storeId) {
-        Map<String,Object>orderAndPayments=paymentDao.findByJoinCardVbankKpayAndPayment(orderId, storeId);
+        Map<String,Object>orderAndPayments=new HashMap<>();
+        orderAndPayments=paymentDao.findByJoinCardVbankKpayAndPayment(orderId, storeId);
         int cancleAllFlag=Integer.parseInt(orderAndPayments.get("cancle_all_flag").toString());
         int totalPrice=Integer.parseInt(orderAndPayments.get("payment_total_price").toString());
         int minusPrice=Integer.parseInt(orderAndPayments.get("order_price").toString());
@@ -92,7 +93,7 @@ public class paymentService {
     }
     public void updatePirceAndCancleTime(int price,int cancleTime,String mchtTrdNo) {
         if(price<=0){
-            paymentDao.updatePriceAndCancleTimeZero(cancleTime, price, mchtTrdNo, 1);
+            paymentDao.updatePriceAndCancleTimeZero(cancleTime, price,1,mchtTrdNo);
         }else{
             paymentDao.updatePriceAndCancleTime(cancleTime, price, mchtTrdNo);
         }
