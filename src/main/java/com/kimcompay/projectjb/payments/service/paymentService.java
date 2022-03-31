@@ -58,8 +58,9 @@ public class paymentService {
     @Autowired
     private RedisTemplate<String,Object>redisTemplate;
 
-    public void cancleByStore(int orderId) {
-        
+    public void cancleByStore(int orderId,int storeId) {
+        List<Map<String,Object>>orderAndPayments=paymentDao.findByJoinCardVbankKpayAndPayment(orderId, storeId);
+        System.out.println(orderAndPayments.toString());
     }
     public JSONObject getPaymentsByStoreId(int page,String start,String end,int storeId) {
         List<Map<String,Object>>paymentVos=getVos(page, start, end, storeId);
