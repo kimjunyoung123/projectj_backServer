@@ -55,6 +55,15 @@ public class settleService {
         }
         return message;
     }
+    public void cancleByStore(Map<String,Object>orderAndPayments,String method) {
+        if(method.equals(senums.cardText.get())){
+            
+        }else if(method.equals(senums.vbankText.get())){
+            vbankService.cancleDivision(orderAndPayments);
+        }else{
+            throw utillService.makeRuntimeEX("세틀뱅크에서 지원하지 않는 결제수단입니다", "cancleByStore");
+        }
+    }
     @Transactional(rollbackFor = Exception.class)
     public void confrimPayment(String kind,String status,settleDto settleDto) throws paymentFailException{
         //결제 성공/실패 판단

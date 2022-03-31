@@ -28,6 +28,15 @@ public class vbankService {
     @Autowired
     private vbankDao vbankDao;
 
+    public void cancleDivision(Map<String,Object>orderAndPayments) {
+        int state=Integer.parseInt(orderAndPayments.get("vbank_status").toString());
+        System.out.println(state);
+        if(state==0){
+
+        }else{
+
+        }
+    }
     public void insert(settleDto settleDto) {
         Timestamp expireDate=StringToTimestamp(settleDto.getExpireDt());
         vbankDao.save(dtoToVo(settleDto, expireDate));

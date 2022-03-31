@@ -59,8 +59,22 @@ public class paymentService {
     private RedisTemplate<String,Object>redisTemplate;
 
     public void cancleByStore(int orderId,int storeId) {
-        List<Map<String,Object>>orderAndPayments=paymentDao.findByJoinCardVbankKpayAndPayment(orderId, storeId);
-        System.out.println(orderAndPayments.toString());
+        Map<String,Object>orderAndPayments=paymentDao.findByJoinCardVbankKpayAndPayment(orderId, storeId);
+        int cancleAllFlag=Integer.parseInt(orderAndPayments.get("cancle_all_flag").toString());
+        int totalPrice=Integer.parseInt(orderAndPayments.get("payment_total_price").toString());
+        if(orderAndPayments.isEmpty()){
+            throw utillService.makeRuntimeEX("내역이 존재하지 않습니다", "cancleByStore");
+        }else if(cancleAllFlag==1||totalPrice<=0){
+            throw utillService.makeRuntimeEX("이미 전액 환불된 제품입니다", "cancleByStore");
+        }
+        String method=orderAndPayments.get("method").toString();
+        if(method.equals(senums.cardText.get())||method.equals(senums.vbankText.get())){
+            settleService.cancleByStore(orderAndPayments, method);
+        }else if(method.equals(senums.kpayText.get())){
+
+        }else{
+            throw utillService.makeRuntimeEX("지원하지 않는 결제 수단입니다", "cancleByStore");
+        }
     }
     public JSONObject getPaymentsByStoreId(int page,String start,String end,int storeId) {
         List<Map<String,Object>>paymentVos=getVos(page, start, end, storeId);

@@ -20,12 +20,12 @@ public interface paymentDao extends JpaRepository<paymentVo,Integer> {
     +" order by a.payment_id desc limit ?,?" ,nativeQuery =true)
     List<Map<String,Object>>findJoinByStoreId(int storeId,int sameStoreId,int start,int pageSize);
 
-    @Query(value = "SELECT a.payment_id,a.method,a.soldout_action,a.payment_total_price,a.payment_created,a.cancle_all_flag,a.cncl_ord"
-    +",b.*,c.*,d.*,e.*"
+    @Query(value = "SELECT b.payment_id,b.method,b.soldout_action,b.payment_total_price,b.payment_created,b.cancle_all_flag,b.cncl_ord"
+    +",a.*,c.*,d.*,e.*"
     +" FROM orders a inner join payments b on a.order_mcht_trd_no=b.mcht_trd_no"
     +" left join vbanks c on a.order_mcht_trd_no=c.vbank_mcht_trd_no"
     +" left join cards d on a.order_mcht_trd_no=d.card_mcht_trd_no"
     +" left join kpays e on a.order_mcht_trd_no=e.kpay_mcht_trd_no"
     +" where a.order_id=? and a.store_id=?",nativeQuery = true)
-    List<Map<String,Object>>findByJoinCardVbankKpayAndPayment(int orderId,int storeId);
+    Map<String,Object>findByJoinCardVbankKpayAndPayment(int orderId,int storeId);
 }
