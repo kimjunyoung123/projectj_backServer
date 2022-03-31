@@ -1,6 +1,7 @@
 package com.kimcompay.projectjb.apis.settle;
 
 import java.time.LocalDateTime;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -47,23 +48,23 @@ public class settleService {
                 method="결제실패$환불성공";
             }   
         }else if(method.equals("vbank")){
-            if(vbankService.cancleNotPayment(settleDto)){
-                method="결제실패$채번이취소되었습니다";
-            }else{
-                message="다시시도 해주세요";
-            } 
+            JSONObject response=vbankService.cancleNotPayment(settleDto);
+            method="결제실패$"+response.toString();
+        
         }
         return message;
     }
-    public JSONObject cancleByStore(Map<String,Object>orderAndPayments,String method) {
+    public String cancleByStore(Map<String,Object>orderAndPayments,String method) {
         if(method.equals(senums.cardText.get())){
-            
+          
         }else if(method.equals(senums.vbankText.get())){
-            return vbankService.cancleDivision(orderAndPayments);
+            return ((LinkedHashMap<String,Object> )vbankService.cancleDivision(orderAndPayments).get("params")).get("outRsltMsg").toString(); 
+         
         }else{
             throw utillService.makeRuntimeEX("세틀뱅크에서 지원하지 않는 결제수단입니다", "cancleByStore");
         }
-        return null;
+        return  null;
+
     }
     @Transactional(rollbackFor = Exception.class)
     public void confrimPayment(String kind,String status,settleDto settleDto) throws paymentFailException{

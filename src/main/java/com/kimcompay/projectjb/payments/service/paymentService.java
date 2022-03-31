@@ -62,7 +62,7 @@ public class paymentService {
     private orderService orderService;
 
     @Transactional(rollbackFor = Exception.class)
-    public void cancleByStore(int orderId,int storeId) {
+    public JSONObject cancleByStore(int orderId,int storeId) {
         Map<String,Object>orderAndPayments=new HashMap<>();
         orderAndPayments=paymentDao.findByJoinCardVbankKpayAndPayment(orderId, storeId);
         int cancleAllFlag=Integer.parseInt(orderAndPayments.get("cancle_all_flag").toString());
@@ -83,13 +83,15 @@ public class paymentService {
         orderService.changeStateById(orderId, 1);
         //pg사대응
         String method=orderAndPayments.get("method").toString();
+        String  message="";
         if(method.equals(senums.cardText.get())||method.equals(senums.vbankText.get())){
-            settleService.cancleByStore(orderAndPayments, method);
+            message= settleService.cancleByStore(orderAndPayments, method);
         }else if(method.equals(senums.kpayText.get())){
 
         }else{
             throw utillService.makeRuntimeEX("지원하지 않는 결제 수단입니다", "cancleByStore");
         }
+        return utillService.getJson(true, message);
     }
     public void updatePirceAndCancleTime(int price,int cancleTime,String mchtTrdNo) {
         if(price<=0){

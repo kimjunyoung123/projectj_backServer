@@ -32,14 +32,6 @@ public class vbankService {
    
     public JSONObject cancleDivision(Map<String,Object>orderAndPayments) {
         int state=Integer.parseInt(orderAndPayments.get("vbank_status").toString());
-        if(state==0){
-            return cancleAndGetReAccount(orderAndPayments);
-        }else{
-            
-        }
-        return null;
-    }
-    public JSONObject cancleAndGetReAccount(Map<String,Object>orderAndPayments){
         int totalPrice=Integer.parseInt(orderAndPayments.get("payment_total_price").toString());
         int minusPrice=Integer.parseInt(orderAndPayments.get("order_price").toString());
         int cancleTime=Integer.parseInt(orderAndPayments.get("cncl_ord").toString())+1;
@@ -52,17 +44,16 @@ public class vbankService {
         settleDto.setCnclOrd(cancleTime);
         settleDto.setFnCd(orderAndPayments.get("vbank_fn_cd").toString());
         settleDto.setVtlAcntNo(orderAndPayments.get("vtl_acnt_no").toString());
-        //재채번
-        if(totalPrice>0){   
-            cancle(settleDto);
+        if(state==0){
+            return cancleNotPayment(settleDto);
         }else{
-            //채번취소
-        }   
-        return null;
+            return cancle(settleDto);
+        }
     }
-    public void cancle(settleDto settleDto) {
+    public JSONObject cancle(settleDto settleDto) {
         JSONObject reponse=requestTo.requestPost(getCancleBody(settleDto), "https://tbgw.settlebank.co.kr/spay/APIRefund.do", utillService.getSettleHeader());
         utillService.writeLog("세틀뱅크 가상계좌 취소 통신결과: "+reponse.toString(), vbankService.class);
+        return reponse;
     }
     private JSONObject getReAccountBody(settleDto settleDto) {
         Map<String,String>map=utillService.getSettleTimeAndDate(LocalDateTime.now());
@@ -101,10 +92,10 @@ public class vbankService {
         System.out.println("time2: "+expireDate.substring(0, 4)+"-"+expireDate.substring(5, 6)+"-"+expireDate.substring(7, 8)+" "+expireDate.substring(9,10)+":"+expireDate.substring(11, 12)+":"+expireDate.substring(13, 14));
         return Timestamp.valueOf(expireDate.substring(0, 4)+"-"+expireDate.substring(4, 6)+"-"+expireDate.substring(6, 7)+" "+expireDate.substring(8, 9)+":"+expireDate.substring(10, 11)+":"+expireDate.substring(12, 13));
     }
-    public boolean cancleNotPayment(settleDto settleDto) {
+    public JSONObject cancleNotPayment(settleDto settleDto) {
         JSONObject reponse=requestTo.requestPost(makeCancleAccountBody(settleDto), cancleAccountUrl, utillService.getSettleHeader());
         utillService.writeLog("세틀뱅크 가상계좌 채번취소 통신결과: "+reponse.toString(), vbankService.class);
-        return true;
+        return reponse;
     }
     private JSONObject makeCancleAccountBody(settleDto settleDto) {
         try {
