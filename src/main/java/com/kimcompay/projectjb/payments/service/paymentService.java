@@ -68,10 +68,11 @@ public class paymentService {
         int cancleAllFlag=Integer.parseInt(orderAndPayments.get("cancle_all_flag").toString());
         int totalPrice=Integer.parseInt(orderAndPayments.get("payment_total_price").toString());
         int minusPrice=Integer.parseInt(orderAndPayments.get("order_price").toString());
+        int orderCancleFlag=Integer.parseInt(orderAndPayments.get("oder_cancle_flag").toString());
         totalPrice=totalPrice-minusPrice;
         if(orderAndPayments.isEmpty()){
             throw utillService.makeRuntimeEX("내역이 존재하지 않습니다", "cancleByStore");
-        }else if(cancleAllFlag==1||totalPrice<=0){
+        }else if(cancleAllFlag==1||totalPrice<=0||orderCancleFlag==1){
             throw utillService.makeRuntimeEX("이미 전액 환불된 제품입니다", "cancleByStore");
         }else if(totalPrice<0){
             throw utillService.makeRuntimeEX("남은 금액보다 요청금액이 큽니다 \n남은금액: "+(totalPrice+minusPrice)+"\n요청금액: "+minusPrice, "cancleByStore");
