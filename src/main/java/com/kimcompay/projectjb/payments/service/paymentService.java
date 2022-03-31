@@ -86,7 +86,7 @@ public class paymentService {
         String method=orderAndPayments.get("method").toString();
         String  message="";
         if(method.equals(senums.cardText.get())||method.equals(senums.vbankText.get())){
-            message= settleService.cancleByStore(orderAndPayments, method);
+            message=settleService.cancleByStore(orderAndPayments, method);
         }else if(method.equals(senums.kpayText.get())){
 
         }else{

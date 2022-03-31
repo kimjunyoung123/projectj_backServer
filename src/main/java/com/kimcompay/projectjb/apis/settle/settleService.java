@@ -43,28 +43,41 @@ public class settleService {
     public String canclePay(settleDto settleDto) {
         String method=settleDto.getMethod();
         String message="결제실패$환불실패";
+        JSONObject response=new JSONObject();
         if(method.equals("card")){
-            if(cardService.cancle(settleDto)){
-                method="결제실패$환불성공";
-            }   
+            response=cardService.cancle(settleDto);
+            method="결제실패$환불성공"+response.toString();
+              
         }else if(method.equals("vbank")){
-            JSONObject response=vbankService.cancleNotPayment(settleDto);
+            response=vbankService.cancleNotPayment(settleDto);
             method="결제실패$"+response.toString();
         
         }
         return message;
     }
     public String cancleByStore(Map<String,Object>orderAndPayments,String method) {
+        int totalPrice=Integer.parseInt(orderAndPayments.get("payment_total_price").toString());
+        int minusPrice=Integer.parseInt(orderAndPayments.get("order_price").toString());
+        int cancleTime=Integer.parseInt(orderAndPayments.get("cncl_ord").toString())+1;
+        totalPrice=totalPrice-minusPrice;
+        settleDto settleDto=new settleDto();
         if(method.equals(senums.cardText.get())){
-          
+            settleDto.setMchtId(orderAndPayments.get("key").toString());
+            return ((LinkedHashMap<String,Object> )cardService.cancle(settleDto).get("params")).get("outRsltMsg").toString(); 
         }else if(method.equals(senums.vbankText.get())){
-            return ((LinkedHashMap<String,Object> )vbankService.cancleDivision(orderAndPayments).get("params")).get("outRsltMsg").toString(); 
+            int state=Integer.parseInt(orderAndPayments.get("vbank_status").toString());
+            settleDto.setMchtId(orderAndPayments.get("vbank_mcht_id").toString());
+            settleDto.setMchtTrdNo(orderAndPayments.get("order_mcht_trd_no").toString());
+            settleDto.setTrdAmt(Integer.toString(minusPrice));
+            settleDto.setTrdNo(orderAndPayments.get("vbank_trd_no").toString());
+            settleDto.setCnclOrd(cancleTime);
+            settleDto.setFnCd(orderAndPayments.get("vbank_fn_cd").toString());
+            settleDto.setVtlAcntNo(orderAndPayments.get("vtl_acnt_no").toString());
+            return ((LinkedHashMap<String,Object> )vbankService.cancleDivision(settleDto,state).get("params")).get("outRsltMsg").toString(); 
          
         }else{
             throw utillService.makeRuntimeEX("세틀뱅크에서 지원하지 않는 결제수단입니다", "cancleByStore");
         }
-        return  null;
-
     }
     @Transactional(rollbackFor = Exception.class)
     public void confrimPayment(String kind,String status,settleDto settleDto) throws paymentFailException{

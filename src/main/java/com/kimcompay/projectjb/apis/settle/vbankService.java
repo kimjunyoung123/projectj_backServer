@@ -30,20 +30,8 @@ public class vbankService {
     private vbankDao vbankDao;
 
    
-    public JSONObject cancleDivision(Map<String,Object>orderAndPayments) {
-        int state=Integer.parseInt(orderAndPayments.get("vbank_status").toString());
-        int totalPrice=Integer.parseInt(orderAndPayments.get("payment_total_price").toString());
-        int minusPrice=Integer.parseInt(orderAndPayments.get("order_price").toString());
-        int cancleTime=Integer.parseInt(orderAndPayments.get("cncl_ord").toString())+1;
-        totalPrice=totalPrice-minusPrice;
-        settleDto settleDto=new settleDto();
-        settleDto.setMchtId(orderAndPayments.get("vbank_mcht_id").toString());
-        settleDto.setMchtTrdNo(orderAndPayments.get("order_mcht_trd_no").toString());
-        settleDto.setTrdAmt(Integer.toString(minusPrice));
-        settleDto.setTrdNo(orderAndPayments.get("vbank_trd_no").toString());
-        settleDto.setCnclOrd(cancleTime);
-        settleDto.setFnCd(orderAndPayments.get("vbank_fn_cd").toString());
-        settleDto.setVtlAcntNo(orderAndPayments.get("vtl_acnt_no").toString());
+    public JSONObject cancleDivision(settleDto settleDto,int state) {
+
         if(state==0){
             return cancleNotPayment(settleDto);
         }else{
