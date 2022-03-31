@@ -80,13 +80,17 @@ public class aopService {
         logger.info("checkOwnerParam");
         storeService.checkExist(Integer.parseInt(utillService.getHttpServletRequest().getParameter("storeId")));
     }
-    //update,insert,delete
+    //update,insert,delete,select
     @Before("execution(* com.kimcompay.projectjb.users.company.compayAuthRestController.tryInsertFlyer(..))"
     +"||execution(* com.kimcompay.projectjb.users.company.compayAuthRestController.tryInsertProduct(..))"
     +"||execution(* com.kimcompay.projectjb.users.company.compayAuthRestController.deleteActionHub(..))"
     +"||execution(* com.kimcompay.projectjb.users.company.compayAuthRestController.tryInsertFlyer(..))"
     +"||execution(* com.kimcompay.projectjb.users.company.compayAuthRestController.updateProductController(..))"
-    +"||execution(* com.kimcompay.projectjb.users.company.compayAuthRestController.tryUpdateFlyer(..))")
+    +"||execution(* com.kimcompay.projectjb.users.company.compayAuthRestController.tryUpdateFlyer(..))"
+    +"||execution(* com.kimcompay.projectjb.users.company.compayAuthRestController.getOrders(..))"
+    +"||execution(* com.kimcompay.projectjb.users.company.compayAuthRestController.getOrder(..))"
+    +"||execution(* com.kimcompay.projectjb.users.company.compayAuthRestController.changeOrderState(..))"
+    +"||execution(* com.kimcompay.projectjb.users.company.compayAuthRestController.canclePayment(..))")
     public void checkOwnerPath(JoinPoint joinPoint) {
         logger.info("checkOwnerPath");
         MethodSignature signature = (MethodSignature)joinPoint.getSignature();

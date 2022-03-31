@@ -149,9 +149,9 @@ public class compayAuthRestController {
         return orderService.changeOrderState(mcht_trd_no, storeId, state);
     }
     //매장 전용 환불 
-    @RequestMapping(value = "/order/state/{storeId}/{mcht_trd_no}/{orderId}",method = RequestMethod.PUT)
-    public void canclePayment(@PathVariable int storeId,@PathVariable String mcht_trd_no,@PathVariable int orderId) {
-        
+    @RequestMapping(value = "/order/cancle/{orderId}",method = RequestMethod.PUT)
+    public void canclePayment(@PathVariable int orderId) {
+        paymentService.cancleByStore(orderId);
     }
 
 }
