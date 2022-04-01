@@ -26,9 +26,9 @@ public class deliveryService {
     public JSONObject getDeliverAddress(int roomId) {
         return utillService.getJson(true, deliverRoomDetailDao.findAddressByRoomId(roomId));
     }
-    public JSONObject getDelivers(int page,String keyword,int storeId,int state) {
+    public JSONObject getDelivers(int page,String keyword,int storeId) {
         List<String>dates=utillService.getDateInStrgin(keyword);
-        List<Map<String,Object>>deliveryInfors=selectByPeriodAndStoreId(page, dates.get(0),dates.get(1), storeId,state);
+        List<Map<String,Object>>deliveryInfors=selectByPeriodAndStoreId(page, dates.get(0),dates.get(1), storeId);
         //요청페이지,배달건수 검증
         if(utillService.checkEmthy(deliveryInfors)){ 
             throw utillService.makeRuntimeEX("배달건수가 존재하지 않습니다", "getDelivers");
@@ -44,15 +44,15 @@ public class deliveryService {
         response.put("message", deliveryInfors);
         return response;
     }
-    public List<Map<String,Object>> selectByPeriodAndStoreId(int page,String startDay,String endDay,int storeId,int state) {
+    public List<Map<String,Object>> selectByPeriodAndStoreId(int page,String startDay,String endDay,int storeId) {
         Map<String,Object>result=utillService.checkRequestDate(startDay, endDay);
         if((boolean)result.get("flag")){
             Timestamp start=Timestamp.valueOf(result.get("start").toString());
             Timestamp end=Timestamp.valueOf(result.get("end").toString());
-            return deliveryRoomDao.findByDay(start, end, storeId,state,start, end, storeId,state,utillService.getStart(page, pageSize)-1,pageSize);
+            return deliveryRoomDao.findByDay(start, end, storeId,start, end, storeId,utillService.getStart(page, pageSize)-1,pageSize);
 
         }
-        return deliveryRoomDao.findByAll(storeId,state,storeId,state,utillService.getStart(page, pageSize)-1,pageSize);
+        return deliveryRoomDao.findByAll(storeId,storeId,utillService.getStart(page, pageSize)-1,pageSize);
     }
     public List<Integer> selectRoomIdByUserIdAndFlag(int userId,int flag) {
         return deliverRoomDetailDao.findAllByRoomIdAndDoneFlag(userId, flag);

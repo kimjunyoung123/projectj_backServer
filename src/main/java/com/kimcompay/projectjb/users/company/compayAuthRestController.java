@@ -60,7 +60,7 @@ public class compayAuthRestController {
             return storeService.getStores(page, keyword);
         }else if(kind.equals("deliver")){
             HttpServletRequest request=utillService.getHttpServletRequest();
-            return deliveryService.getDelivers(page,keyword,Integer.parseInt(request.getParameter("storeId")), Integer.parseInt(request.getParameter("state")));
+            return deliveryService.getDelivers(page,keyword,Integer.parseInt(request.getParameter("storeId")));
         }else if(kind.equals("flyers")){
             HttpServletRequest request=utillService.getHttpServletRequest();
             return flyerService.getFlyers(Integer.parseInt(request.getParameter("storeId")), page, keyword);
