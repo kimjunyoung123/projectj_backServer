@@ -6,6 +6,8 @@ import java.util.Map;
 import com.kimcompay.projectjb.utillService;
 import com.kimcompay.projectjb.delivery.model.deliverRoomDetailDao;
 import com.kimcompay.projectjb.delivery.model.deliveryRoomDao;
+import com.kimcompay.projectjb.delivery.model.tryInsertDto;
+
 import org.json.simple.JSONObject;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +22,7 @@ public class deliveryService {
     @Autowired
     private deliverRoomDetailDao deliverRoomDetailDao;
     
-    public void makeDeliverRoom(String mchtTrdNo,int storeId) {
+    public void makeDeliverRoom(tryInsertDto tryInsertDto,int storeId) {
 
     }
     public JSONObject getDeliverAddress(int roomId) {

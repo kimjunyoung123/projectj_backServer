@@ -12,6 +12,7 @@ import com.kimcompay.projectjb.users.company.model.products.tryProductInsertDto;
 import com.kimcompay.projectjb.users.company.model.stores.tryInsertStoreDto;
 import com.kimcompay.projectjb.users.company.model.stores.tryUpdateStoreDto;
 import com.kimcompay.projectjb.utillService;
+import com.kimcompay.projectjb.delivery.model.tryInsertDto;
 import com.kimcompay.projectjb.delivery.service.deliveryService;
 import com.kimcompay.projectjb.payments.model.order.orderDao;
 import com.kimcompay.projectjb.payments.service.orderService;
@@ -154,8 +155,8 @@ public class compayAuthRestController {
         return paymentService.cancleByStore(orderId,storeId);
     }
     //배달방만들기
-    @RequestMapping(value = "/deliver/{action}/{storeId}/{mcht_trd_no}",method = RequestMethod.POST)
-    public void aboutDeliver(@PathVariable int storeId,@PathVariable String mcht_trd_no,@PathVariable String action) {
-        deliveryService.makeDeliverRoom(mcht_trd_no, storeId);
+    @RequestMapping(value = "/deliver/ready/{storeId}",method = RequestMethod.POST)
+    public void aboutDeliver(@PathVariable int storeId,@Valid @RequestBody tryInsertDto tryInsertDto) {
+        deliveryService.makeDeliverRoom(tryInsertDto, storeId);
     }
 }

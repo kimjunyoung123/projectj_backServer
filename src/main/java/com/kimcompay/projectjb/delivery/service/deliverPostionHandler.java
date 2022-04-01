@@ -65,9 +65,6 @@ public class deliverPostionHandler extends TextWebSocketHandler {
       //권한에 따라 
       if(role.equals(senums.company_role.get())){
          try {
-            //배달시작하는 결제번호/가맹점번호 꺼내기
-            Map<String,Object>params=utillService.getQueryMap(session.getUri().getQuery());
-            deliveryService.makeDeliverRoom(params.get("mcht_trd_no").toString(),Integer.parseInt(params.get("storeid").toString()));
          } catch (NullPointerException e) {
             //주문 요청이 한건도 없다면 예외발생
             throw utillService.makeRuntimeEX("상점: "+id+" 배달목록 존재하지 않음", "afterConnectionEstablished");
