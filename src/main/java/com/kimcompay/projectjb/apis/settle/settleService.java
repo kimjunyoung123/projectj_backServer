@@ -61,16 +61,17 @@ public class settleService {
         int cancleTime=Integer.parseInt(orderAndPayments.get("cncl_ord").toString())+1;
         totalPrice=totalPrice-minusPrice;
         settleDto settleDto=new settleDto();
+        settleDto.setTrdAmt(Integer.toString(minusPrice));
+        settleDto.setCnclOrd(cancleTime);
+        settleDto.setMchtTrdNo(orderAndPayments.get("order_mcht_trd_no").toString());
         if(method.equals(senums.cardText.get())){
-            settleDto.setMchtId(orderAndPayments.get("key").toString());
+            settleDto.setMchtId("nxca_jt_il");
+            settleDto.setTrdNo(orderAndPayments.get("card_org_trd_no").toString());
             return ((LinkedHashMap<String,Object> )cardService.cancle(settleDto).get("params")).get("outRsltMsg").toString(); 
         }else if(method.equals(senums.vbankText.get())){
             int state=Integer.parseInt(orderAndPayments.get("vbank_status").toString());
             settleDto.setMchtId(orderAndPayments.get("vbank_mcht_id").toString());
-            settleDto.setMchtTrdNo(orderAndPayments.get("order_mcht_trd_no").toString());
-            settleDto.setTrdAmt(Integer.toString(minusPrice));
             settleDto.setTrdNo(orderAndPayments.get("vbank_trd_no").toString());
-            settleDto.setCnclOrd(cancleTime);
             settleDto.setFnCd(orderAndPayments.get("vbank_fn_cd").toString());
             settleDto.setVtlAcntNo(orderAndPayments.get("vtl_acnt_no").toString());
             return ((LinkedHashMap<String,Object> )vbankService.cancleDivision(settleDto,state).get("params")).get("outRsltMsg").toString(); 
