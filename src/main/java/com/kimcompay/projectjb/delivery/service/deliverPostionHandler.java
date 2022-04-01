@@ -1,5 +1,7 @@
 package com.kimcompay.projectjb.delivery.service;
 
+import java.net.URI;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -63,10 +65,9 @@ public class deliverPostionHandler extends TextWebSocketHandler {
       //권한에 따라 
       if(role.equals(senums.company_role.get())){
          try {
-            //배달 요청이 있는지 검사 로직 추가해야함
-            
-            System.out.println(session.getAttributes().get("storeid"));
-            System.out.println(session.getUri());
+            //배달시작하는 결제번호/가맹점번호 꺼내기
+            Map<String,Object>params=utillService.getQueryMap(session.getUri().getQuery());
+            System.out.println(params.toString());
            // String storeId=httpServletRequest.getParameter("storeid");
             //String mchtTrdNo=httpServletRequest.getParameter("mcht_trd_no");
             //System.out.println(storeId+","+mchtTrdNo);

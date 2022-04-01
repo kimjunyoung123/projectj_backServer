@@ -43,7 +43,25 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 public class utillService {
 
 
-    
+    public static Map<String, Object> getQueryMap(String query)
+    {    	
+    	if (query==null) return null;
+    	
+    	int pos1=query.indexOf("?");
+    	if (pos1>=0) {
+    		query=query.substring(pos1+1);
+    	}
+    	
+        String[] params = query.split("&");
+        Map<String, Object> map = new HashMap<String, Object>();
+        for (String param : params)
+        {
+            String name = param.split("=")[0];
+            String value = param.split("=")[1];
+            map.put(name, value);
+        }
+        return map;
+    }
     public static settleDto requestToSettleDto(HttpServletRequest request) {
         settleDto dto=settleDto.builder()
          .mchtId(request.getParameter("mchtId"))//상점아이디
