@@ -20,11 +20,12 @@ public class deliveryService {
     @Autowired
     private deliverRoomDetailDao deliverRoomDetailDao;
 
+    public void makeDeliverRoom( ) {
+        
+    }
     public JSONObject getDeliverAddress(int roomId) {
-
         return utillService.getJson(true, deliverRoomDetailDao.findAddressByRoomId(roomId));
     }
-    
     public JSONObject getDelivers(int page,String keyword,int storeId,int state) {
         List<String>dates=utillService.getDateInStrgin(keyword);
         List<Map<String,Object>>deliveryInfors=selectByPeriodAndStoreId(page, dates.get(0),dates.get(1), storeId,state);

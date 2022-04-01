@@ -153,5 +153,4 @@ public class compayAuthRestController {
     public JSONObject canclePayment(@PathVariable int storeId,@PathVariable int orderId) {
         return paymentService.cancleByStore(orderId,storeId);
     }
-
 }

@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
 
 import com.kimcompay.projectjb.utillService;
 import com.kimcompay.projectjb.enums.intenums;
@@ -63,6 +64,13 @@ public class deliverPostionHandler extends TextWebSocketHandler {
       if(role.equals(senums.company_role.get())){
          try {
             //배달 요청이 있는지 검사 로직 추가해야함
+            
+            System.out.println(session.getAttributes().get("storeid"));
+            System.out.println(session.getUri());
+           // String storeId=httpServletRequest.getParameter("storeid");
+            //String mchtTrdNo=httpServletRequest.getParameter("mcht_trd_no");
+            //System.out.println(storeId+","+mchtTrdNo);
+            deliveryService.makeDeliverRoom();
          } catch (NullPointerException e) {
             //주문 요청이 한건도 없다면 예외발생
             throw utillService.makeRuntimeEX("상점: "+id+" 배달목록 존재하지 않음", "afterConnectionEstablished");
