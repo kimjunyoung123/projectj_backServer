@@ -153,4 +153,9 @@ public class compayAuthRestController {
     public JSONObject canclePayment(@PathVariable int storeId,@PathVariable int orderId) {
         return paymentService.cancleByStore(orderId,storeId);
     }
+    //배달방만들기
+    @RequestMapping(value = "/deliver/{action}/{storeId}/{mcht_trd_no}",method = RequestMethod.POST)
+    public void aboutDeliver(@PathVariable int storeId,@PathVariable String mcht_trd_no,@PathVariable String action) {
+        deliveryService.makeDeliverRoom(mcht_trd_no, storeId);
+    }
 }

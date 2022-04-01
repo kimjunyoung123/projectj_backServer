@@ -35,5 +35,7 @@ public class deliverRoomDetailVo {
     private int  doneFlag;
     @Column(name = "deliver_room_detail_address",nullable = false,length = 50)
     private String  address;
+    @Column(name = "deliver_room_detail_mchtTrdNo",nullable = false)
+    private String  mchtTrdNo;
 
 }

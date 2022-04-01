@@ -19,9 +19,9 @@ public class deliveryService {
     private deliveryRoomDao deliveryRoomDao;
     @Autowired
     private deliverRoomDetailDao deliverRoomDetailDao;
+    
+    public void makeDeliverRoom(String mchtTrdNo,int storeId) {
 
-    public void makeDeliverRoom( ) {
-        
     }
     public JSONObject getDeliverAddress(int roomId) {
         return utillService.getJson(true, deliverRoomDetailDao.findAddressByRoomId(roomId));
