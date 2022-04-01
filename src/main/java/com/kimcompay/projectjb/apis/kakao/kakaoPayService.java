@@ -130,7 +130,7 @@ public class kakaoPayService {
            
         
     }
-    public boolean cancleKpay(String tid,int cancleAmount,int taxFree) {
+    public JSONObject cancleKpay(String tid,int cancleAmount,int taxFree) {
         HttpHeaders httpHeaders=new HttpHeaders();
         httpHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
         httpHeaders.add("Authorization", "KakaoAK "+kakaoAdminKey);
@@ -140,13 +140,8 @@ public class kakaoPayService {
         multiValueBody.add("partner_user_id", utillService.getLoginId());
         multiValueBody.add("tid", tid);
         multiValueBody.add("cancel_tax_free_amount", taxFree);
-        try {
-            JSONObject  respon=requestTo.requestPost(multiValueBody, "https://kapi.kakao.com/v1/payment/cancel ", httpHeaders);
-            utillService.writeLog("카카오페이 통신결과: "+respon.toString(), kakaoPayService.class);
-            return true;
-        } catch (Exception e) {
-            utillService.writeLog("카카오페이 환불실패 사유: "+e.getMessage(), kakaoPayService.class);
-        }
-        return false;
+        JSONObject  respon=requestTo.requestPost(multiValueBody, "https://kapi.kakao.com/v1/payment/cancel ", httpHeaders);
+        utillService.writeLog("카카오페이 통신결과: "+respon.toString(), kakaoPayService.class);
+        return respon;
     }
 }

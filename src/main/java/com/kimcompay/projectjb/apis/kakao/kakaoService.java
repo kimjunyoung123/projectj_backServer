@@ -68,11 +68,8 @@ public class kakaoService {
         try {
             if(action.equals(senums.paymentText.get())){
                 Map<String,Object>amount=(Map<String, Object>) reponse.get("amount");
-                Boolean result=kakaoPayService.cancleKpay(reponse.get("tid").toString(), Integer.parseInt(amount.get("total").toString()),Integer.parseInt(amount.get("tax_free").toString()));
-                if(result){
-                    return "메세지:카카오 페이 결제에 실패하였습니다$전액 환불되었습니다";
-                }
-                return "메세지:카카오 페이 결제에 실패하였습니다$환불에 실패하였습니다$관리자에게 문의주세요";
+                kakaoPayService.cancleKpay(reponse.get("tid").toString(), Integer.parseInt(amount.get("total").toString()),Integer.parseInt(amount.get("tax_free").toString()));
+                return "메세지:카카오 페이 결제에 실패하였습니다$전액 환불되었습니다";
             }
         } catch (Exception e) {
             

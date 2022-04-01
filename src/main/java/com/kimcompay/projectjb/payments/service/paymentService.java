@@ -88,7 +88,8 @@ public class paymentService {
         if(method.equals(senums.cardText.get())||method.equals(senums.vbankText.get())){
             message=settleService.cancleByStore(orderAndPayments, method);
         }else if(method.equals(senums.kpayText.get())){
-
+            kakaoPayService.cancleKpay(orderAndPayments.get("tid").toString(), minusPrice, 0);
+            message="정상처리되었습니다";
         }else{
             throw utillService.makeRuntimeEX("지원하지 않는 결제 수단입니다", "cancleByStore");
         }
