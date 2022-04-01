@@ -78,7 +78,7 @@ public class vbankService {
     private Timestamp StringToTimestamp(String expireDate) { 
         System.out.println("time: "+expireDate);
         System.out.println("time2: "+expireDate.substring(0, 4)+"-"+expireDate.substring(4, 6)+"-"+expireDate.substring(6, 8)+" "+expireDate.substring(8,10)+":"+expireDate.substring(10, 12)+":"+expireDate.substring(12, 14));
-        return Timestamp.valueOf(expireDate.substring(0, 4)+"-"+expireDate.substring(4, 6)+"-"+expireDate.substring(6, 8)+" "+expireDate.substring(8, 9)+":"+expireDate.substring(10, 11)+":"+expireDate.substring(12, 13));
+        return Timestamp.valueOf(expireDate.substring(0, 4)+"-"+expireDate.substring(4, 6)+"-"+expireDate.substring(6, 8)+" "+expireDate.substring(8, 10)+":"+expireDate.substring(10, 12)+":"+expireDate.substring(12, 14));
     }
     public JSONObject cancleNotPayment(settleDto settleDto) {
         JSONObject reponse=requestTo.requestPost(makeCancleAccountBody(settleDto), cancleAccountUrl, utillService.getSettleHeader());
