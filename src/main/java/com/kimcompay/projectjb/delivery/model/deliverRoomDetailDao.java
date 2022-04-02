@@ -16,4 +16,6 @@ public interface deliverRoomDetailDao extends JpaRepository<deliverRoomDetailVo,
 
     @Query(value = "select deliver_room_detail_address from deliver_room_details where room_id=?",nativeQuery = true)
     List<String>findAddressByRoomId(int roomId);
+
+    int countByMchtTrdNo(String mchtTrdNo);
 }

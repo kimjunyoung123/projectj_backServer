@@ -156,7 +156,7 @@ public class compayAuthRestController {
     }
     //배달방만들기
     @RequestMapping(value = "/deliver/ready/{storeId}",method = RequestMethod.POST)
-    public void aboutDeliver(@PathVariable int storeId,@Valid @RequestBody tryInsertDto tryInsertDto) {
-        deliveryService.makeDeliverRoom(tryInsertDto, storeId);
+    public JSONObject aboutDeliver(@PathVariable int storeId,@Valid @RequestBody tryInsertDto tryInsertDto) {
+        return deliveryService.makeDeliverRoom(tryInsertDto, storeId);
     }
 }

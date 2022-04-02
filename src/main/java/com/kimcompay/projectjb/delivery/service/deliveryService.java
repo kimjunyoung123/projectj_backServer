@@ -9,7 +9,9 @@ import javax.print.DocFlavor.STRING;
 
 import com.kimcompay.projectjb.utillService;
 import com.kimcompay.projectjb.delivery.model.deliverRoomDetailDao;
+import com.kimcompay.projectjb.delivery.model.deliverRoomDetailVo;
 import com.kimcompay.projectjb.delivery.model.deliveryRoomDao;
+import com.kimcompay.projectjb.delivery.model.deliveryRoomVo;
 import com.kimcompay.projectjb.delivery.model.tryInsertDto;
 import com.kimcompay.projectjb.payments.service.orderService;
 import com.kimcompay.projectjb.payments.service.paymentService;
@@ -32,21 +34,40 @@ public class deliveryService {
     private paymentService paymentService;
     
     @Transactional(rollbackFor = Exception.class)
-    public void makeDeliverRoom(tryInsertDto tryInsertDto,int storeId) {
-        List<Map<String,Object>>ordersAndPayment=new ArrayList<>();
+    public JSONObject makeDeliverRoom(tryInsertDto tryInsertDto,int storeId) {
+        List<List<Map<String,Object>>>ordersAndPayment=new ArrayList<>();
         List<String>mchtTrdNos=tryInsertDto.getMchtTrdNos();
         for(String mchtTrdNo:mchtTrdNos){
-            ordersAndPayment=paymentService.getPaymentAndOrdersUseDeliver(mchtTrdNo, storeId);
+            if(deliverRoomDetailDao.countByMchtTrdNo(mchtTrdNo)>=1){
+                throw utillService.makeRuntimeEX("이미 다른 배달방에 들어있습니다 \n결제번호: "+mchtTrdNo, "makeDeliverRoom");
+            }
+            ordersAndPayment.add(paymentService.getPaymentAndOrdersUseDeliver(mchtTrdNo, storeId));
         }
         if(ordersAndPayment.isEmpty()){
             throw utillService.makeRuntimeEX("내역이 존재하지 않습니다", "makeDeliverRoom");
         }
-        for(Map<String,Object>orderAndPayment:ordersAndPayment){
-            if(orderAndPayment.get("cancle_all_flag").equals("1")){
-                throw utillService.makeRuntimeEX("전액 환불된 배달이 있습니다 \n결제번호:"+orderAndPayment.get("order_mcht_trd_no"), "makeDeliverRoom");
+        System.out.println(ordersAndPayment.size());
+        deliveryRoomVo deliveryRoomVo=new deliveryRoomVo();
+        deliveryRoomVo.setCompanyId(utillService.getLoginId());
+        deliveryRoomVo.setDeliverRoomFlag(0);
+        deliveryRoomVo.setStoreId(storeId);
+        deliveryRoomDao.save(deliveryRoomVo);
+        for(List<Map<String,Object>> ordersAndPayments:ordersAndPayment){
+            for(Map<String,Object>orderAndPayment:ordersAndPayments){
+                if(orderAndPayment.get("cancle_all_flag").equals("1")){
+                    throw utillService.makeRuntimeEX("전액 환불된 배달이 있습니다 \n결제번호:"+orderAndPayment.get("order_mcht_trd_no"), "makeDeliverRoom");
+                }
+                System.out.println(orderAndPayment.get("order_mcht_trd_no".toString()));
+                deliverRoomDetailVo deliverRoomDetailVo=new deliverRoomDetailVo();
+                deliverRoomDetailVo.setAddress(orderAndPayment.get("payment_postcode")+"/"+orderAndPayment.get("payment_address")+"/"+orderAndPayment.get("payment_detail_address"));
+                deliverRoomDetailVo.setMchtTrdNo(orderAndPayment.get("order_mcht_trd_no").toString());
+                deliverRoomDetailVo.setUserId(Integer.parseInt(orderAndPayment.get("user_id").toString()));
+                deliverRoomDetailVo.setDoneFlag(0);
+                deliverRoomDetailVo.setRoomId(deliveryRoomVo.getRoomId());
+                deliverRoomDetailDao.save(deliverRoomDetailVo);
             }
-            
         }
+        return utillService.getJson(true, "배달방이 만들어 졌습니다");
     }
     public JSONObject getDeliverAddress(int roomId) {
         return utillService.getJson(true, deliverRoomDetailDao.findAddressByRoomId(roomId));
