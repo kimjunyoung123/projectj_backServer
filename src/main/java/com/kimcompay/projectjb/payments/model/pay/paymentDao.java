@@ -40,4 +40,8 @@ public interface paymentDao extends JpaRepository<paymentVo,Integer> {
     @Transactional
     @Query(value = "update payments set cncl_ord=?,payment_total_price=?,cancle_all_flag=? where mcht_trd_no=?",nativeQuery = true)
     void updatePriceAndCancleTimeZero(int cancleTime,int totalPrice,int one,String mchtTrdNo);
+
+    @Query(value = "select a.payment_address,a.payment_detail_address,a.payment_postcode,a.cancle_all_flag,b.*"
+    +" from payments a inner join orders b on a.mcht_trd_no=b.order_mcht_trd_no and b.store_id=? where a.mcht_trd_no=?",nativeQuery = true)
+    List<Map<String,Object>>findByMchtTrdNoAndStoreIdJoinOrders(int storeId,String mchtTrdNo);
 }

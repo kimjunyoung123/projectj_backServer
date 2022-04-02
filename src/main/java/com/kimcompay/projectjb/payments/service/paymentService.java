@@ -61,6 +61,9 @@ public class paymentService {
     @Autowired
     private orderService orderService;
 
+    public List<Map<String,Object>> getPaymentAndOrdersUseDeliver(String mchtTrdNo,int storeId) {
+        return paymentDao.findByMchtTrdNoAndStoreIdJoinOrders(storeId, mchtTrdNo);
+    }
     @Transactional(rollbackFor = Exception.class)
     public JSONObject cancleByStore(int orderId,int storeId) {
         Map<String,Object>orderAndPayments=new HashMap<>();
