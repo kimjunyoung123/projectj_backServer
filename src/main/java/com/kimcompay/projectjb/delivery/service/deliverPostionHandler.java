@@ -37,6 +37,7 @@ public class deliverPostionHandler extends TextWebSocketHandler {
       JSONObject xAndYAndRoom=utillService.stringToJson(message.getPayload());
       utillService.writeLog(xAndYAndRoom.toString(), deliverPostionHandler.class);
       //배달종료 메시지가 있다면 store만 해당됨
+      System.out.println(xAndYAndRoom.containsKey("state"));
       if(xAndYAndRoom.containsKey("state")){
          closeAction(session, xAndYAndRoom);
          return;
@@ -98,44 +99,52 @@ public class deliverPostionHandler extends TextWebSocketHandler {
       }   
    }
    public void closeAtStore(JSONObject xAndYRoom) {
+      System.out.println("closeAtStore");
       //배달은 계속 되야하니 예외 잡아줌 안끊기게
       try {
          int roomId=Integer.parseInt(xAndYRoom.get("roomid").toString());
          int userId=Integer.parseInt(xAndYRoom.get("userid").toString());
          List<Map<String,Object>>room=roomList.get(roomId);
          int num=0;
+         System.out.println(userId);
          try {
             for(Map<String,Object>roomDetail:room){
-               if(roomDetail.get("userId").equals(Integer.toString(userId))){
+               if(Integer.parseInt(roomDetail.get("userId").toString())==userId){
+                  System.out.println((roomDetail.get("userId").toString()));
                   break;
                }
                num+=1;
             }
             room.remove(num);
+            roomList.replace(roomId, room);
          } catch (NullPointerException e) {
+            e.printStackTrace();
             //배달 완료전까지 손님이 방에 안들어 왔을 수도 있으므로 무시
          }
          String mchtTrdNo=xAndYRoom.get("mchtTrdNo").toString();
          String state=xAndYRoom.get("state").toString();
          int storeId=Integer.parseInt(xAndYRoom.get("storeid").toString());
          deliveryService.changeStateDetail(storeId, userId, mchtTrdNo, state,roomId); 
-
       } catch (Exception e) {
          //TODO: handle exception
       }
       
    }
    public void closeAtUser(int roomId,int userId) {
+      System.out.println("closeAtUser");
       //배달방에서 나가기
       List<Map<String,Object>>room=roomList.get(roomId);
       int num=0;
       for(Map<String,Object>roomDetail:room){
-         if(roomDetail.get("userId").equals(Integer.toString(userId))){
+         if(Integer.parseInt(roomDetail.get("userId").toString())==userId){
+            System.out.println((roomDetail.get("userId").toString()));
             break;
          }
          num+=1;
       }
+      System.out.println(num);
       room.remove(num);
+      roomList.replace(roomId, room);
    }
    public void actionAtStore(int storeId,int roomId) {
        //배달방이 있나검사
