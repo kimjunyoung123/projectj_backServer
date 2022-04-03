@@ -33,6 +33,9 @@ public class deliveryService {
     @Autowired
     private paymentService paymentService;
     
+    public int countRoomByRoomId(int storeId,int roomId) {
+        return deliveryRoomDao.countByStoreIdAndRoomId(storeId, roomId);
+    }
     @Transactional(rollbackFor = Exception.class)
     public JSONObject makeDeliverRoom(tryInsertDto tryInsertDto,int storeId) {
         List<List<Map<String,Object>>>ordersAndPayment=new ArrayList<>();

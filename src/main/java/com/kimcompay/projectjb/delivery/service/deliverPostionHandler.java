@@ -64,11 +64,9 @@ public class deliverPostionHandler extends TextWebSocketHandler {
       int id=Integer.parseInt(infor.get("id").toString());
       //권한에 따라 
       if(role.equals(senums.company_role.get())){
-         try {
-         } catch (NullPointerException e) {
-            //주문 요청이 한건도 없다면 예외발생
-            throw utillService.makeRuntimeEX("상점: "+id+" 배달목록 존재하지 않음", "afterConnectionEstablished");
-         }
+         //해당 배달방이 존재하는지+해당 매장것이 맞는지 검사
+         Map<String,Object>params=utillService.getQueryMap(session.getUri().getQuery());
+         actionAtStore(Integer.parseInt(params.get("storeid").toString()), Integer.parseInt(params.get("roomid").toString()));
       }else if(role.equals(senums.user_role.get())){
          actionAtUser(session, id);
       }   
@@ -83,6 +81,9 @@ public class deliverPostionHandler extends TextWebSocketHandler {
       //회사가 배달완료를 누르면 =배열전체삭제
       //roomList.get(1).clear();//예제코드
       //유저가 퇴장하면 현재 가지고있던 배열에서 자기 제거 내일 구현해보자
+   }
+   public void actionAtStore(int storeId,int roomId) {
+      deliveryService.countRoomByRoomId(storeId, roomId);
    }
    public void actionAtUser(WebSocketSession session,int id) {
       //int roomId=0;//상점에서준 방번호 꺼내기 로직 추가해야함

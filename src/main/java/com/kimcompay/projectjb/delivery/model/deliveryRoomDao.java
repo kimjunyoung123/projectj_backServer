@@ -19,4 +19,5 @@ public interface deliveryRoomDao extends JpaRepository<deliveryRoomVo,Integer> {
     @Query(value = "select *,(select count(*) from delivery_rooms where store_id=?)totalCount from delivery_rooms where store_id=? order by room_id desc limit ?,?",nativeQuery = true)
     List<Map<String,Object>>findByAll(int store_id,int sameStore_id,int start,int pageSize);
 
+    int countByStoreIdAndRoomId(int storeId,int roomId);
 }
