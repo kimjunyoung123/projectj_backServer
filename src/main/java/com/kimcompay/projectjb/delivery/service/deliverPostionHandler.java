@@ -37,7 +37,6 @@ public class deliverPostionHandler extends TextWebSocketHandler {
       JSONObject xAndYAndRoom=utillService.stringToJson(message.getPayload());
       utillService.writeLog(xAndYAndRoom.toString(), deliverPostionHandler.class);
       //배달종료 메시지가 있다면 store만 해당됨
-      System.out.println(xAndYAndRoom.containsKey("state"));
       if(xAndYAndRoom.containsKey("state")){
          closeAction(session, xAndYAndRoom);
          return;
