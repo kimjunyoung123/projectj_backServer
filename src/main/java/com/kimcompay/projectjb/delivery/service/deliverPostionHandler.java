@@ -81,9 +81,63 @@ public class deliverPostionHandler extends TextWebSocketHandler {
       //회사가 배달완료를 누르면 =배열전체삭제
       //roomList.get(1).clear();//예제코드
       //유저가 퇴장하면 현재 가지고있던 배열에서 자기 제거 내일 구현해보자
+      Map<Object,Object>infor=getLoginInfor(session);
+      String role=infor.get("role").toString();
+      //권한에 따라 
+      Map<String,Object>params=utillService.getQueryMap(session.getUri().getQuery());
+      if(role.equals(senums.company_role.get())){
+         //해당 배달방이 존재하는지+해당 매장것이 맞는지 검사
+         System.out.println(params.toString());
+         closeAtStore(Integer.parseInt(params.get("storeid").toString()), Integer.parseInt(params.get("roomid").toString()));
+      }else if(role.equals(senums.user_role.get())){
+         closeAtUser(Integer.parseInt(params.get("roomid").toString()));
+      }   
+   }
+   public void closeAtStore(int storeId,int roomId) {
+      //배달방 없애기
+      roomList.remove(roomId);
+   }
+   public void closeAtUser(int roomId) {
+      //배달방에서 나가기
+      
    }
    public void actionAtStore(int storeId,int roomId) {
-      deliveryService.countRoomByRoomId(storeId, roomId);
+       //배달방이 있나검사
+       if(deliveryService.countRoomByRoomId(storeId, roomId)<=0){
+         throw utillService.makeRuntimeEX("배달방을 만들지 않았습니다", "actionAtStore");
+      }
+      List<Map<String,Object>>room=new ArrayList<>();
+      //이미 웹소켓이 연결되어있는지 검사
+      try {
+         room=roomList.get(roomId);
+         int size=room.size();
+         if(size==0){
+            throw new NullPointerException("방에 손님도 방장도 없음");
+         }
+         int num=0;
+         for(Map<String,Object>roomDetail:room){
+            num+=1;
+            if(roomDetail.containsKey("storeId")){
+               throw new IllegalArgumentException();
+            }
+            if(num==size){
+               throw new NullPointerException("방에 방장이 없음");
+            }
+         }
+      } catch(IllegalArgumentException e2){
+         utillService.writeLog("이미 웹소켓이 연결되어있습니다", deliverPostionHandler.class);
+         
+      }catch (NullPointerException e) {
+         utillService.writeLog("배달방 만들기", deliverPostionHandler.class);
+         //방만들기
+         Map<String,Object>store=new HashMap<>();
+         store.put("storeId", storeId);
+         if(room==null){
+            room=new ArrayList<>();
+         }
+         room.add(store);
+         roomList.put(roomId, room);
+      }
    }
    public void actionAtUser(WebSocketSession session,int id) {
       //int roomId=0;//상점에서준 방번호 꺼내기 로직 추가해야함

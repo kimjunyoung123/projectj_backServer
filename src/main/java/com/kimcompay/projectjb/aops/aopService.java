@@ -62,8 +62,7 @@ public class aopService {
     +"||execution(* com.kimcompay.projectjb.board.service.*.*(..))"
     +"||execution(* com.kimcompay.projectjb.apis.google.ocrService.*(..))"
     +"||execution(* com.kimcompay.projectjb.payments.service.*.*(..))"
-    +"||execution(* com.kimcompay.projectjb.apis.settle.*.*(..))"
-    +"||execution(* com.kimcompay.projectjb.delivery.service.*.*(..))")
+    +"||execution(* com.kimcompay.projectjb.apis.settle.*.*(..))")
     public void writeLog(JoinPoint joinPoint) throws Throwable {
         logger.info("writeLog");
         MethodSignature signature = (MethodSignature)joinPoint.getSignature();
