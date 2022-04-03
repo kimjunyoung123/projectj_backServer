@@ -29,16 +29,19 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 public class deliverPostionHandler extends TextWebSocketHandler {
     Map<Integer, List<Map<String,Object>>> roomList =new HashMap<>(); //웹소켓 세션을 담아둘 리스트 ---roomListSessions
    @Autowired
-   private storeService storeService;
-   @Autowired
    private deliveryService deliveryService;
 
 
     @Override//메세지가오는함수
     public void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
       JSONObject xAndYAndRoom=utillService.stringToJson(message.getPayload());
+      utillService.writeLog(xAndYAndRoom.toString(), deliverPostionHandler.class);
+      //배달종료 메시지가 있다면 store만 해당됨
+      if(xAndYAndRoom.containsKey("state")){
+         closeAction(session, xAndYAndRoom);
+         return;
+      }
       int roomId=Integer.parseInt(xAndYAndRoom.get("roomId").toString());
-      System.out.println(xAndYAndRoom);
       //배달방번호 조회 검증 로직 추가해야함
       try {
             for(Map<String,Object>room:roomList.get(roomId)){
@@ -55,6 +58,13 @@ public class deliverPostionHandler extends TextWebSocketHandler {
          utillService.writeLog("만들어진 방이 없습니다",deliverPostionHandler.class);
       }
       
+   }
+   public void closeAction(WebSocketSession session,JSONObject xAndYRoom) {
+      Map<Object,Object>infor=getLoginInfor(session);
+      String role=infor.get("role").toString();
+      if(role.equals(senums.company_role.get())){
+         closeAtStore(xAndYRoom);
+      }
    }
    @Override//연결이되면 자동으로 작동하는함수
    public void afterConnectionEstablished(WebSocketSession session) throws Exception {
@@ -78,28 +88,46 @@ public class deliverPostionHandler extends TextWebSocketHandler {
    }
    @Override //연결이끊기면 자동으로 작동하는함수
    public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
-      //회사가 배달완료를 누르면 =배열전체삭제
-      //roomList.get(1).clear();//예제코드
-      //유저가 퇴장하면 현재 가지고있던 배열에서 자기 제거 내일 구현해보자
+      //유저는 페이지 나가는순간 끝남
       Map<Object,Object>infor=getLoginInfor(session);
       String role=infor.get("role").toString();
       //권한에 따라 
       Map<String,Object>params=utillService.getQueryMap(session.getUri().getQuery());
-      if(role.equals(senums.company_role.get())){
-         //해당 배달방이 존재하는지+해당 매장것이 맞는지 검사
-         System.out.println(params.toString());
-         closeAtStore(Integer.parseInt(params.get("storeid").toString()), Integer.parseInt(params.get("roomid").toString()));
-      }else if(role.equals(senums.user_role.get())){
+      if(role.equals(senums.user_role.get())){
          closeAtUser(Integer.parseInt(params.get("roomid").toString()));
       }   
    }
-   public void closeAtStore(int storeId,int roomId) {
-      //배달방 없애기
-      roomList.remove(roomId);
+   public void closeAtStore(JSONObject xAndYRoom) {
+      //배달은 계속 되야하니 예외 잡아줌 안끊기게
+      try {
+         int roomId=Integer.parseInt(xAndYRoom.get("roomid").toString());
+         int userId=Integer.parseInt(xAndYRoom.get("userid").toString());
+         List<Map<String,Object>>room=roomList.get(roomId);
+         int num=0;
+         try {
+            for(Map<String,Object>roomDetail:room){
+               if(roomDetail.get("userId").equals(Integer.toString(userId))){
+                  break;
+               }
+               num+=1;
+            }
+            room.remove(num);
+         } catch (NullPointerException e) {
+            //배달 완료전까지 손님이 방에 안들어 왔을 수도 있으므로 무시
+         }
+         String mchtTrdNo=xAndYRoom.get("mchtTrdNo").toString();
+         String state=xAndYRoom.get("state").toString();
+         int storeId=Integer.parseInt(xAndYRoom.get("storeid").toString());
+         deliveryService.changeStateDetail(storeId, userId, mchtTrdNo, state,roomId); 
+
+      } catch (Exception e) {
+         //TODO: handle exception
+      }
+      
    }
    public void closeAtUser(int roomId) {
       //배달방에서 나가기
-      
+
    }
    public void actionAtStore(int storeId,int roomId) {
        //배달방이 있나검사

@@ -53,7 +53,10 @@ public enum senums {
     paymentText("payment"),
     cardText("card"),
     kpayText("kpay"),
-    vbankText("vbank");
+    vbankText("vbank"),
+    doneDeliver("1"),
+    cancleDeliver("5");
+
     
     private String s;
     senums(String s){

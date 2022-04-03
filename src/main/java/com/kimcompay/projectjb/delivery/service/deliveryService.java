@@ -13,6 +13,7 @@ import com.kimcompay.projectjb.delivery.model.deliverRoomDetailVo;
 import com.kimcompay.projectjb.delivery.model.deliveryRoomDao;
 import com.kimcompay.projectjb.delivery.model.deliveryRoomVo;
 import com.kimcompay.projectjb.delivery.model.tryInsertDto;
+import com.kimcompay.projectjb.enums.senums;
 import com.kimcompay.projectjb.payments.service.orderService;
 import com.kimcompay.projectjb.payments.service.paymentService;
 
@@ -33,6 +34,14 @@ public class deliveryService {
     @Autowired
     private paymentService paymentService;
     
+    @Transactional
+    public void changeStateDetail(int storeId,int userId,String mchtTrdNo,String state,int roomId) {
+        int flag=Integer.parseInt(senums.valueOf(state).get());
+        deliverRoomDetailVo deliverRoomDetailVo=deliverRoomDetailDao.findDeliverByOther(roomId, storeId, mchtTrdNo, userId).orElseGet(()->null);
+        if(deliverRoomDetailVo!=null){
+            deliverRoomDetailVo.setDoneFlag(flag);
+        }
+    }
     public int countRoomByRoomId(int storeId,int roomId) {
         return deliveryRoomDao.countByStoreIdAndRoomId(storeId, roomId);
     }
