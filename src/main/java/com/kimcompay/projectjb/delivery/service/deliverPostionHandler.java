@@ -94,7 +94,7 @@ public class deliverPostionHandler extends TextWebSocketHandler {
       //권한에 따라 
       Map<String,Object>params=utillService.getQueryMap(session.getUri().getQuery());
       if(role.equals(senums.user_role.get())){
-         closeAtUser(Integer.parseInt(params.get("roomid").toString()));
+         closeAtUser(Integer.parseInt(params.get("roomid").toString()),Integer.parseInt(infor.get("id").toString()));
       }   
    }
    public void closeAtStore(JSONObject xAndYRoom) {
@@ -125,9 +125,17 @@ public class deliverPostionHandler extends TextWebSocketHandler {
       }
       
    }
-   public void closeAtUser(int roomId) {
+   public void closeAtUser(int roomId,int userId) {
       //배달방에서 나가기
-
+      List<Map<String,Object>>room=roomList.get(roomId);
+      int num=0;
+      for(Map<String,Object>roomDetail:room){
+         if(roomDetail.get("userId").equals(Integer.toString(userId))){
+            break;
+         }
+         num+=1;
+      }
+      room.remove(num);
    }
    public void actionAtStore(int storeId,int roomId) {
        //배달방이 있나검사
